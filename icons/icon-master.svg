@@ -1,0 +1,24 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="12" y1="8" x2="116" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2E63FF"/>
+      <stop offset="1" stop-color="#0A1FB8"/>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="128" height="128" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#06105C" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <rect x="8" y="8" width="112" height="112" rx="24" fill="url(#bg)"/>
+    <text
+      x="64"
+      y="77"
+      text-anchor="middle"
+      fill="white"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="48"
+      font-weight="700"
+      letter-spacing="-3"
+    >TS</text>
+  </g>
+</svg>
