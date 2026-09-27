@@ -1,180 +1,179 @@
-# TabSidecar Landing Page — Design & UX Decisions
+# tabsidecar.com: design and UX decisions
 
-Reference doc for `tabsidecar/index.html`. Captures the *why* behind the
-design system, layout, and copy so future edits stay consistent.
-
----
-
-## Product positioning
-
-TabSidecar is a **tab + window manager** for Chrome, not just a tab cleaner.
-Cleanup (Auto-Park) is one of several jobs — equal billing goes to the unified
-tab list, window management, and session recovery.
-
-- **Hero headline:** "Your tabs and windows, in one place." — deliberately names
-  *both* tabs and windows so the page doesn't read as a OneTab clone.
-- **Hero lead** names all four jobs in order: searchable tab list → save & name
-  windows → restart recovery → cleanup. No em dashes (house style — see Voice).
-- **"Replaces" chips** (OneTab, Toby, Session Buddy, The Great Suspender) anchor
-  the category. Toby is intentionally included because it's the workspace-manager
-  competitor, not just a cleanup tool.
-- Status is **beta, built by one solo developer**. The page is honest about this
-  rather than hiding it.
+Reference for the pages in this repo. Captures the *why* behind the design,
+layout and copy so future edits stay consistent. Last rewritten September 27,
+2026, when the site moved to the Windows design.
 
 ---
 
-## Design system
+## Where the pages come from
 
-### Color (CSS vars in `:root`)
-Warm off-white paper, near-black warm ink, four accent hues used to color-code
-the four feature areas. Avoid inventing new colors — use these.
+Don't edit the HTML here by hand. The pages are built from prototypes in the
+extension repo:
 
-| Token | Hex | Use |
-|---|---|---|
-| `--bg` | `#fbfbfa` | Page background (warm white) |
-| `--ink` | `#2c2a26` | Primary text (warm near-black) |
-| `--ink-2` | `#5f5b53` | Body / secondary text |
-| `--ink-3` | `#8d887e` | Muted captions, metadata |
-| `--line` / `--line-2` | `#e9e7e2` / `#f0eeea` | Borders, hairline dividers |
-| `--accent` | `#3a63d6` (blue) | Primary actions, Smart Organizer |
-| `--green` | `#2e9460` | Auto-Park |
-| `--orange` | `#cf7a2c` | Session Recovery + the "Locked" pill |
-| `--purple` | `#7a52cf` | Window Management |
-| `--mark` | `#fbe6a4` | Highlight (currently unused — see note) |
+| Live file | Prototype (TabSentry/website/prototypes/) |
+|---|---|
+| `index.html` | `home-windows.html` |
+| `privacy.html` | `privacy.html` |
+| `reset-password.html` | `reset-password.html` |
+| `email-confirmed.html` | `email-confirmed.html` |
+| `assets/*` | `shared/*` |
 
-**Each feature area owns one accent.** The eyebrow, bullet dots, and demo
-accents all use that hue. Keep this mapping when editing.
+Edit the prototype, preview it with `python website/serve.py` (no-cache server
+on port 8765), then from the TabSentry repo run
+
+    python website/build_site.py ../tabsidecar-website
+
+and commit and push here. The build strips everything between proto markers
+(`<!-- proto -->…<!-- /proto -->`, `/* proto */…/* /proto */`): the prototype
+switcher bar, review notes, state previews and fake-success shortcuts. It
+stamps asset URLs with a build version and fails if anything prototype-only is
+left. Never write the literal marker text inside a comment; the build will
+strip from there.
+
+`icons/` stays here and isn't built: the favicons and the account emails load
+`icons/icon48.png` from the live site.
+
+---
+
+## The idea: the page is a window list
+
+The site looks like the product. Every section of the home page is a **window
+card**, drawn the way the popup draws a window with the Tint style: a 4% wash
+of the window color, a tinted border, a 4px color stripe on the left, and a
+header with a caret, color dot, title and meta. Sections collapse like windows,
+and each ⋮ menu jumps to any other section. Product pictures are live HTML
+mockups built from the popup's own styles (`assets/mock.css`), not
+screenshots, so they stay sharp and the big one is clickable.
+
+### Color
+One white background, no color bands. Color only appears where it means
+something:
+
+- **Window colors** name the sections, like window colors in the popup:
+  popup blue `#3b82f6`, Auto-Park amber `#f59e0b`, Saved Windows sky
+  `#0ea5e9`, Cloud Sync pink `#ec4899`, Organize violet `#8b5cf6`, And the rest
+  indigo `#6366f1`. The FAQ is neutral, like the All tabs group.
+- **Anchor teal** `#009688` belongs to recovery and anchored windows only
+  (Session restore). Don't use it for anything else.
+- **One blue button** per view for the main action (`--brand #3b82f6`).
+- Status banners use the popup's banner colors: green done, amber needs you,
+  red failed.
+
+The tokens are the popup's, in `assets/mock.css` (`--text #17181c`,
+`--muted #70737c`, `--border #e6e7eb`, `--app #f6f7f9` and so on). Don't add
+new colors.
 
 ### Type
-- **Hanken Grotesk** (400/500/600/700) via Google Fonts. Grotesk, not a
-  generic Inter/Roboto default.
-- Fluid headings with `clamp()`; tight negative letter-spacing on h1/h2.
-- Body 17px, line-height 1.6.
+System fonts, the same as the extension: Segoe UI Variable (Display for
+headings) with the usual `-apple-system`/Roboto fallbacks. No web fonts.
 
-### Layout
-- Single narrow column, `max-width: 880px`, centered. This is a focused
-  marketing page, not a wide dashboard.
-- Sections separated by hairline top borders + generous 80px vertical padding.
-- Sticky blurred nav.
-- Responsive: feature grids collapse to one column at ≤720px; secondary nav
-  links hide on mobile.
+### Controls are popup-sized
+Buttons, fields and menus match the popup's density, not typical marketing
+sizes. On account pages: 32px buttons (7px corners, 13.5px text), 38px
+password fields, 30px menu items. "Fat" 42px+ buttons go against the design.
+The one exception is the hero and closing "Add to Chrome" calls to action.
 
 ---
 
-## Page structure (in order)
+## Home page (`index.html`)
 
-1. **Hero** — tag, headline, lead, two CTAs, "Replaces" chips, static popup mock.
-2. **Features** — four alternating (`.rev`) feature blocks, each with a small
-   **animated demo** that plays when scrolled into view and settles to a static
-   state under `prefers-reduced-motion`:
-   1. **Session Recovery** (orange) — windows restore after a crash/restart.
-   2. **Auto-Park** (green) — idle tabs close into a searchable list.
-   3. **Window Management** (purple) — title / lock / save a window.
-   4. **Smart Organizer** (blue) — rule-based tab routing into windows.
-3. **The first week** — timeline of how it gets more useful over days.
-4. **How it works** — 3 install steps.
-5. **Building in the open** — honest beta note (currently commented out, see below).
-6. **FAQ**.
-7. **Pricing** — Free now / Pro later.
-8. **Footer**.
+Order, top to bottom:
 
----
+1. **Hero:** "Free for Chrome and Edge" pill, *Close tabs without losing
+   them.*, one lead sentence, Add to Chrome.
+2. **TabSidecar** (blue, "Current"): the clickable popup mockup.
+3. **Auto-Park** (amber): the headline feature, with its animated demo.
+4. **Session restore** (teal, "Anchored").
+5. **Saved Windows** (sky): got its own section instead of a tile. A strong
+   reason to install on its own.
+6. **Cloud Sync** (pink): sign in, snapshot every hour, sign in on a new
+   machine or profile and import. Its checklist lists only what a snapshot
+   really contains (closed windows yes, single closed tabs no).
+7. **Organize** (violet): *Five ways to keep your windows tidy.* Name and
+   color windows, anchor, rules, labels, nicknames and notes.
+8. **And the rest** (indigo): eight small-feature tiles.
+9. **Questions** (neutral FAQ), then a closing call to action.
 
-## Feature-order & layout decisions
+Removed on purpose: a Search section (folded into a tile; the hero already
+promises search) and a "Make it yours" theme picker (on phones the options
+pushed the popup out of view, so you couldn't see what they changed; it's a
+tile now).
 
-- Feature order was changed to put **Window Management third** and **Smart
-  Organizer last**. Rationale: window management is a core differentiator and
-  belongs with the other window features (Recovery, Auto-Park); Smart Organizer
-  is the most advanced/optional, so it closes the section.
-- The `.rev` class alternates the text/demo sides down the column. **When you
-  reorder feature blocks, re-check the `.rev` classes** so the left/right
-  alternation stays clean. Current pattern: orange (normal) → green (rev) →
-  purple (normal) → blue (rev).
-
-### Window Management — bullet decisions
-- Capability list was trimmed from five bullets to **three** for focus:
-  **Title**, **Lock**, **Save**. These map 1:1 to the demo's Title→Lock→Save
-  animation chips, keeping copy and motion in sync.
-- Cut: *"See every open window in a single list"* (table stakes — the demo
-  already shows the list) and *"Anchor a window…"* (overlaps conceptually with
-  Lock; demoted to the intro line rather than a headline bullet).
-- **Anchor** still lives in the intro sentence ("title, lock, anchor, or save")
-  and in the Pro plan, just not as an equal-weight bullet.
-- **Lock** is framed against Auto-Park ("never auto-parked") — it's only
-  meaningful *because* this product also has Auto-Park. That interdependence is
-  the selling point.
-
-### Session Recovery — bullet decision
-- Third bullet was *"Mark one window as an anchor so it always returns,"* which
-  collided with the new Anchor feature in Window Management. Replaced with
-  **"Works even when Chrome's own restore doesn't"** — leans on the real
-  competitive edge (Chrome's built-in session restore is unreliable).
+### Layout rules
+- **Two columns only when both sides are about the same height** (Session
+  restore, Saved Windows). When one side is much taller, **stack**: heading and
+  intro on top (max 640px wide), content full width below (Auto-Park,
+  Organize, Cloud Sync). Don't leave a short column next to empty space.
+- **Tiles** (Organize, And the rest): icon in a small box on top, bold title,
+  one line of copy. Equal columns (3 or 4 wide, 2 on tablets, 1 on phones). A
+  short last row stays left-aligned; never stretch items to fill it. Pick
+  counts that fill rows (And the rest is 8 in 4 columns).
+- **Examples are tiny.** Organize shows small inline chips (window names,
+  label pills, `github.com → Work`) instead of full menus or popup
+  screenshots, which ate phone screens.
+- **Phones:** check 375px and 320px. Mock rows drop secondary text before
+  anything overflows; the top nav hides below 900px; nothing may scroll
+  sideways.
 
 ---
 
-## Animated demos
+## Legal page (`privacy.html`)
 
-Each feature has a JS-driven demo (`data-demo="..."`) wired up in `init()`:
-`recover`, `park`, `windows`, `sort`, plus the hero tab strip.
+Read as a document, not a window list:
 
-- Demos start on scroll-into-view (`onView`) and **loop**.
-- All respect `prefers-reduced-motion`: when reduced, they render a final
-  settled state instead of animating.
-- **Window Management demo** cycles Title → Lock → Save: the active window's
-  title types out to "Research", then Lock and Save chips highlight in sequence,
-  dropping "Locked" (orange) and "Saved" (purple) pills onto the card, with a
-  one-line hint explaining each step.
-  - Note: the demo does **not** include an Anchor step (Anchor was demoted from
-    the bullet list). If Anchor is ever promoted back to a headline feature, add
-    a matching step here.
-
----
-
-## Voice & copy guidelines
-
-The reviewer's stated preference: **plain, grounded, un-corny.** Avoid
-slogan-style or "AI-coded" lines (e.g. "No hype. Just a tool that respects your
-tabs." was explicitly rejected).
-
-- Honest about being beta and solo-built; never overclaim.
-- **No em dashes** in headline/lead copy (house style).
-- Don't name what's missing (an earlier line about "no testimonials yet" was cut
-  — don't advertise the gap).
-- Lead with the promise/guarantee, not the disclaimer.
+- **At a glance** is the only window (blue): five summary rows that only
+  restate the policy.
+- A numbered **In this policy** contents list, then plain sections with
+  headings and flowing text.
+- **Never collapse sections.** Collapsed text is hidden from find-in-page, so
+  someone searching for "delete" could find nothing, and a privacy policy must
+  never look like it hides something.
+- Facts go in simple panels (permission rows, "Sent to / What's sent" style
+  lists), not nested cards.
+- The policy text is the source of truth; change wording deliberately, and
+  keep it in step with the extension's code and the Supabase setup.
 
 ---
 
-## Pricing
+## Account pages (`reset-password.html`, `email-confirmed.html`)
 
-- **Free** plan = everything available today, free during beta.
-- **Pro** plan = "Coming soon" (disabled button, dashed border). Lists future AI
-  features plus **"Advanced window management"** (kept deliberately short — longer
-  phrasings like "grouping and rules" were rejected). The "Still working on it."
-  note was removed.
+Where the Cloud Sync emails land. One blue window card titled "TabSidecar
+account · Cloud Sync", so a page opened from an email link clearly belongs to
+TabSidecar. Popup-sized controls, requirements checked off as you type
+(8-character minimum, matching `MIN_PASSWORD_LENGTH` in the extension), and a
+state for every outcome: ready, working, failed, done, expired link, no link.
+Both pages drop the token from the address bar on load and sign out the
+account's other sessions after a password is set.
 
----
+## Account emails
 
-## Navbar
-- Links: Features · Pricing · **Privacy** · Add to Chrome (button).
-- Privacy points to `#` — **placeholder, no page built yet.**
-
----
-
-## Known placeholders / open items
-
-- **Privacy** nav link → `#` (no page yet).
-- **"Building in the open" section is commented out** in the HTML (the honest
-  beta note + three trust cards). Left as an HTML comment with a restore note —
-  uncomment to bring back. Reviewer felt it "didn't feel right" for now.
-- `--mark` highlight token exists but the hero `<mark>` was removed; currently
-  unused.
-- Product mock in the hero is a **static placeholder** (`popup.png · tabs grouped
-  by window`), not a real screenshot.
+Same look as the account pages: white page, one window card with the blue
+stripe, a popup-sized button, the code in a mono box. Tables and inline styles
+only, so Gmail and Outlook render them alike. Built by
+`TabSentry/supabase/email-templates/build.mjs`; paste each file into Supabase →
+Authentication → Emails. The dashboard copy is what gets sent. Sent today:
+Confirm sign up, Magic link (existing account) and Reset password. Change email
+address is archived and Reauthentication is unused, but both stay branded.
 
 ---
 
-## Export notes
-- Standalone/offline build: bundle to `TabSidecar.html` (fonts + assets inline).
-  Requires the `<template id="__bundler_thumbnail">` already in `<head>`.
-- Print/PDF: a separate `index.html` variant exists with print
-  styles and demos forced to their settled static state.
+## Voice and copy
+
+Plain, grounded, un-corny. Avoid slogan-style or "AI-coded" lines.
+
+- Honest; never overclaim. Every claim must match what the extension does
+  (check the code when unsure).
+- **No em dashes** in page copy.
+- Don't name what's missing.
+- Lead with the promise, not the disclaimer.
+- Short headings that say what happens: *Chrome restarts. Your windows come
+  back.* *New laptop. Same windows.*
+
+---
+
+## Open items
+
+- The FAQ says TabSidecar is free and that an account is only needed for Cloud
+  Sync. Revisit if Cloud Sync ever becomes paid or limited.
+- The wordmark uses the "TS" tile, not `icons/icon128.png`.
