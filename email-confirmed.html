@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Email Confirmed · TabSidecar</title>
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
+  <link rel="shortcut icon" href="icons/icon32.png">
+  <link rel="stylesheet" href="base.css">
+  <style>
+    .reset-main {
+      min-height: calc(100vh - 60px);
+      display: grid;
+      align-items: center;
+      padding: 54px 0;
+    }
+
+    .reset-card {
+      max-width: 460px;
+      margin: 0 auto;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .reset-card h1 {
+      font-size: 34px;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .reset-copy {
+      color: var(--ink-2);
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+
+
+
+
+    .reset-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .reset-status {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .reset-status.show {
+      display: block;
+    }
+
+    .reset-status.error {
+      background: #fff0f0;
+      color: #a83232;
+    }
+
+    .reset-status.success {
+      background: #edf8f2;
+      color: var(--green);
+    }
+
+    .reset-small {
+      margin: 14px 0 0;
+      color: var(--ink-3);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 560px) {
+      .reset-main {
+        align-items: start;
+        padding: 32px 0;
+      }
+
+      .reset-card {
+        padding: 22px;
+      }
+
+      .reset-card h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-in">
+      <a href="/" class="logo">
+        <img src="icons/icon32.png" class="logo-ic" alt="">
+        <span>TabSidecar</span>
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/privacy.html">Privacy</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="reset-main">
+    <div class="wrap">
+      <section class="reset-card" aria-labelledby="confirm-title">
+        <h1 id="confirm-title">Email confirmed</h1>
+        <p class="reset-copy" id="confirm-copy">Your TabSidecar account is ready. Open the extension, go to Account, and sign in with your email and password.</p>
+        <div class="reset-status" id="confirm-status" role="status" aria-live="polite"></div>
+        <p class="reset-small">You can close this tab.</p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Supabase appends the result to the URL hash. A successful link carries
+    // session tokens this page doesn't use, so drop them from the address bar
+    // and history right away.
+    const params = new URLSearchParams(window.location.hash.slice(1) || window.location.search.slice(1));
+    history.replaceState(null, document.title, window.location.pathname);
+
+    if (params.get('error') || params.get('error_code')) {
+      const expired = params.get('error_code') === 'otp_expired';
+      document.getElementById('confirm-title').textContent = expired ? 'This link has expired' : 'We couldn’t confirm your email';
+      document.getElementById('confirm-copy').textContent = expired
+        ? 'Confirmation links only work once and expire after an hour. Open the extension, go to Account, enter your email and password, and choose Resend confirmation email.'
+        : 'Open the extension, go to Account, enter your email and password, and choose Resend confirmation email.';
+      const status = document.getElementById('confirm-status');
+      const description = params.get('error_description');
+      if (description) {
+        status.textContent = description;
+        status.className = 'reset-status show error';
+      }
+    }
+  </script>
+</body>
+</html>
