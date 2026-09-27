@@ -1,0 +1,65 @@
+/*
+ * Window cards for pages drawn as a window list (home-windows.html,
+ * privacy.html, reset-password.html). Each section is a window card in its
+ * own window color, drawn the way the popup draws Tint (4% wash, tinted
+ * border, 4px stripe). .neutral is the All tabs group. windows.js wires the
+ * carets, the ⋮ "Jump to" menus and the collapse/expand-all buttons.
+ */
+.nav-links a { white-space: nowrap; }
+.list-bar { display: flex; align-items: center; gap: 8px; padding: 0 2px 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
+.list-bar .lb-title { font: 650 15px/1 var(--font); letter-spacing: -.01em; margin-right: 6px; }
+.list-bar .count { color: var(--faint); font-size: 13.5px; }
+.list-bar .sp { flex: 1; }
+.ibtn { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; color: var(--muted); background: none; border: 0; cursor: pointer; }
+.ibtn:hover { background: var(--surface-hover); color: var(--text); }
+.ibtn svg { width: 17px; height: 17px; }
+.swatch-row { display: flex; gap: 5px; align-items: center; }
+.swatch-row i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+
+.stack { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+.swin {
+  --wc: #8b5cf6;
+  position: relative; border-radius: 14px; overflow: clip; scroll-margin-top: 80px;
+  background: color-mix(in srgb, var(--wc) 4%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--wc) 18%, var(--border));
+  box-shadow: var(--shadow);
+}
+.swin::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--wc); }
+.swin.neutral { background: var(--surface); border-color: var(--border); }
+.swin.neutral::before { background: var(--border-strong); }
+.swin-head { display: flex; align-items: center; gap: 12px; height: 58px; padding: 0 14px 0 18px; }
+.swin-head .caret { width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center; color: var(--faint); background: none; border: 0; cursor: pointer; flex: none; }
+.swin-head .caret:hover { background: var(--surface-hover); color: var(--text); }
+.swin-head .caret svg { transition: transform .15s; }
+.swin.closed .swin-head .caret svg { transform: rotate(-90deg); }
+.swin-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--wc); flex: none; }
+.swin.neutral .swin-dot { background: var(--border-strong); }
+.swin-title { margin: 0; font: 600 16px/1.2 var(--font); letter-spacing: -.01em; white-space: nowrap; }
+.swin-meta { color: var(--faint); font-size: 14px; white-space: nowrap; }
+.swin-head .tagx { display: inline-flex; align-items: center; gap: 5px; height: 23px; padding: 0 9px; border-radius: 6px; font-size: 12.5px; font-weight: 500; white-space: nowrap; }
+.tagx.brand { color: var(--brand-strong); background: var(--brand-soft); }
+.tagx.anchor { color: #00796b; background: rgba(0, 150, 136, .1); }
+[data-theme="dark"] .tagx.anchor { color: #4db6ac; background: rgba(0, 150, 136, .2); }
+.tagx svg { width: 13px; height: 13px; }
+.swin-head .end { margin-left: auto; display: flex; align-items: center; gap: 6px; position: relative; }
+.swin-body { border-top: 1px solid color-mix(in srgb, var(--wc) 14%, var(--border)); padding: 40px 44px 44px; }
+.swin.neutral .swin-body { border-top-color: var(--border); }
+.swin.closed .swin-body { display: none; }
+.swin-head:has(.menu-wrap:hover), .swin-head:has(.menu-wrap:focus-within) { background: color-mix(in srgb, var(--wc) 8%, transparent); }
+@media (max-width: 700px) {
+  .swin-body { padding: 26px 18px 24px; }
+  .swin-meta, .swin-head .fav-row, .swin-head .end .meta { display: none; }
+}
+
+/* The ⋮ menu on each section header, same overlay style as the popup */
+.menu-wrap { position: relative; }
+.menu-wrap .pop-menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 10; min-width: 210px; padding: 4px; background: var(--menu-bg); border: 1px solid var(--menu-border); border-radius: 10px; box-shadow: var(--menu-shadow); display: none; }
+.menu-wrap:hover .pop-menu, .menu-wrap:focus-within .pop-menu { display: block; }
+.menu-wrap::after { content: ""; position: absolute; right: 0; top: 100%; width: 220px; height: 8px; }
+.pop-menu .hdr { font-size: 10.5px; font-weight: 600; color: var(--faint); text-transform: uppercase; letter-spacing: .06em; padding: 7px 10px 3px; }
+.pop-menu a { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 10px; border-radius: 6px; color: var(--text-2); font-size: 13px; text-decoration: none; }
+.pop-menu a:hover { background: var(--surface-hover); color: var(--text); }
+.pop-menu a i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.fav-row { display: flex; gap: 4px; }
+.fav-row span { width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; background: color-mix(in srgb, var(--wc) 14%, var(--surface)); color: color-mix(in srgb, var(--wc) 70%, var(--text)); }
+.fav-row svg { width: 12px; height: 12px; }

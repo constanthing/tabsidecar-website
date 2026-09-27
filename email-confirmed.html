@@ -1,246 +1,252 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-variant="confirmed" data-bg="white">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Email Confirmed · TabSidecar</title>
-  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
-  <link rel="shortcut icon" href="icons/icon32.png">
-  <link rel="stylesheet" href="base.css">
-  <style>
-    .reset-main {
-      min-height: calc(100vh - 60px);
-      display: grid;
-      align-items: center;
-      padding: 54px 0;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Email Confirmed · TabSidecar</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/mock.css?v=202609271803">
+<link rel="stylesheet" href="assets/site.css?v=202609271803">
+<link rel="stylesheet" href="assets/windows.css?v=202609271803">
+<script src="assets/site.js?v=202609271803"></script>
+<script src="assets/icons.js?v=202609271803" defer></script>
+<script src="assets/mock.js?v=202609271803" defer></script>
+<style>
+  /* Email confirmed: where the fallback link in the signup code email lands
+     (EMAIL_CONFIRM_REDIRECT_URL in background/cloud-auth.js). The email is
+     confirmed by the time the page opens; it asks for the account's first
+     password. Same card and controls as reset-password.html: one window
+     card (assets/windows.css) in the brand blue; controls are popup-sized
+     (32px buttons, 38px fields). The status line uses the popup's banner
+     colors (green done, amber needs you, red failed). Same Supabase calls
+     as the live tabsidecar.com/email-confirmed.html. */
+  main { min-height: calc(100vh - 64px); padding: 72px var(--gutter) 120px; }
+  .col { width: 100%; max-width: 440px; margin: 0 auto; }
+  .card .swin-body { padding: 24px 24px 22px; }
+  .card h1 { margin: 0 0 6px; font: 650 24px/1.2 var(--display); letter-spacing: -.02em; }
+  .card .copy { font-size: 14.5px; margin-bottom: 18px; }
 
-    .reset-card {
-      max-width: 460px;
-      margin: 0 auto;
-      padding: 28px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--card);
-      box-shadow: var(--shadow);
-    }
+  /* Popup-sized buttons, like Sync now and Restore */
+  .card .b { height: 32px; padding: 0 12px; gap: 6px; border-radius: 7px; font-size: 13.5px; box-shadow: none; }
+  .card .b svg { width: 15px; height: 15px; }
+  [hidden] { display: none !important; }
 
-    .reset-card h1 {
-      font-size: 34px;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-    }
+  .field { display: grid; gap: 6px; margin-bottom: 14px; }
+  .field label { font-size: 13px; font-weight: 600; color: var(--text-2); }
+  .pw { display: flex; align-items: center; height: 38px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 0 4px 0 11px; transition: border-color .12s, box-shadow .12s; }
+  .pw:focus-within { border-color: var(--brand-line); box-shadow: 0 0 0 3px var(--brand-soft); }
+  .pw.bad { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
+  .pw input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--text); font: 16px var(--font); }  /* 16px stops iOS zooming in */
+  .pw input:disabled { color: var(--faint); }
+  .pw .show { height: 28px; padding: 0 8px; border: 0; border-radius: 6px; background: none; color: var(--muted); font: 500 13px var(--font); cursor: pointer; }
+  .pw .show:hover { background: var(--surface-hover); color: var(--text); }
 
-    .reset-copy {
-      color: var(--ink-2);
-      font-size: 16px;
-      line-height: 1.5;
-      margin-bottom: 22px;
-    }
+  /* Requirements, checked off as you type */
+  .reqs { list-style: none; margin: 2px 0 18px; padding: 0; display: grid; gap: 6px; }
+  .reqs li { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--muted); }
+  .reqs .tick { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border-strong); display: grid; place-items: center; flex: none; transition: background .12s, border-color .12s; }
+  .reqs .tick svg { width: 10px; height: 10px; stroke-width: 3; color: #fff; opacity: 0; }
+  .reqs li.met { color: var(--text-2); }
+  .reqs li.met .tick { background: var(--ok); border-color: var(--ok); }
+  .reqs li.met .tick svg { opacity: 1; }
 
-    .reset-form {
-      display: grid;
-      gap: 12px;
-    }
+  /* Status line, in the popup's banner colors */
+  .status { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; border: 1px solid; font-size: 14px; line-height: 1.45; margin-bottom: 16px; }
+  .status svg { width: 17px; height: 17px; margin-top: 1px; }
+  .status.ok { background: var(--ok-soft); border-color: var(--ok-line); color: var(--text-2); }
+  .status.ok svg { color: var(--ok); }
+  .status.warn { background: var(--warn-soft); border-color: var(--warn-line); color: var(--text-2); }
+  .status.warn svg { color: var(--warn); }
+  .status.err { background: color-mix(in srgb, var(--danger) 7%, var(--surface)); border-color: color-mix(in srgb, var(--danger) 30%, transparent); color: var(--text-2); }
+  .status.err svg { color: var(--danger); }
 
-    .reset-form label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ink-2);
-    }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .b[disabled] { opacity: .6; pointer-events: none; }
+  .spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .45); border-top-color: #fff; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-    .reset-form input {
-      width: 100%;
-      min-height: 44px;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: #fff;
-      color: var(--ink);
-      font: inherit;
-      font-size: 16px;
-      outline: none;
-    }
+  .fine { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--border); color: var(--faint); font-size: 13.5px; line-height: 1.5; }
+  .path { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; color: var(--text-2); font-weight: 500; }
+  .path svg { width: 12px; height: 12px; color: var(--faint); }
 
-    .reset-form input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(58, 99, 214, 0.14);
-    }
+  /* Done and expired views */
+  .big-ico { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 14px; }
+  .big-ico svg { width: 20px; height: 20px; }
+  .big-ico.ok { background: var(--ok-soft); color: var(--ok); border: 1px solid var(--ok-line); }
+  .big-ico { background: var(--app); color: var(--muted); border: 1px solid var(--border); }
+  .done-chip { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; margin-bottom: 12px; border-radius: 6px; background: var(--ok-soft); color: var(--ok); border: 1px solid var(--ok-line); font-size: 12.5px; font-weight: 500; }
+  .done-chip svg { width: 13px; height: 13px; }
+  .big-ico.warn { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-line); }
+  .steps { border: 1px solid var(--border); border-radius: 10px; margin: 4px 0 20px; }
+  .steps .row { padding: 10px 12px; gap: 12px; }
+  .steps .n { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; flex: none; background: var(--app); border: 1px solid var(--border); font: 600 12.5px var(--font); color: var(--text-2); }
+  .steps .label { font-size: 14px; }
 
-    .reset-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 6px;
-      flex-wrap: wrap;
-    }
-
-    .reset-status {
-      display: none;
-      padding: 10px 12px;
-      border-radius: 9px;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .reset-status.show {
-      display: block;
-    }
-
-    .reset-status.error {
-      background: #fff0f0;
-      color: #a83232;
-    }
-
-    .reset-status.success {
-      background: #edf8f2;
-      color: var(--green);
-    }
-
-    .reset-small {
-      margin: 14px 0 0;
-      color: var(--ink-3);
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    @media (max-width: 560px) {
-      .reset-main {
-        align-items: start;
-        padding: 32px 0;
-      }
-
-      .reset-card {
-        padding: 22px;
-      }
-
-      .reset-card h1 {
-        font-size: 30px;
-      }
-    }
-    .reset-form[hidden] {
-      display: none;
-    }
-  </style>
+  @media (max-width: 520px) { main { padding-top: 32px; } .card .swin-body { padding: 20px 16px; } }
+</style>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
 </head>
 <body>
-  <nav>
-    <div class="wrap nav-in">
-      <a href="/" class="logo">
-        <img src="icons/icon32.png" class="logo-ic" alt="">
-        <span>TabSidecar</span>
-      </a>
-      <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/privacy.html">Privacy</a>
-      </div>
-    </div>
-  </nav>
 
-  <main class="reset-main">
-    <div class="wrap">
-      <section class="reset-card" aria-labelledby="confirm-title">
-        <h1 id="confirm-title">Email confirmed</h1>
-        <p class="reset-copy" id="confirm-copy">Choose a password for your TabSidecar account. You'll use it with your email to sign in from the extension.</p>
+<header class="site-nav lined"><div class="wrap">
+  <a class="wordmark" href="/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <nav class="nav-links" aria-label="Site"><a href="/">Home</a><a href="privacy.html">Privacy</a></nav>
+  <a class="b sm" href="mailto:support@tabsidecar.com">Help</a>
+</div></header>
 
-        <form class="reset-form" id="password-form" hidden>
-          <label for="new-password">Password (at least 8 characters)</label>
-          <input id="new-password" name="new-password" type="password" autocomplete="new-password" minlength="8" required>
+<main>
+  <div class="col">
 
-          <label for="confirm-password">Confirm password</label>
-          <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" minlength="8" required>
+    <section class="card swin" style="--wc:#3b82f6" aria-labelledby="confirm-title">
+      <header class="swin-head"><span class="swin-dot" style="margin-left:4px"></span><span class="swin-title">TabSidecar account</span><span class="swin-meta">Cloud Sync</span></header>
+      <div class="swin-body">
 
-          <div class="reset-status" id="confirm-status" role="status" aria-live="polite"></div>
-
-          <div class="reset-actions">
-            <button class="btn" type="submit" id="password-submit">Set Password</button>
-          </div>
+      <!-- Confirmed: choose a password -->
+      <div id="viewForm">
+        <span class="done-chip"><i data-icon="check"></i>Email confirmed</span>
+        <h1 id="confirm-title">Choose a password</h1>
+        <p class="copy">You’ll use it with <b id="emailOut">you@example.com</b> to sign in to Cloud Sync from the extension.</p>
+        <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+        <form id="password-form" novalidate>
+          <div class="field"><label for="new-password">Password</label>
+            <div class="pw"><input id="new-password" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-show="new-password">Show</button></div></div>
+          <div class="field"><label for="confirm-password">Confirm password</label>
+            <div class="pw" id="confirmBox"><input id="confirm-password" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-show="confirm-password">Show</button></div></div>
+          <ul class="reqs">
+            <li id="reqLen"><span class="tick"><i data-icon="check"></i></span>At least 8 characters</li>
+            <li id="reqMatch"><span class="tick"><i data-icon="check"></i></span>Both passwords match</li>
+          </ul>
+          <div class="actions"><button class="b primary" type="submit" id="password-submit">Set password</button></div>
         </form>
+        <p class="fine">Rather do it in the extension? Enter the code from the same email in <span class="path">TabSidecar<i data-icon="chev-r"></i>Account</span></p>
+      </div>
 
-        <p class="reset-small" id="confirm-small">The code in the same email works too: enter it in TabSidecar → Account.</p>
-      </section>
-    </div>
-  </main>
+      <!-- Password saved -->
+      <div id="viewDone" hidden>
+        <div class="big-ico ok"><i data-icon="check"></i></div>
+        <h1>You’re all set</h1>
+        <p class="copy">Your password is saved. Open TabSidecar, go to <span class="path">Account</span>, and sign in with your email and new password.</p>
+        <p class="copy" id="othersCopy">You can close this tab.</p>
+      </div>
 
-  <script>
-    const SUPABASE_URL = 'https://quqhdnkypnuxvmibnzhn.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2O_Jk16JhJLmK7bFtLHsNQ_ifUzkz1Z';
+      <!-- Expired or failed link -->
+      <div id="viewExpired" hidden>
+        <div class="big-ico warn"><i data-icon="clock"></i></div>
+        <h1 id="expiredTitle">This link has expired</h1>
+        <p class="copy">Links work once and expire after an hour. Get a new code from the extension:</p>
+        <div class="steps">
+          <div class="row"><span class="n">1</span><span class="txt"><span class="label">Open TabSidecar from the toolbar</span></span></div>
+          <div class="row"><span class="n">2</span><span class="txt"><span class="label">Go to <b>Account</b></span></span></div>
+          <div class="row"><span class="n">3</span><span class="txt"><span class="label">Choose <b>Resend code</b>, or enter your email and choose <b>Create Account</b> again</span></span></div>
+        </div>
+        <p class="fine" id="expiredDetail" hidden></p>
+        <div class="actions"><a class="b" href="mailto:support@tabsidecar.com">Contact support</a><a class="b quiet" href="/">Back to home</a></div>
+      </div>
 
-    // The link in the signup (or existing-account) code email lands here with a
-    // session in the URL hash. The account has no password until one is set
-    // here or in the extension (#171). Drop the tokens from the address bar and
-    // history right away.
-    const params = new URLSearchParams(window.location.hash.slice(1) || window.location.search.slice(1));
-    history.replaceState(null, document.title, window.location.pathname);
+      <!-- Opened without a link -->
+      <div id="viewEmpty" hidden>
+        <div class="big-ico"><i data-icon="mail"></i></div>
+        <h1>Nothing to confirm</h1>
+        <p class="copy">This page opens from the link in your TabSidecar code email. To create an account, open TabSidecar, go to <span class="path">Account</span>, and choose <b>Create Account</b>.</p>
+        <div class="actions"><a class="b" href="/">Back to home</a></div>
+      </div>
 
-    const title = document.getElementById('confirm-title');
-    const copy = document.getElementById('confirm-copy');
-    const small = document.getElementById('confirm-small');
-    const form = document.getElementById('password-form');
-    const statusEl = document.getElementById('confirm-status');
-    const passwordInput = document.getElementById('new-password');
-    const confirmInput = document.getElementById('confirm-password');
-    const submitButton = document.getElementById('password-submit');
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://quqhdnkypnuxvmibnzhn.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2O_Jk16JhJLmK7bFtLHsNQ_ifUzkz1Z';
+  const MIN_LENGTH = 8;  // MIN_PASSWORD_LENGTH in background/cloud-auth.js
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const $ = id => document.getElementById(id);
+    const form = $('password-form'), submit = $('password-submit'), statusEl = $('status');
+    const pw = $('new-password'), confirm = $('confirm-password');
+    const icon = n => window.TS ? TS.icon(n) : '';
+
+    // The link in the signup (or existing-account) code email lands here with
+    // a session in the URL hash. The account has no password until one is set
+    // here or in the extension (#171). Drop the tokens from the address bar.
+    const params = new URLSearchParams(location.hash.slice(1) || location.search.slice(1));
     const accessToken = params.get('access_token');
+    const linkError = params.get('error') || params.get('error_code');
+    if (accessToken || linkError) history.replaceState(null, document.title, location.pathname);
 
-    function showStatus(message, type) {
-      statusEl.textContent = message;
-      statusEl.className = `reset-status show ${type}`;
-    }
+    const view = name => ['Form', 'Done', 'Expired', 'Empty'].forEach(v => { $('view' + v).hidden = v !== name; });
+    const status = (type, text) => {
+      if (!type) { statusEl.hidden = true; return; }
+      statusEl.className = `status ${type}`;
+      statusEl.innerHTML = `${icon({ ok: 'check', warn: 'clock', err: 'x' }[type])}<span>${text}</span>`;
+      statusEl.hidden = false;
+    };
+    const busy = on => {
+      submit.disabled = on;
+      submit.innerHTML = on ? '<span class="spin"></span>Saving…' : 'Set password';
+      form.querySelectorAll('input').forEach(i => { i.disabled = on; });
+    };
+    const checkReqs = () => {
+      $('reqLen').classList.toggle('met', pw.value.length >= MIN_LENGTH);
+      const match = confirm.value.length > 0 && pw.value === confirm.value;
+      $('reqMatch').classList.toggle('met', match);
+      $('confirmBox').classList.toggle('bad', confirm.value.length >= pw.value.length && confirm.value.length > 0 && !match);
+    };
+    const expired = (isExpired, detail) => {
+      $('expiredTitle').textContent = isExpired ? 'This link has expired' : 'We couldn’t confirm your email';
+      $('expiredDetail').textContent = detail || '';
+      $('expiredDetail').hidden = !detail;
+      view('Expired');
+    };
+    [pw, confirm].forEach(i => i.addEventListener('input', () => { checkReqs(); status(null); }));
+    document.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => {
+      const input = $(b.dataset.show), hidden = input.type === 'password';
+      input.type = hidden ? 'text' : 'password';
+      b.textContent = hidden ? 'Hide' : 'Show';
+    }));
 
     async function supabase(path, options) {
-      const response = await fetch(`${SUPABASE_URL}${path}`, {
+      const res = await fetch(`${SUPABASE_URL}${path}`, {
         ...options,
         headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
       });
-      const text = await response.text();
+      const text = await res.text();
       const body = text ? JSON.parse(text) : null;
-      if (!response.ok) {
-        throw new Error(body?.msg || body?.message || body?.error_description || body?.error || 'Something went wrong.');
-      }
+      if (!res.ok) throw new Error(body?.msg || body?.message || body?.error_description || body?.error || 'Something went wrong.');
       return body;
     }
 
-    if (params.get('error') || params.get('error_code')) {
-      const expired = params.get('error_code') === 'otp_expired';
-      title.textContent = expired ? 'This link has expired' : 'We couldn’t confirm your email';
-      copy.textContent = 'Links only work once and expire after an hour. Open the extension, go to Account, and choose Resend code, or enter your email and choose Create Account again.';
-      small.textContent = params.get('error_description') || '';
-    } else if (!accessToken) {
-      title.textContent = 'Nothing to confirm';
-      copy.textContent = 'Open the TabSidecar extension, go to Account, and choose Create Account to get a code.';
-      small.textContent = '';
-    } else {
-      form.hidden = false;
-    }
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const password = passwordInput.value;
-      if (password.length < 8) return showStatus('Use at least 8 characters.', 'error');
-      if (password !== confirmInput.value) return showStatus('The passwords do not match.', 'error');
-
-      submitButton.disabled = true;
-      submitButton.textContent = 'Saving...';
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (pw.value.length < MIN_LENGTH) return status('err', `Use at least ${MIN_LENGTH} characters.`);
+      if (pw.value !== confirm.value) return status('err', 'The passwords don’t match.');
+      busy(true);
       try {
-        await supabase('/auth/v1/user', { method: 'PUT', body: JSON.stringify({ password }) });
+        await supabase('/auth/v1/user', { method: 'PUT', body: JSON.stringify({ password: pw.value }) });
         // Only this browser's session survives a password change.
-        try {
-          await supabase('/auth/v1/logout?scope=others', { method: 'POST' });
-        } catch {
-          // The password is set; revoking other sessions is best effort here.
-        }
-        form.hidden = true;
-        title.textContent = 'You’re all set';
-        copy.textContent = 'Your password is saved. Open the TabSidecar extension, go to Account, and sign in with your email and new password.';
-        small.textContent = 'You can close this tab.';
-      } catch (error) {
-        showStatus(error.message || 'Could not set your password.', 'error');
-        submitButton.disabled = false;
-        submitButton.textContent = 'Set Password';
+        try { await supabase('/auth/v1/logout?scope=others', { method: 'POST' }); } catch { /* best effort */ }
+        form.reset(); checkReqs(); view('Done');
+      } catch (err) {
+        status('err', err.message || 'Could not set your password.');
+      } finally {
+        busy(false);
       }
     });
-  </script>
+
+    if (linkError) expired(params.get('error_code') === 'otp_expired', params.get('error_description'));
+    else if (accessToken) {
+      view('Form');
+      // The access token is a JWT; its payload carries the email. Read it
+      // locally, no extra request.
+      try {
+        const claims = JSON.parse(atob(accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if (claims.email) $('emailOut').textContent = claims.email;
+      } catch { /* keep the generic wording */ }
+    } else view('Empty');
+
+  });
+</script>
 </body>
 </html>

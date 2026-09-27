@@ -1,217 +1,295 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-variant="privacy" data-bg="white">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TabSidecar Privacy Policy</title>
-  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
-  <link rel="shortcut icon" href="icons/icon32.png">
-  <link rel="stylesheet" href="base.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TabSidecar Privacy Policy</title>
+<meta name="description" content="How TabSidecar handles your data: what it accesses, what stays on your computer, and what it sends when you use an optional feature.">
+<link rel="stylesheet" href="assets/mock.css?v=202609271803">
+<link rel="stylesheet" href="assets/site.css?v=202609271803">
+<link rel="stylesheet" href="assets/windows.css?v=202609271803">
+<script src="assets/site.js?v=202609271803"></script>
+<script src="assets/icons.js?v=202609271803" defer></script>
+<script src="assets/mock.js?v=202609271803" defer></script>
+<style>
+  /* Privacy policy in the Windows design, read as a document: At a glance is
+     the one window (assets/windows.css, blue); every other section is a plain
+     heading and text, never collapsed, so find-in-page reaches all of it. A
+     contents list under At a glance jumps to each section. The text is the
+     published tabsidecar.com/privacy.html (tabsidecar-website 29d890e); the
+     review note under the heading lists what differs in presentation only.
+     The note and its switch are not part of the page and get deleted before
+     this ships. */
+  .doc-wrap { max-width: 880px; }
+  .hero { padding: 64px 0 40px; display: grid; gap: 14px; justify-items: start; }
+  .hero .h1 { font-size: clamp(34px, 4.4vw, 48px); margin: 0; }
+  .hero .lede { max-width: 36em; margin: 0; }
+  .hero .meta { margin: 0; }
+
+  .swin-head { padding-left: 22px; }
+  .swin-body { padding: 24px 28px 28px; }
+  @media (max-width: 700px) { .swin-body { padding: 20px 16px 22px; } }
+
+  /* Contents, in two columns */
+  .toc { margin: 36px 0 8px; }
+  .toc h2 { margin: 0 0 10px; font-size: 13.5px; font-weight: 600; color: var(--muted); }
+  .toc ol { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 32px; counter-reset: toc; }
+  .toc li { counter-increment: toc; break-inside: avoid; }
+  .toc a { display: flex; gap: 10px; align-items: baseline; padding: 5px 0; color: var(--text-2); font-size: 15px; text-decoration: none; }
+  .toc a::before { content: counter(toc); width: 18px; flex: none; color: var(--faint); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .toc a:hover { color: var(--text); text-decoration: underline; }
+  @media (max-width: 560px) { .toc ol { columns: 1; } }
+
+  /* Policy sections: heading and text */
+  .sec { padding-top: 40px; margin-top: 40px; border-top: 1px solid var(--border); scroll-margin-top: 72px; }
+  .sec > h2 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 14px; font: 650 24px/1.25 var(--display); letter-spacing: -.02em; }
+  .sec > .intro { margin: 0 0 18px; color: var(--muted); font-size: 15.5px; max-width: 42em; }
+  .tagx { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; font: 500 12.5px var(--font); letter-spacing: 0; }
+  .doc-end { height: 40px; }
+
+  .doc p { margin: 0 0 12px; color: var(--text-2); font-size: 15.5px; line-height: 1.65; max-width: 44em; }
+  .doc p:last-child { margin-bottom: 0; }
+  .doc code, .row code { font: 13px var(--mono); background: var(--app); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; color: var(--text-2); white-space: nowrap; }
+
+  .grp { margin-bottom: 20px; }
+  .grp:last-child { margin-bottom: 0; }
+  .grp > h3 { font-size: 13.5px; font-weight: 600; color: var(--muted); margin: 0 2px 8px; }
+  .row .ctl { flex: none; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .row .ctl.ts { font-size: 13px; }
+
+  /* Permission rows: the permission in mono on the left, what it's for on the right */
+  .perm { align-items: flex-start; }
+  .perm .pname { flex: none; width: 190px; padding-top: 1px; }
+  .perm .pname code { font-size: 12.5px; white-space: normal; }
+
+  .list-rows .row { align-items: flex-start; padding-top: 13px; padding-bottom: 13px; }
+  .row .ico { width: 32px; height: 32px; border-radius: 8px; }
+  .row .ico svg { width: 15px; height: 15px; }
+  .list-rows .row .label { font-size: 15px; }
+
+  /* "Sent to / What's sent" facts under each feature */
+  .kv { display: grid; grid-template-columns: minmax(0, 1fr); margin: 0; }
+  .kv > div { padding: 13px 18px; border-top: 1px solid var(--border); }
+  .kv > div:first-child { border-top: 0; }
+  .kv dt { font-size: 14px; font-weight: 600; color: var(--text); }
+  .kv dd { margin: 3px 0 0; color: var(--text-2); font-size: 14.5px; line-height: 1.6; }
+
+  .nots { display: flex; flex-wrap: wrap; gap: 6px; padding: 14px 18px; }
+  .nots .chip-tag svg { width: 12px; height: 12px; }
+
+  @media (max-width: 640px) {
+    .row { flex-wrap: wrap; }
+    .row .ctl { justify-content: flex-start; width: 100%; }
+    .perm .pname { width: 100%; }
+  }
+
+</style>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
 </head>
-<body id="top">
-  <nav class="nav" aria-label="Primary">
-    <div class="wrap nav-in">
-      <a href="index.html" class="logo" aria-label="TabSidecar home">
-        <img
-          class="logo-ic"
-          src="icons/icon32.png"
-          alt=""
-          width="20"
-          height="20">
-        <span>TabSidecar</span>
-      </a>
+<body>
 
-      <div class="nav-links">
-        <a href="index.html#features">Features</a>
-        <a href="index.html#pricing">Pricing</a>
-        <a href="privacy.html" class="current">Privacy</a>
-        <a href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb" class="btn">Add to Chrome</a>
-      </div>
-    </div>
+<header class="site-nav lined"><div class="wrap">
+  <a class="wordmark" href="/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <nav class="nav-links" aria-label="Site">
+    <a href="/#autopark">Features</a><a href="/#faq">FAQ</a><a href="privacy.html" style="color:var(--text)">Privacy</a>
   </nav>
+  <a class="b sm" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Add to Chrome</a>
+</div></header>
 
-  <header class="page-hero">
-    <div class="wrap">
-      <h1>How TabSidecar handles your data.</h1>
-      <p class="page-lead">
-        TabSidecar runs in your browser and keeps your tabs and windows on your device unless you choose a feature that sends them elsewhere, like cloud sync. Last updated September 27, 2026.
-      </p>
-      <div class="page-actions">
-        <a href="mailto:support@tabsidecar.com" class="btn">Contact</a>
-        <a href="index.html" class="btn btn-ghost">Back to home</a>
+<main class="wrap doc-wrap" id="top">
+    <section class="hero">
+      <span class="eyebrow"><i data-icon="shield"></i>Privacy policy</span>
+      <h1 class="h1">How TabSidecar handles your data.</h1>
+      <p class="lede">TabSidecar runs in your browser and keeps your tabs and windows on your device unless you choose a feature that sends them elsewhere, like cloud sync.</p>
+      <p class="meta">Last updated September 27, 2026</p>
+    </section>
+
+    <article class="swin" style="--wc:#3b82f6" id="glance">
+      <header class="swin-head"><span class="swin-dot"></span><h2 class="swin-title">At a glance</h2><span class="swin-meta">the short version</span></header>
+      <div class="swin-body">
+        <div class="grp"><div class="panel">
+          <div class="row"><span class="ico"><i data-icon="monitor"></i></span><div class="txt"><div class="label">Stays on your device</div><div class="sub">Your tabs, windows, labels and settings live in the extension’s own storage in your browser.</div></div>
+            <div class="ctl ts"><span class="tag">Local</span></div></div>
+          <div class="row"><span class="ico"><i data-icon="user"></i></span><div class="txt"><div class="label">An account is optional</div><div class="sub">Everything except cloud sync works without one.</div></div>
+            <div class="ctl ts"><span class="tag">Optional</span></div></div>
+          <div class="row"><span class="ico"><i data-icon="cloud"></i></span><div class="txt"><div class="label">Leaves your device only for features you use</div><div class="sub">Cloud sync if you sign in, AI window titles if you turn them on or ask for one, and the update-email list if you join it.</div></div>
+            <div class="ctl ts"><span class="tag">3 features</span></div></div>
+          <div class="row"><span class="ico"><i data-icon="x"></i></span><div class="txt"><div class="label">No ads, analytics or tracking</div><div class="sub">No advertising SDKs, behavior analytics, cross-site tracking pixels or general-purpose telemetry.</div></div>
+            <div class="ctl ts"><span class="tag">None</span></div></div>
+          <div class="row"><span class="ico"><i data-icon="note"></i></span><div class="txt"><div class="label">Doesn’t read what’s on your pages</div><div class="sub">No page contents, keystrokes, form fields, passwords or cookies.</div></div>
+            <div class="ctl ts"><span class="tag">Never</span></div></div>
+        </div></div>
       </div>
-    </div>
-  </header>
+    </article>
 
-  <section class="page-section">
-    <div class="wrap">
-      <div class="page-card">
-        <div class="page-body">
-          <div>
-            <h2>Privacy policy</h2>
-            <p style="margin-top: 16px;">TabSidecar is a tab and window management extension. It helps you organize open tabs, restore windows, auto-park inactive tabs, save browser state, export your own backup files and, if you create an account, back up your tabs and windows to the cloud.</p>
-            <p>Most extension data stays in your browser, in the extension's own storage. Data leaves your device only when you turn on a feature that needs it, each described below: cloud sync if you sign in to an account, AI-generated window titles if you turn them on, and the update-email list if you join it.</p>
-          </div>
+    <nav class="toc" aria-labelledby="toc-title">
+      <h2 id="toc-title">In this policy</h2>
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#access">Information we access</a></li>
+        <li><a href="#permissions">Chrome permissions</a></li>
+        <li><a href="#storage">How information is stored</a></li>
+        <li><a href="#accounts">Accounts and cloud sync</a></li>
+        <li><a href="#encryption">Encryption and who can access your data</a></li>
+        <li><a href="#ai">AI window titles</a></li>
+        <li><a href="#emails">Update emails</a></li>
+        <li><a href="#sharing">Service providers and data sharing</a></li>
+        <li><a href="#choices">Your choices</a></li>
+        <li><a href="#retention">Data retention and deletion</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#children">Children's privacy</a></li>
+        <li><a href="#changes">Changes to this policy</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </nav>
 
-          <div>
-            <h3>Information we access</h3>
-            <ul class="bullet-list">
-              <li>Open tab and window information, including tab URLs, titles, favicon URLs, pinned state, tab position, tab groups and window grouping.</li>
-              <li>Window metadata created inside the product, such as window names, saved windows, labels, nicknames, notes, priorities and filter rules.</li>
-              <li>Closed-tab and auto-park history, including URLs, titles, timestamps and time-accumulation data used for tab management features.</li>
-              <li>Limited Chrome history data used for the extension's closed-URL backfill and history-management features.</li>
-              <li>Settings and preferences you choose inside the extension.</li>
-              <li>If you create an account: your email address, your password (handled by our sign-in provider, never stored by the extension in readable form), and the cloud snapshots described below.</li>
-              <li>An install-scoped random identifier used by the AI title feature for rate limiting.</li>
-              <li>An email address you give us for product updates, only if you choose to.</li>
-            </ul>
-          </div>
+    <section class="sec doc" id="overview">
+      <h2>Overview</h2>
+      <p>TabSidecar is a tab and window management extension. It helps you organize open tabs, restore windows, auto-park inactive tabs, save browser state, export your own backup files and, if you create an account, back up your tabs and windows to the cloud.</p>
+      <p>Most extension data stays in your browser, in the extension's own storage. Data leaves your device only when you turn on a feature that needs it, each described below: cloud sync if you sign in to an account, AI-generated window titles if you turn them on, and the update-email list if you join it.</p>
+    </section>
 
-          <div>
-            <h3>Chrome permissions</h3>
-            <ul class="bullet-list">
-              <li><code>tabs</code>: used to read, organize, move, create, focus, pin and close tabs.</li>
-              <li><code>tabGroups</code>: used to read the names and colors of your tab groups for Local Bridge (see below). Nothing else uses it.</li>
-              <li><code>windows</code>: used to inspect, name, restore, focus, create and remove browser windows.</li>
-              <li><code>alarms</code>: used for scheduled tasks such as auto-park checks, automatic backups, automatic cloud sync and delayed processing.</li>
-              <li><code>storage</code>: used to keep window and tab identities, recovery state and diagnostics on your device, so windows can be matched back after a restart.</li>
-              <li><code>scripting</code>: used to add TabSidecar's two page scripts (described below) to tabs that were already open when the extension was installed or updated.</li>
-              <li><code>history</code>: used to search browser history for closed-URL backfill and to support history deletion features you trigger.</li>
-              <li><code>favicon</code>: used to display site icons for tabs and saved items.</li>
-              <li><code>downloads</code>: used to export backup files that you choose to generate.</li>
-            </ul>
-            <p style="margin-top: 14px;">Host permissions: <code>http://*/*</code> and <code>https://*/*</code> (all websites), <code>https://api.tabsidecar.com/*</code> (AI window titles) and <code>https://quqhdnkypnuxvmibnzhn.supabase.co/*</code> (accounts, cloud sync and the update-email list).</p>
-            <p>The all-websites access also covers Local Bridge's local address (<code>127.0.0.1</code>), and exists for two small scripts that run on every page as it starts loading:</p>
-            <ul class="bullet-list">
-              <li><code>identity-content.js</code> stores a random TabSidecar tab and window ID in the page's session storage and navigation history state. Chrome restores these with the tab after a browser restart, which lets TabSidecar match a restored tab to its saved data. The script only reads and writes its own keys and never touches the page's other data. It tells the extension a site's origin (for example <code>https://example.com</code>) if that site cleared the IDs.</li>
-              <li><code>title-content.js</code> reads the page title and adds a lock symbol to it when you lock a tab in TabSidecar.</li>
-            </ul>
-            <p>Neither script reads page contents, keystrokes, form fields, passwords or cookies, and neither sends anything off your device. TabSidecar does not request permissions for cookies, identity, bookmarks, microphone, camera or geolocation.</p>
-          </div>
+    <section class="sec doc" id="access">
+      <h2>Information we access</h2>
+      <div class="grp"><div class="panel list-rows">
+        <div class="row"><span class="ico"><i data-icon="windows"></i></span><div class="txt"><div class="label">Open tabs and windows</div><div class="sub">Open tab and window information, including tab URLs, titles, favicon URLs, pinned state, tab position, tab groups and window grouping.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="edit"></i></span><div class="txt"><div class="label">What you add in TabSidecar</div><div class="sub">Window metadata created inside the product, such as window names, saved windows, labels, nicknames, notes, priorities and filter rules.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="park"></i></span><div class="txt"><div class="label">Closed and auto-parked tabs</div><div class="sub">Closed-tab and auto-park history, including URLs, titles, timestamps and time-accumulation data used for tab management features.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="history"></i></span><div class="txt"><div class="label">Limited browsing history</div><div class="sub">Limited Chrome history data used for the extension's closed-URL backfill and history-management features.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="gear"></i></span><div class="txt"><div class="label">Settings and preferences</div><div class="sub">Settings and preferences you choose inside the extension.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="user"></i></span><div class="txt"><div class="label">Your account, only if you create one</div><div class="sub">If you create an account: your email address, your password (handled by our sign-in provider, never stored by the extension in readable form), and the cloud snapshots described below.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="sparkle"></i></span><div class="txt"><div class="label">A random install ID</div><div class="sub">An install-scoped random identifier used by the AI title feature for rate limiting.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="mail"></i></span><div class="txt"><div class="label">Your email, only if you ask for updates</div><div class="sub">An email address you give us for product updates, only if you choose to.</div></div></div>
+      </div></div>
+    </section>
 
-          <div>
-            <h3>How information is stored</h3>
-            <p>TabSidecar stores its working data locally in the extension's own IndexedDB database and Chrome extension storage. That data may include open tabs, windows, saved windows, auto-parked tabs, closed URLs, settings, labels, nicknames, saved-for-later items and similar organization metadata. Browsing sessions that TabSidecar tracks for restoring windows stay on your device and are not included in backup files.</p>
-            <p>Local Bridge, an optional feature for tools running on your own computer, can share a snapshot of your windows, tabs and tab groups with a program listening at <code>127.0.0.1</code>. It is off by default, needs a secret you paste in to turn it on, and never sends anything off your computer.</p>
-            <p>When you export backup files, the extension generates them locally and saves them through Chrome's download system. Exported settings leave out the AI install identifier and your sign-in session.</p>
-          </div>
+    <section class="sec doc" id="permissions">
+      <h2>Chrome permissions</h2>
+      <div class="grp"><h3>Permissions</h3><div class="panel">
+        <div class="row perm"><span class="pname"><code>tabs</code></span><div class="txt"><div class="sub">Used to read, organize, move, create, focus, pin and close tabs.</div></div></div>
+        <div class="row perm"><span class="pname"><code>tabGroups</code></span><div class="txt"><div class="sub">Used to read the names and colors of your tab groups for Local Bridge (see below). Nothing else uses it.</div></div></div>
+        <div class="row perm"><span class="pname"><code>windows</code></span><div class="txt"><div class="sub">Used to inspect, name, restore, focus, create and remove browser windows.</div></div></div>
+        <div class="row perm"><span class="pname"><code>alarms</code></span><div class="txt"><div class="sub">Used for scheduled tasks such as auto-park checks, automatic backups, automatic cloud sync and delayed processing.</div></div></div>
+        <div class="row perm"><span class="pname"><code>storage</code></span><div class="txt"><div class="sub">Used to keep window and tab identities, recovery state and diagnostics on your device, so windows can be matched back after a restart.</div></div></div>
+        <div class="row perm"><span class="pname"><code>scripting</code></span><div class="txt"><div class="sub">Used to add TabSidecar's two page scripts (described below) to tabs that were already open when the extension was installed or updated.</div></div></div>
+        <div class="row perm"><span class="pname"><code>history</code></span><div class="txt"><div class="sub">Used to search browser history for closed-URL backfill and to support history deletion features you trigger.</div></div></div>
+        <div class="row perm"><span class="pname"><code>favicon</code></span><div class="txt"><div class="sub">Used to display site icons for tabs and saved items.</div></div></div>
+        <div class="row perm"><span class="pname"><code>downloads</code></span><div class="txt"><div class="sub">Used to export backup files that you choose to generate.</div></div></div>
+      </div></div>
+      <div class="grp"><h3>Host permissions</h3><div class="panel">
+        <div class="row perm"><span class="pname"><code>http://*/*</code><br><code>https://*/*</code></span><div class="txt"><div class="sub">All websites. This also covers Local Bridge's local address (<code>127.0.0.1</code>), and exists for the two page scripts below.</div></div></div>
+        <div class="row perm"><span class="pname"><code>https://<wbr>api.tabsidecar.com/*</code></span><div class="txt"><div class="sub">AI window titles.</div></div></div>
+        <div class="row perm"><span class="pname"><code>https://<wbr>quqhdnkypnuxvmibnzhn<wbr>.supabase.co/*</code></span><div class="txt"><div class="sub">Accounts, cloud sync and the update-email list.</div></div></div>
+      </div></div>
+      <div class="grp"><h3>Page scripts, which run on every page as it starts loading</h3><div class="panel">
+        <div class="row perm"><span class="pname"><code>identity-content.js</code></span><div class="txt"><div class="sub">Stores a random TabSidecar tab and window ID in the page's session storage and navigation history state. Chrome restores these with the tab after a browser restart, which lets TabSidecar match a restored tab to its saved data. The script only reads and writes its own keys and never touches the page's other data. It tells the extension a site's origin (for example <code>https://example.com</code>) if that site cleared the IDs.</div></div></div>
+        <div class="row perm"><span class="pname"><code>title-content.js</code></span><div class="txt"><div class="sub">Reads the page title and adds a lock symbol to it when you lock a tab in TabSidecar.</div></div></div>
+      </div></div>
+      <p>Neither script reads page contents, keystrokes, form fields, passwords or cookies, and neither sends anything off your device. TabSidecar does not request permissions for cookies, identity, bookmarks, microphone, camera or geolocation.</p>
+    </section>
 
-          <div>
-            <h3>Accounts and cloud sync</h3>
-            <p>An account is optional. Everything except cloud sync works without one.</p>
-            <ul class="bullet-list">
-              <li><strong>Sign-in:</strong> accounts use an email address and password through Supabase Auth, our database and sign-in provider. To sign up, we email you a one-time code to confirm the address, then you set a password. Changing your password signs out your other sessions. Sign-ups whose email is never confirmed are deleted automatically after a day.</li>
-              <li><strong>What a cloud snapshot contains:</strong> your open tabs (URLs and titles) and windows, window names, saved, kept and closed windows, saved-for-later items, auto-parked tabs, nicknames, labels, priorities, notes, filter rules and extension settings. Each snapshot also records a device ID, a device name such as “Chrome on Windows”, and tab and window counts. Closed-tab history from Chrome and your sign-in session are not included.</li>
-              <li><strong>Devices:</strong> for each device we store its random ID, device name, extension version, browser name, platform and when it last synced.</li>
-              <li><strong>When it syncs:</strong> while you're signed in, the extension uploads a snapshot automatically (every hour by default; you can change the interval or turn it off) and whenever you sync manually.</li>
-              <li><strong>How many are kept:</strong> the extension keeps your 20 most recent snapshots per device and deletes older ones. The database also caps each account at 10 devices and 50 MB of snapshots, removing the oldest snapshots first.</li>
-            </ul>
-          </div>
+    <section class="sec doc" id="storage">
+      <h2>How information is stored</h2>
+      <p>TabSidecar stores its working data locally in the extension's own IndexedDB database and Chrome extension storage. That data may include open tabs, windows, saved windows, auto-parked tabs, closed URLs, settings, labels, nicknames, saved-for-later items and similar organization metadata. Browsing sessions that TabSidecar tracks for restoring windows stay on your device and are not included in backup files.</p>
+      <p>Local Bridge, an optional feature for tools running on your own computer, can share a snapshot of your windows, tabs and tab groups with a program listening at <code>127.0.0.1</code>. It is off by default, needs a secret you paste in to turn it on, and never sends anything off your computer.</p>
+      <p>When you export backup files, the extension generates them locally and saves them through Chrome's download system. Exported settings leave out the AI install identifier and your sign-in session.</p>
+    </section>
 
-          <div>
-            <h3>Encryption and who can access your data</h3>
-            <ul class="bullet-list">
-              <li>Data is encrypted in transit (HTTPS) and encrypted at rest by our database provider, Supabase.</li>
-              <li>Cloud snapshots are <strong>not</strong> end-to-end encrypted. The TabSidecar operator can technically access them, and only does so when needed for support or security.</li>
-              <li>Other users can't access your data. Database access rules restrict every row to the account that owns it.</li>
-            </ul>
-          </div>
+    <section class="sec doc" id="accounts">
+      <h2>Accounts and cloud sync</h2>
+      <p class="intro">An account is optional. Everything except cloud sync works without one.</p>
+      <div class="grp"><div class="panel">
+        <dl class="kv">
+          <div><dt>Sign-in</dt><dd>Accounts use an email address and password through Supabase Auth, our database and sign-in provider. To sign up, we email you a one-time code to confirm the address, then you set a password. Changing your password signs out your other sessions. Sign-ups whose email is never confirmed are deleted automatically after a day.</dd></div>
+          <div><dt>What a cloud snapshot contains</dt><dd>Your open tabs (URLs and titles) and windows, window names, saved, kept and closed windows, saved-for-later items, auto-parked tabs, nicknames, labels, priorities, notes, filter rules and extension settings. Each snapshot also records a device ID, a device name such as “Chrome on Windows”, and tab and window counts. Closed-tab history from Chrome and your sign-in session are not included.</dd></div>
+          <div><dt>Devices</dt><dd>For each device we store its random ID, device name, extension version, browser name, platform and when it last synced.</dd></div>
+          <div><dt>When it syncs</dt><dd>While you're signed in, the extension uploads a snapshot automatically (every hour by default; you can change the interval or turn it off) and whenever you sync manually.</dd></div>
+          <div><dt>How many are kept</dt><dd>The extension keeps your 20 most recent snapshots per device and deletes older ones. The database also caps each account at 10 devices and 50 MB of snapshots, removing the oldest snapshots first.</dd></div>
+        </dl>
+      </div></div>
+    </section>
 
-          <div>
-            <h3>AI window titles</h3>
-            <p>AI window titles are off until you turn them on, either during setup or in Settings → Artificial Intelligence. Asking for an AI title for a single window also sends that window's request.</p>
-            <p>When they're on, the extension sends a request to <code>api.tabsidecar.com</code> containing an install-scoped random identifier, the window's tab titles and the site name of each tab (for example <code>github.com</code>, not the full address), and your existing window titles. If you're signed in, the request also carries your sign-in token so your account gets a higher daily limit. Our server passes the tab titles and site names to Google's Gemini API to generate the title and returns it to the extension.</p>
-            <p>Our server does not store tab titles or site names. To enforce daily limits it keeps a count of requests per day for your install identifier, account and network address, and deletes those counts after 7 days.</p>
-          </div>
+    <section class="sec doc" id="encryption">
+      <h2>Encryption and who can access your data</h2>
+      <div class="grp"><div class="panel list-rows">
+        <div class="row"><span class="ico"><i data-icon="lock"></i></span><div class="txt"><div class="label">Encrypted in transit and at rest</div><div class="sub">Data is encrypted in transit (HTTPS) and encrypted at rest by our database provider, Supabase.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="shield"></i></span><div class="txt"><div class="label">Not end-to-end encrypted</div><div class="sub">Cloud snapshots are not end-to-end encrypted. The TabSidecar operator can technically access them, and only does so when needed for support or security.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="user"></i></span><div class="txt"><div class="label">Only your account</div><div class="sub">Other users can't access your data. Database access rules restrict every row to the account that owns it.</div></div></div>
+      </div></div>
+    </section>
 
-          <div>
-            <h3>Update emails</h3>
-            <p>If you choose to join the update-email list, the extension sends that email address to our Supabase database. We use it only to send product updates.</p>
-          </div>
+    <section class="sec doc" id="ai">
+      <h2>AI window titles</h2>
+      <p>AI window titles are off until you turn them on, either during setup or in Settings → Artificial Intelligence. Asking for an AI title for a single window also sends that window's request.</p>
+      <p>When they're on, the extension sends a request to <code>api.tabsidecar.com</code> containing an install-scoped random identifier, the window's tab titles and the site name of each tab (for example <code>github.com</code>, not the full address), and your existing window titles. If you're signed in, the request also carries your sign-in token so your account gets a higher daily limit. Our server passes the tab titles and site names to Google's Gemini API to generate the title and returns it to the extension.</p>
+      <p>Our server does not store tab titles or site names. To enforce daily limits it keeps a count of requests per day for your install identifier, account and network address, and deletes those counts after 7 days.</p>
+    </section>
 
-          <div>
-            <h3>Service providers and data sharing</h3>
-            <p>TabSidecar does not sell your personal information and does not include advertising SDKs, behavior analytics, cross-site tracking pixels or general-purpose telemetry. We use two service providers:</p>
-            <ul class="bullet-list">
-              <li><strong>Supabase:</strong> hosts accounts, sign-in, cloud snapshots, devices and the update-email list, and sends account emails.</li>
-              <li><strong>Google (Gemini API):</strong> generates AI window titles from the tab titles and site names described above, if you turn them on.</li>
-            </ul>
-          </div>
+    <section class="sec doc" id="emails">
+      <h2>Update emails</h2>
+      <p>If you choose to join the update-email list, the extension sends that email address to our Supabase database. We use it only to send product updates.</p>
+    </section>
 
-          <div>
-            <h3>Your choices</h3>
-            <p>You can use TabSidecar without an account; turn automatic cloud sync off or change how often it runs; turn AI window titles on or off (they're off unless you turn them on); choose whether to join the update-email list; export your own backup files locally; remove local extension data by uninstalling the extension or clearing its storage through Chrome; and manage browser history separately through Chrome.</p>
-          </div>
+    <section class="sec doc" id="sharing">
+      <h2>Service providers and data sharing</h2>
+      <p>TabSidecar does not sell your personal information and does not include advertising SDKs, behavior analytics, cross-site tracking pixels or general-purpose telemetry. We use two service providers:</p>
+      <div class="grp"><div class="panel">
+        <dl class="kv">
+          <div><dt>Supabase</dt><dd>Hosts accounts, sign-in, cloud snapshots, devices and the update-email list, and sends account emails.</dd></div>
+          <div><dt>Google (Gemini API)</dt><dd>Generates AI window titles from the tab titles and site names described above, if you turn them on.</dd></div>
+        </dl>
+      </div></div>
+    </section>
 
-          <div>
-            <h3>Data retention and deletion</h3>
-            <p>Local data remains in the extension's storage until you delete it, clear the extension's data or uninstall the extension. Exported backup files remain wherever you save them.</p>
-            <p>Cloud snapshots are kept as described under “Accounts and cloud sync” until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
-          </div>
+    <section class="sec doc" id="choices">
+      <h2>Your choices</h2>
+      <p class="intro">You can:</p>
+      <div class="grp"><div class="panel list-rows">
+        <div class="row"><span class="ico"><i data-icon="user"></i></span><div class="txt"><div class="sub">Use TabSidecar without an account.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="cloud"></i></span><div class="txt"><div class="sub">Turn automatic cloud sync off or change how often it runs.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="sparkle"></i></span><div class="txt"><div class="sub">Turn AI window titles on or off (they're off unless you turn them on).</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="mail"></i></span><div class="txt"><div class="sub">Choose whether to join the update-email list.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="download"></i></span><div class="txt"><div class="sub">Export your own backup files locally.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="trash"></i></span><div class="txt"><div class="sub">Remove local extension data by uninstalling the extension or clearing its storage through Chrome.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="history"></i></span><div class="txt"><div class="sub">Manage browser history separately through Chrome.</div></div></div>
+      </div></div>
+    </section>
 
-          <div>
-            <h3>Security</h3>
-            <p>Account data is protected by the encryption and per-account access rules described above. Deleting an account requires a password sign-in within the last few minutes, so a stolen session alone can't delete it. No software can guarantee absolute security, but TabSidecar keeps most tab-management data on your device unless you use a feature that sends it to a backend service.</p>
-          </div>
+    <section class="sec doc" id="retention">
+      <h2>Data retention and deletion</h2>
+      <p>Local data remains in the extension's storage until you delete it, clear the extension's data or uninstall the extension. Exported backup files remain wherever you save them.</p>
+      <p>Cloud snapshots are kept as described under <a href="#accounts">“Accounts and cloud sync”</a> until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
+    </section>
 
-          <div>
-            <h3>Children's privacy</h3>
-            <p>TabSidecar is not directed to children under 13, and we do not knowingly collect personal information from children.</p>
-          </div>
+    <section class="sec doc" id="security">
+      <h2>Security</h2>
+      <p>Account data is protected by the encryption and per-account access rules described above. Deleting an account requires a password sign-in within the last few minutes, so a stolen session alone can't delete it. No software can guarantee absolute security, but TabSidecar keeps most tab-management data on your device unless you use a feature that sends it to a backend service.</p>
+    </section>
 
-          <div>
-            <h3>Changes to this policy</h3>
-            <p>We update this policy when the product changes how it handles data, before or when those changes ship. The date at the top of this page shows when it was last updated.</p>
-          </div>
+    <section class="sec doc" id="children">
+      <h2>Children's privacy</h2>
+      <p>TabSidecar is not directed to children under 13, and we do not knowingly collect personal information from children.</p>
+    </section>
 
-          <div>
-            <h3>Contact</h3>
-            <p>For privacy questions about TabSidecar, contact <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <section class="sec doc" id="changes">
+      <h2>Changes to this policy</h2>
+      <p>We update this policy when the product changes how it handles data, before or when those changes ship. The date at the top of this page shows when it was last updated.</p>
+    </section>
 
-  <footer>
-    <div class="wrap">
-      <div class="foot-grid">
-        <div>
-          <a href="index.html" class="logo">
-            <img
-              class="logo-ic"
-              src="icons/icon32.png"
-              alt=""
-              width="20"
-              height="20">
-            TabSidecar
-          </a>
-          <p>A tab manager for Chrome. Closes what you're not using, keeps everything you might need.</p>
-        </div>
-      <div>
-        <h5>Product</h5>
-        <a href="index.html#features">Features</a>
-        <a href="index.html#pricing">Pricing</a>
-        <a href="#">Changelog</a>
-      </div>
-      <div>
-        <h5>Support</h5>
-        <a href="mailto:support@tabsidecar.com">Help</a>
-        <a href="mailto:support@tabsidecar.com?subject=TabSidecar%20bug%20report&amp;body=What%20happened%3F%0A%0AWhat%20did%20you%20expect%20to%20happen%3F%0A%0ASteps%20to%20reproduce%3A%0A1.%20%0A2.%20%0A3.%20%0A%0ABrowser%20or%20device%20details%3A%0A%0AAnything%20else%20that%20might%20help%3F%0A">Report a bug</a>
-        <a href="mailto:support@tabsidecar.com?subject=TabSidecar%20feature%20request&amp;body=What%20are%20you%20trying%20to%20do%3F%0A%0AWhat%20would%20you%20like%20TabSidecar%20to%20add%20or%20change%3F%0A%0AWhy%20would%20this%20help%3F%0A%0AAny%20examples%2C%20screenshots%2C%20or%20links%3F%0A">Request a feature</a>
-      </div>
-      <div>
-        <h5>About</h5>
-        <a href="privacy.html">Privacy</a>
-        <a href="mailto:support@tabsidecar.com">Contact</a>
-      </div>
-      </div>
-      <div class="foot-bottom">
-        <span>Free Chrome extension · Beta</span>
-        <span>Built in the open</span>
-      </div>
-    </div>
-  </footer>
+    <section class="sec doc" id="contact">
+      <h2>Contact</h2>
+      <p>For privacy questions about TabSidecar, contact <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
+    </section>
+    <div class="doc-end"></div>
+</main>
+
+<footer class="site-foot"><div class="wrap">
+  <a class="wordmark" href="/" style="font-size:14.5px"><span class="logo-tile" style="width:22px;height:22px;border-radius:6px;font-size:9px">TS</span>TabSidecar</a>
+  <span class="grow"></span>
+  <a href="privacy.html">Privacy</a><a href="mailto:support@tabsidecar.com">Support</a><a href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Chrome Web Store</a>
+  <span>© 2026</span>
+</div></footer>
+
 </body>
 </html>
