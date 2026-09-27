@@ -39,9 +39,34 @@
       margin-bottom: 22px;
     }
 
+    .reset-form {
+      display: grid;
+      gap: 12px;
+    }
 
+    .reset-form label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-2);
+    }
 
+    .reset-form input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+      outline: none;
+    }
 
+    .reset-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(58, 99, 214, 0.14);
+    }
 
     .reset-actions {
       display: flex;
@@ -94,6 +119,9 @@
         font-size: 30px;
       }
     }
+    .reset-form[hidden] {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -114,33 +142,105 @@
     <div class="wrap">
       <section class="reset-card" aria-labelledby="confirm-title">
         <h1 id="confirm-title">Email confirmed</h1>
-        <p class="reset-copy" id="confirm-copy">Your TabSidecar account is ready. Open the extension, go to Account, and sign in with your email and password.</p>
-        <div class="reset-status" id="confirm-status" role="status" aria-live="polite"></div>
-        <p class="reset-small">You can close this tab.</p>
+        <p class="reset-copy" id="confirm-copy">Choose a password for your TabSidecar account. You'll use it with your email to sign in from the extension.</p>
+
+        <form class="reset-form" id="password-form" hidden>
+          <label for="new-password">Password (at least 8 characters)</label>
+          <input id="new-password" name="new-password" type="password" autocomplete="new-password" minlength="8" required>
+
+          <label for="confirm-password">Confirm password</label>
+          <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" minlength="8" required>
+
+          <div class="reset-status" id="confirm-status" role="status" aria-live="polite"></div>
+
+          <div class="reset-actions">
+            <button class="btn" type="submit" id="password-submit">Set Password</button>
+          </div>
+        </form>
+
+        <p class="reset-small" id="confirm-small">The code in the same email works too: enter it in TabSidecar → Account.</p>
       </section>
     </div>
   </main>
 
   <script>
-    // Supabase appends the result to the URL hash. A successful link carries
-    // session tokens this page doesn't use, so drop them from the address bar
-    // and history right away.
+    const SUPABASE_URL = 'https://quqhdnkypnuxvmibnzhn.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2O_Jk16JhJLmK7bFtLHsNQ_ifUzkz1Z';
+
+    // The link in the signup (or existing-account) code email lands here with a
+    // session in the URL hash. The account has no password until one is set
+    // here or in the extension (#171). Drop the tokens from the address bar and
+    // history right away.
     const params = new URLSearchParams(window.location.hash.slice(1) || window.location.search.slice(1));
     history.replaceState(null, document.title, window.location.pathname);
 
+    const title = document.getElementById('confirm-title');
+    const copy = document.getElementById('confirm-copy');
+    const small = document.getElementById('confirm-small');
+    const form = document.getElementById('password-form');
+    const statusEl = document.getElementById('confirm-status');
+    const passwordInput = document.getElementById('new-password');
+    const confirmInput = document.getElementById('confirm-password');
+    const submitButton = document.getElementById('password-submit');
+    const accessToken = params.get('access_token');
+
+    function showStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = `reset-status show ${type}`;
+    }
+
+    async function supabase(path, options) {
+      const response = await fetch(`${SUPABASE_URL}${path}`, {
+        ...options,
+        headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
+      });
+      const text = await response.text();
+      const body = text ? JSON.parse(text) : null;
+      if (!response.ok) {
+        throw new Error(body?.msg || body?.message || body?.error_description || body?.error || 'Something went wrong.');
+      }
+      return body;
+    }
+
     if (params.get('error') || params.get('error_code')) {
       const expired = params.get('error_code') === 'otp_expired';
-      document.getElementById('confirm-title').textContent = expired ? 'This link has expired' : 'We couldn’t confirm your email';
-      document.getElementById('confirm-copy').textContent = expired
-        ? 'Confirmation links only work once and expire after an hour. Open the extension, go to Account, enter your email and password, and choose Resend confirmation email.'
-        : 'Open the extension, go to Account, enter your email and password, and choose Resend confirmation email.';
-      const status = document.getElementById('confirm-status');
-      const description = params.get('error_description');
-      if (description) {
-        status.textContent = description;
-        status.className = 'reset-status show error';
-      }
+      title.textContent = expired ? 'This link has expired' : 'We couldn’t confirm your email';
+      copy.textContent = 'Links only work once and expire after an hour. Open the extension, go to Account, and choose Resend code, or enter your email and choose Create Account again.';
+      small.textContent = params.get('error_description') || '';
+    } else if (!accessToken) {
+      title.textContent = 'Nothing to confirm';
+      copy.textContent = 'Open the TabSidecar extension, go to Account, and choose Create Account to get a code.';
+      small.textContent = '';
+    } else {
+      form.hidden = false;
     }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const password = passwordInput.value;
+      if (password.length < 8) return showStatus('Use at least 8 characters.', 'error');
+      if (password !== confirmInput.value) return showStatus('The passwords do not match.', 'error');
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Saving...';
+      try {
+        await supabase('/auth/v1/user', { method: 'PUT', body: JSON.stringify({ password }) });
+        // Only this browser's session survives a password change.
+        try {
+          await supabase('/auth/v1/logout?scope=others', { method: 'POST' });
+        } catch {
+          // The password is set; revoking other sessions is best effort here.
+        }
+        form.hidden = true;
+        title.textContent = 'You’re all set';
+        copy.textContent = 'Your password is saved. Open the TabSidecar extension, go to Account, and sign in with your email and new password.';
+        small.textContent = 'You can close this tab.';
+      } catch (error) {
+        showStatus(error.message || 'Could not set your password.', 'error');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Set Password';
+      }
+    });
   </script>
 </body>
 </html>
