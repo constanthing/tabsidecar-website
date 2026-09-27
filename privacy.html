@@ -35,7 +35,7 @@
     <div class="wrap">
       <h1>How TabSidecar handles your data.</h1>
       <p class="page-lead">
-        TabSidecar runs locally in your browser and is built to help you manage tabs and windows with local-first defaults. This page reflects the current audited build as of June 2, 2026.
+        TabSidecar runs in your browser and keeps your tabs and windows on your device unless you choose a feature that sends them elsewhere, like cloud sync. Last updated September 27, 2026.
       </p>
       <div class="page-actions">
         <a href="mailto:support@tabsidecar.com" class="btn">Contact</a>
@@ -50,85 +50,119 @@
         <div class="page-body">
           <div>
             <h2>Privacy policy</h2>
-            <p style="margin-top: 16px;">TabSidecar is a tab and window management extension. Its main purpose is to help you organize open tabs, restore windows, auto-park inactive tabs, save browser state, and export your own backup files.</p>
-            <p>Based on the current code audit, most extension data is stored locally in the browser using the extension's own IndexedDB database. The current code also includes two outbound data flows: optional AI-generated window titles sent to TabSidecar's API, and an optional email submission during onboarding sent to a Supabase backend.</p>
+            <p style="margin-top: 16px;">TabSidecar is a tab and window management extension. It helps you organize open tabs, restore windows, auto-park inactive tabs, save browser state, export your own backup files and, if you create an account, back up your tabs and windows to the cloud.</p>
+            <p>Most extension data stays in your browser, in the extension's own storage. Data leaves your device only when you turn on a feature that needs it, each described below: cloud sync if you sign in to an account, AI-generated window titles if you turn them on, and the update-email list if you join it.</p>
           </div>
 
           <div>
             <h3>Information we access</h3>
             <ul class="bullet-list">
-              <li>Open tab and window information, including tab URLs, titles, favicon URLs, pinned state, tab position, and window grouping.</li>
-              <li>Window metadata created inside the product, such as window names, saved windows, labels, nicknames, notes, priorities, and filter rules.</li>
-              <li>Closed-tab and auto-park history, including URLs, titles, timestamps, and time-accumulation data used for tab management features.</li>
+              <li>Open tab and window information, including tab URLs, titles, favicon URLs, pinned state, tab position, tab groups and window grouping.</li>
+              <li>Window metadata created inside the product, such as window names, saved windows, labels, nicknames, notes, priorities and filter rules.</li>
+              <li>Closed-tab and auto-park history, including URLs, titles, timestamps and time-accumulation data used for tab management features.</li>
               <li>Limited Chrome history data used for the extension's closed-URL backfill and history-management features.</li>
               <li>Settings and preferences you choose inside the extension.</li>
-              <li>An install-scoped random identifier used by the AI title feature for rate limiting and service operation.</li>
-              <li>An email address only if you choose to submit one during onboarding.</li>
+              <li>If you create an account: your email address, your password (handled by our sign-in provider, never stored by the extension in readable form), and the cloud snapshots described below.</li>
+              <li>An install-scoped random identifier used by the AI title feature for rate limiting.</li>
+              <li>An email address you give us for product updates, only if you choose to.</li>
             </ul>
           </div>
 
           <div>
-            <h3>Chrome permissions audit</h3>
+            <h3>Chrome permissions</h3>
             <ul class="bullet-list">
-            <li><code>tabs</code>: used to read, organize, move, create, focus, pin, and close tabs.</li>
-            <li><code>windows</code>: used to inspect, name, restore, focus, create, and remove browser windows.</li>
-            <li><code>alarms</code>: used for scheduled extension tasks such as auto-park checks and delayed processing.</li>
-            <li><code>history</code>: used to search browser history for closed-URL backfill and to support history deletion features triggered by the user.</li>
-            <li><code>favicon</code>: used to display site icons for tabs and saved items.</li>
-            <li><code>downloads</code>: used to export backup files that you choose to generate.</li>
+              <li><code>tabs</code>: used to read, organize, move, create, focus, pin and close tabs.</li>
+              <li><code>tabGroups</code>: used to read the names and colors of your tab groups for Local Bridge (see below). Nothing else uses it.</li>
+              <li><code>windows</code>: used to inspect, name, restore, focus, create and remove browser windows.</li>
+              <li><code>alarms</code>: used for scheduled tasks such as auto-park checks, automatic backups, automatic cloud sync and delayed processing.</li>
+              <li><code>storage</code>: used to keep window and tab identities, recovery state and diagnostics on your device, so windows can be matched back after a restart.</li>
+              <li><code>scripting</code>: used to add TabSidecar's two page scripts (described below) to tabs that were already open when the extension was installed or updated.</li>
+              <li><code>history</code>: used to search browser history for closed-URL backfill and to support history deletion features you trigger.</li>
+              <li><code>favicon</code>: used to display site icons for tabs and saved items.</li>
+              <li><code>downloads</code>: used to export backup files that you choose to generate.</li>
             </ul>
-            <p style="margin-top: 14px;">The current host permissions are <code>https://api.tabsidecar.com/*</code> and <code>https://ymvkvyfsrcdkkpkcicfd.supabase.co/*</code>.</p>
-            <p>TabSidecar does not currently request permissions for cookies, identity, bookmarks, microphone, camera, geolocation, or broad host access to arbitrary websites. It also does not read page contents, keystrokes, form fields, or passwords from websites.</p>
+            <p style="margin-top: 14px;">Host permissions: <code>http://*/*</code> and <code>https://*/*</code> (all websites), <code>https://api.tabsidecar.com/*</code> (AI window titles) and <code>https://quqhdnkypnuxvmibnzhn.supabase.co/*</code> (accounts, cloud sync and the update-email list).</p>
+            <p>The all-websites access also covers Local Bridge's local address (<code>127.0.0.1</code>), and exists for two small scripts that run on every page as it starts loading:</p>
+            <ul class="bullet-list">
+              <li><code>identity-content.js</code> stores a random TabSidecar tab and window ID in the page's session storage and navigation history state. Chrome restores these with the tab after a browser restart, which lets TabSidecar match a restored tab to its saved data. The script only reads and writes its own keys and never touches the page's other data. It tells the extension a site's origin (for example <code>https://example.com</code>) if that site cleared the IDs.</li>
+              <li><code>title-content.js</code> reads the page title and adds a lock symbol to it when you lock a tab in TabSidecar.</li>
+            </ul>
+            <p>Neither script reads page contents, keystrokes, form fields, passwords or cookies, and neither sends anything off your device. TabSidecar does not request permissions for cookies, identity, bookmarks, microphone, camera or geolocation.</p>
           </div>
 
           <div>
             <h3>How information is stored</h3>
-            <p>Based on the current codebase, TabSidecar primarily stores data locally in the extension's own IndexedDB database. That local data may include open tabs, windows, saved windows, auto-parked tabs, closed URLs, settings, labels, nicknames, saved-for-later items, and similar organization metadata.</p>
-            <p>When you export backup files, the extension generates those files locally and saves them through Chrome's download system. The current code excludes the install-scoped AI <code>userId</code> from exported settings backups.</p>
+            <p>TabSidecar stores its working data locally in the extension's own IndexedDB database and Chrome extension storage. That data may include open tabs, windows, saved windows, auto-parked tabs, closed URLs, settings, labels, nicknames, saved-for-later items and similar organization metadata. Browsing sessions that TabSidecar tracks for restoring windows stay on your device and are not included in backup files.</p>
+            <p>Local Bridge, an optional feature for tools running on your own computer, can share a snapshot of your windows, tabs and tab groups with a program listening at <code>127.0.0.1</code>. It is off by default, needs a secret you paste in to turn it on, and never sends anything off your computer.</p>
+            <p>When you export backup files, the extension generates them locally and saves them through Chrome's download system. Exported settings leave out the AI install identifier and your sign-in session.</p>
           </div>
 
           <div>
-            <h3>When information is sent off your device</h3>
+            <h3>Accounts and cloud sync</h3>
+            <p>An account is optional. Everything except cloud sync works without one.</p>
             <ul class="bullet-list">
-              <li>Optional AI window titles: if the AI window-title feature is enabled, the extension sends a request to <code>api.tabsidecar.com</code> containing an install-scoped random identifier, simplified tab information for the current window, and existing window titles so the service can return a generated title.</li>
-              <li>Optional onboarding email submission: if you enter your email address during onboarding, the extension sends that email address to a Supabase endpoint at <code>ymvkvyfsrcdkkpkcicfd.supabase.co</code>.</li>
+              <li><strong>Sign-in:</strong> accounts use an email address and password through Supabase Auth, our database and sign-in provider. To sign up, we email you a one-time code to confirm the address, then you set a password. Changing your password signs out your other sessions. Sign-ups whose email is never confirmed are deleted automatically after a day.</li>
+              <li><strong>What a cloud snapshot contains:</strong> your open tabs (URLs and titles) and windows, window names, saved, kept and closed windows, saved-for-later items, auto-parked tabs, nicknames, labels, priorities, notes, filter rules and extension settings. Each snapshot also records a device ID, a device name such as “Chrome on Windows”, and tab and window counts. Closed-tab history from Chrome and your sign-in session are not included.</li>
+              <li><strong>Devices:</strong> for each device we store its random ID, device name, extension version, browser name, platform and when it last synced.</li>
+              <li><strong>When it syncs:</strong> while you're signed in, the extension uploads a snapshot automatically (every hour by default; you can change the interval or turn it off) and whenever you sync manually.</li>
+              <li><strong>How many are kept:</strong> the extension keeps your 20 most recent snapshots per device and deletes older ones. The database also caps each account at 10 devices and 50 MB of snapshots, removing the oldest snapshots first.</li>
             </ul>
-            <p>TabSidecar does not currently include third-party advertising SDKs, behavior analytics SDKs, cross-site tracking pixels, or general-purpose telemetry platforms. We also found documentation describing possible future cloud backup architecture, but that documentation does not appear to be an active user-facing backup upload feature in the current build.</p>
           </div>
 
           <div>
-            <h3>How we use information</h3>
-            <p>TabSidecar uses information to display, search, sort, and organize your tabs and windows, auto-park inactive tabs, restore windows and layouts, save your labels and preferences, generate local backup exports, generate optional AI-based window titles if enabled, and collect an optional onboarding email address if you choose to submit one.</p>
+            <h3>Encryption and who can access your data</h3>
+            <ul class="bullet-list">
+              <li>Data is encrypted in transit (HTTPS) and encrypted at rest by our database provider, Supabase.</li>
+              <li>Cloud snapshots are <strong>not</strong> end-to-end encrypted. The TabSidecar operator can technically access them, and only does so when needed for support or security.</li>
+              <li>Other users can't access your data. Database access rules restrict every row to the account that owns it.</li>
+            </ul>
           </div>
 
           <div>
-            <h3>Data sharing</h3>
-            <p>Based on the current code audit, TabSidecar does not sell your personal information. The current code sends data to external service providers only in the limited cases described above: the TabSidecar API for optional AI window titles and Supabase for optional onboarding email capture.</p>
+            <h3>AI window titles</h3>
+            <p>AI window titles are off until you turn them on, either during setup or in Settings → Artificial Intelligence. Asking for an AI title for a single window also sends that window's request.</p>
+            <p>When they're on, the extension sends a request to <code>api.tabsidecar.com</code> containing an install-scoped random identifier, the window's tab titles and the site name of each tab (for example <code>github.com</code>, not the full address), and your existing window titles. If you're signed in, the request also carries your sign-in token so your account gets a higher daily limit. Our server passes the tab titles and site names to Google's Gemini API to generate the title and returns it to the extension.</p>
+            <p>Our server does not store tab titles or site names. To enforce daily limits it keeps a count of requests per day for your install identifier, account and network address, and deletes those counts after 7 days.</p>
+          </div>
+
+          <div>
+            <h3>Update emails</h3>
+            <p>If you choose to join the update-email list, the extension sends that email address to our Supabase database. We use it only to send product updates.</p>
+          </div>
+
+          <div>
+            <h3>Service providers and data sharing</h3>
+            <p>TabSidecar does not sell your personal information and does not include advertising SDKs, behavior analytics, cross-site tracking pixels or general-purpose telemetry. We use two service providers:</p>
+            <ul class="bullet-list">
+              <li><strong>Supabase:</strong> hosts accounts, sign-in, cloud snapshots, devices and the update-email list, and sends account emails.</li>
+              <li><strong>Google (Gemini API):</strong> generates AI window titles from the tab titles and site names described above, if you turn them on.</li>
+            </ul>
           </div>
 
           <div>
             <h3>Your choices</h3>
-            <p>You can choose whether to use the AI window-title feature, choose whether to provide an email address during onboarding, export your own backup files locally, remove extension data by uninstalling the extension or clearing extension storage through Chrome's extension controls, and manage browser history separately through Chrome.</p>
+            <p>You can use TabSidecar without an account; turn automatic cloud sync off or change how often it runs; turn AI window titles on or off (they're off unless you turn them on); choose whether to join the update-email list; export your own backup files locally; remove local extension data by uninstalling the extension or clearing its storage through Chrome; and manage browser history separately through Chrome.</p>
           </div>
 
           <div>
-            <h3>Data retention</h3>
-            <p>Local data remains in the extension's local storage until you delete it, overwrite it, clear the extension's data, or uninstall the extension. Exported backup files remain wherever you save them. If you submit an onboarding email or use the AI title service, data sent to those services may be retained by the relevant backend according to operational needs and applicable law.</p>
+            <h3>Data retention and deletion</h3>
+            <p>Local data remains in the extension's storage until you delete it, clear the extension's data or uninstall the extension. Exported backup files remain wherever you save them.</p>
+            <p>Cloud snapshots are kept as described under “Accounts and cloud sync” until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
           </div>
 
           <div>
             <h3>Security</h3>
-            <p>TabSidecar stores most working data locally inside the browser extension environment. No software can guarantee absolute security, but the current architecture limits always-on remote transmission by keeping most tab-management data on device unless you use a feature that specifically sends data to a backend service.</p>
+            <p>Account data is protected by the encryption and per-account access rules described above. Deleting an account requires a password sign-in within the last few minutes, so a stolen session alone can't delete it. No software can guarantee absolute security, but TabSidecar keeps most tab-management data on your device unless you use a feature that sends it to a backend service.</p>
           </div>
 
           <div>
             <h3>Children's privacy</h3>
-            <p>TabSidecar is not directed to children under 13, and we do not knowingly design it to collect personal information from children.</p>
+            <p>TabSidecar is not directed to children under 13, and we do not knowingly collect personal information from children.</p>
           </div>
 
           <div>
             <h3>Changes to this policy</h3>
-            <p>This Privacy Policy may be updated as the product changes. If future versions add cloud backup, accounts, or additional remote services, this policy should be updated to reflect those changes before or when those features ship.</p>
+            <p>We update this policy when the product changes how it handles data, before or when those changes ship. The date at the top of this page shows when it was last updated.</p>
           </div>
 
           <div>
