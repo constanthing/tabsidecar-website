@@ -11,6 +11,7 @@
 <script src="assets/site.js?v=202609271832"></script>
 <script src="assets/icons.js?v=202609271832" defer></script>
 <script src="assets/mock.js?v=202609271832" defer></script>
+<script src="assets/common-passwords.js?v=202609281" defer></script>
 <style>
   /* Email confirmed: where the fallback link in the signup code email lands
      (EMAIL_CONFIRM_REDIRECT_URL in background/cloud-auth.js). The email is
@@ -226,6 +227,7 @@
       e.preventDefault();
       if (pw.value.length < MIN_LENGTH) return status('err', `Use at least ${MIN_LENGTH} characters.`);
       if (pw.value !== confirm.value) return status('err', 'The passwords don’t match.');
+      if (await isCommonPassword(pw.value)) return status('err', COMMON_PASSWORD_MESSAGE);
       busy(true);
       try {
         await supabase('/auth/v1/user', { method: 'PUT', body: JSON.stringify({ password: pw.value }) });
@@ -248,6 +250,7 @@
     if (linkError) expired(params.get('error_code') === 'otp_expired', params.get('error_description'));
     else if (accessToken) {
       view('Form');
+      isCommonPassword('');  // start loading the list
       // The access token is a JWT; its payload carries the email. Read it
       // locally, no extra request.
       try {
