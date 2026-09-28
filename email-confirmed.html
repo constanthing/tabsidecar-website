@@ -214,7 +214,11 @@
       });
       const text = await res.text();
       const body = text ? JSON.parse(text) : null;
-      if (!res.ok) throw new Error(body?.msg || body?.message || body?.error_description || body?.error || 'Something went wrong.');
+      if (!res.ok) {
+        const err = new Error(body?.msg || body?.message || body?.error_description || body?.error || 'Something went wrong.');
+        err.code = body?.error_code;
+        throw err;
+      }
       return body;
     }
 
@@ -229,7 +233,13 @@
         try { await supabase('/auth/v1/logout?scope=others', { method: 'POST' }); } catch { /* best effort */ }
         form.reset(); checkReqs(); view('Done');
       } catch (err) {
-        status('err', err.message || 'Could not set your password.');
+        // Supabase requires the current password once an account has one, so
+        // a code-email link can't replace it (#178).
+        if (err.code === 'current_password_required' || err.code === 'current_password_mismatch') {
+          status('err', 'This account already has a password. Sign in with it in TabSidecar, or choose <b>Forgot password?</b> there to reset it.');
+        } else {
+          status('err', err.message || 'Could not set your password.');
+        }
       } finally {
         busy(false);
       }
