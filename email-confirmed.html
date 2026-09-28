@@ -215,11 +215,7 @@
       });
       const text = await res.text();
       const body = text ? JSON.parse(text) : null;
-      if (!res.ok) {
-        const err = new Error(body?.msg || body?.message || body?.error_description || body?.error || 'Something went wrong.');
-        err.code = body?.error_code;
-        throw err;
-      }
+      if (!res.ok) throw new Error(body?.msg || body?.message || body?.error_description || body?.error || 'Something went wrong.');
       return body;
     }
 
@@ -231,17 +227,13 @@
       busy(true);
       try {
         await supabase('/auth/v1/user', { method: 'PUT', body: JSON.stringify({ password: pw.value }) });
-        // Only this browser's session survives a password change.
-        try { await supabase('/auth/v1/logout?scope=others', { method: 'POST' }); } catch { /* best effort */ }
+        // Sign out every session, this link's included: the user signs in with
+        // the new password in TabSidecar, and the link's session could otherwise
+        // set another password without the current one (#178).
+        try { await supabase('/auth/v1/logout?scope=global', { method: 'POST' }); } catch { /* best effort */ }
         form.reset(); checkReqs(); view('Done');
       } catch (err) {
-        // Supabase requires the current password once an account has one, so
-        // a code-email link can't replace it (#178).
-        if (err.code === 'current_password_required' || err.code === 'current_password_mismatch') {
-          status('err', 'This account already has a password. Sign in with it in TabSidecar, or choose <b>Forgot password?</b> there to reset it.');
-        } else {
-          status('err', err.message || 'Could not set your password.');
-        }
+        status('err', err.message || 'Could not set your password.');
       } finally {
         busy(false);
       }
