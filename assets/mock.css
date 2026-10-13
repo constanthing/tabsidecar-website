@@ -463,3 +463,38 @@
 .ts .kbd-list kbd { font-size: 11.5px; color: var(--text-2); padding: 1px 6px; }
 .ts .feature-mock .set-group:last-child, .ts.feature-mock .set-group:last-child { margin-bottom: 0; }
 .ts .win.neutral .wdot { background: var(--border-strong); }
+
+/* Restore banner, grouped (restore redesign #267-#275): Named windows, then a
+   folding Other windows (N); rows wrap their buttons like .unmatched-window. */
+.ts .rb-groups { position: relative; gap: 8px; padding: 10px 14px 12px; }
+.ts .rb-groups .rb-title-main { font-size: 13px; }
+.ts .rb-group { display: flex; flex-direction: column; gap: 4px; }
+.ts .rb-group-head { display: flex; align-items: center; gap: 6px; padding: 2px 0; color: var(--muted); font-size: 12px; list-style: none; cursor: default; }
+.ts .rb-group-head::-webkit-details-marker { display: none; }
+.ts .rb-other[open] > summary .rb-chev svg { transform: rotate(90deg); }
+.ts .rb-group-list { display: flex; flex-direction: column; gap: 4px; }
+.ts .rb-groups .rb-window { flex-wrap: wrap; gap: 6px 10px; padding: 6px 9px; }
+.ts .rb-groups .rb-wtxt { flex: 1 1 100px; }
+.ts .rb-groups .rb-window .fav-strip { width: 52px; flex: none; }
+.ts .rb-wtxt b { display: flex; align-items: center; gap: 5px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ts .rb-wtxt i { color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ts .rb-groups .rb-wtxt span { color: var(--faint); font-size: 11.5px; }
+.ts .rb-ai { display: grid; color: var(--muted); }
+.ts .rb-ai svg { width: 12px; height: 12px; }
+.ts .rb-acts { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.ts .rb-done { display: none; margin-left: auto; color: var(--ok); font-size: 12px; font-weight: 500; }
+.ts .rb-window.is-done .rb-acts { display: none; }
+.ts .rb-window.is-done .rb-done { display: inline; }
+.ts .rb-window.is-done { background: color-mix(in srgb, var(--ok) 5%, var(--surface)); }
+.ts .rb-window.is-gone { display: none; }
+.ts .rb-groups .toast { bottom: 10px; }
+@container (max-width: 470px) { .ts .rb-acts .btn:first-child { font-size: 0; } .ts .rb-acts .btn:first-child::after { content: "Restore"; font-size: 12px; } }
+.ts.restored { container-type: inline-size; }
+
+.ts .rb-groups .toast.show { pointer-events: auto; }
+.ts .toast-undo { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; opacity: .75; cursor: pointer; }
+.ts .toast-undo:hover, .ts .toast-undo:focus-visible { opacity: 1; text-decoration: underline; }
+.ts .f-snaps-head { display: flex; align-items: baseline; gap: 6px; margin: 6px 2px -2px; font-weight: 600; font-size: 13px; }
+.ts .f-snaps-head span { color: var(--faint); font-weight: 400; font-size: 12px; }
+.ts .link-row .txt { display: flex; flex-direction: column; gap: 1px; }
+.ts .rb-when { white-space: nowrap; }

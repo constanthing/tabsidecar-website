@@ -2,7 +2,8 @@
 
 Reference for the pages in this repo. Captures the *why* behind the design,
 layout and copy so future edits stay consistent. Last rewritten September 27,
-2026, when the site moved to the Windows design.
+2026, when the site moved to the Windows design; home page sections reworked
+October 13, 2026.
 
 ---
 
@@ -52,8 +53,8 @@ something:
 
 - **Window colors** name the sections, like window colors in the popup:
   popup blue `#3b82f6`, Auto-Park amber `#f59e0b`, Saved Windows sky
-  `#0ea5e9`, Cloud Sync pink `#ec4899`, Organize violet `#8b5cf6`, And the rest
-  indigo `#6366f1`. The FAQ is neutral, like the All tabs group.
+  `#0ea5e9`, Cloud Sync pink `#ec4899`. The FAQ is neutral, like the All tabs
+  group.
 - **Anchor teal** `#009688` belongs to recovery and anchored windows only
   (Session restore). Don't use it for anything else.
 - **One blue button** per view for the main action (`--brand #3b82f6`).
@@ -83,38 +84,48 @@ Order, top to bottom:
 1. **Hero:** "Free for Chrome and Edge" pill, *Close tabs without losing
    them.*, one lead sentence, Add to Chrome.
 2. **TabSidecar** (blue, "Current"): the clickable popup mockup.
-3. **Auto-Park** (amber): the headline feature, with its animated demo.
-4. **Session restore** (teal, "Anchored").
+3. **Auto-Park** (amber): the headline feature. Text on the left with a short
+   "never park" list (pinned, locked, playing sound) and Replay; on the right
+   the animated demo, the window stacked above AutoParked.
+4. **Session restore** (teal, "Anchored"): three numbered points (named
+   windows first, the rest folds away, the Last session page) beside the
+   restore banner as the popup draws it after the restore redesign
+   (TabSentry #267-#275): the summary with "Chrome started …", Show restored
+   windows, Restore all, **Named windows**, then **Other windows (N)**, folded.
+   Just the banner, no popup frame around it. Restore, Hide (with the popup's
+   toast and Undo) and Restore all work, with the popup's words.
 5. **Saved Windows** (sky): got its own section instead of a tile. A strong
    reason to install on its own.
-6. **Cloud Sync** (pink): sign in, snapshot every hour, sign in on a new
-   machine or profile and import. Its checklist lists only what a snapshot
-   really contains (closed windows yes, single closed tabs no).
-7. **Organize** (violet): *Five ways to keep your windows tidy.* Name and
-   color windows, anchor, rules, labels, nicknames and notes.
-8. **And the rest** (indigo): eight small-feature tiles.
-9. **Questions** (neutral FAQ), then a closing call to action.
+6. **Cloud Sync** (pink): text on the left (snapshot every hour, import on a
+   new machine or profile, about a week of snapshots per device, off unless you
+   sign in); on the right the Cloud Sync page's This device card and Latest
+   snapshots, four rows from three devices.
+7. **Questions** (neutral FAQ), then a closing call to action.
 
-Removed on purpose: a Search section (folded into a tile; the hero already
-promises search) and a "Make it yours" theme picker (on phones the options
-pushed the popup out of view, so you couldn't see what they changed; it's a
-tile now).
+Removed on purpose:
+- A Search section (the hero promises search and the popup mockup shows it)
+  and a "Make it yours" theme picker (on phones the options pushed the popup
+  out of view).
+- **Organize** and **And the rest** (October 13, 2026): grids of icon tiles
+  with a heading and a line of copy looked weak next to the product pictures,
+  and a richer version with a picture per tile made the page long. The page
+  now keeps to the five features that sell it; the rest is in the popup
+  mockup. The "What comes along" checklist in Cloud Sync went for the same
+  reason.
 
 ### Layout rules
-- **Two columns only when both sides are about the same height** (Session
-  restore, Saved Windows). When one side is much taller, **stack**: heading and
-  intro on top (max 640px wide), content full width below (Auto-Park,
-  Organize, Cloud Sync). Don't leave a short column next to empty space.
-- **Tiles** (Organize, And the rest): icon in a small box on top, bold title,
-  one line of copy. Equal columns (3 or 4 wide, 2 on tablets, 1 on phones). A
-  short last row stays left-aligned; never stretch items to fill it. Pick
-  counts that fill rows (And the rest is 8 in 4 columns).
-- **Examples are tiny.** Organize shows small inline chips (window names,
-  label pills, `github.com → Work`) instead of full menus or popup
-  screenshots, which ate phone screens.
-- **Phones:** check 375px and 320px. Mock rows drop secondary text before
-  anything overflows; the top nav hides below 900px; nothing may scroll
-  sideways.
+- **Text left, picture right** in every feature section, both columns
+  centered vertically. Keep the picture about as tall as the text: trim rows
+  (four snapshots, Other windows folded) rather than leave a short column next
+  to empty space.
+- **Pictures are the product.** Draw them from the popup's own markup and
+  words (`assets/mock.js`): the restore banner, the Cloud Sync page, window
+  cards. Check the extension before showing a control: window colors are
+  assigned automatically (there is no color picker), and Save for later puts
+  a tab on a list with a "Later" chip (there is no timed snooze).
+- **Phones:** check 375px and 320px. Columns stack, text first. Mock rows drop
+  secondary text before anything overflows (banner rows put their buttons on
+  a second line); the top nav hides below 900px; nothing may scroll sideways.
 
 ---
 

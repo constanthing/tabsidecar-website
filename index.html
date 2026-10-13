@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TabSidecar: close tabs without losing them</title>
 <meta name="description" content="TabSidecar parks the tabs you've stopped using, brings your windows back after Chrome restarts, and keeps every tab one search away.">
-<link rel="stylesheet" href="assets/mock.css?v=202609271832">
-<link rel="stylesheet" href="assets/site.css?v=202609271832">
-<link rel="stylesheet" href="assets/windows.css?v=202609271832">
-<script src="assets/site.js?v=202609271832"></script>
-<script src="assets/icons.js?v=202609271832" defer></script>
-<script src="assets/mock.js?v=202609271832" defer></script>
-<script src="assets/windows.js?v=202609271832" defer></script>
+<link rel="stylesheet" href="assets/mock.css?v=202610130328">
+<link rel="stylesheet" href="assets/site.css?v=202610130328">
+<link rel="stylesheet" href="assets/windows.css?v=202610130328">
+<script src="assets/site.js?v=202610130328"></script>
+<script src="assets/icons.js?v=202610130328" defer></script>
+<script src="assets/mock.js?v=202610130328" defer></script>
+<script src="assets/windows.js?v=202610130328" defer></script>
 <style>
   /* Windows: the page is a window list. One background; every section is a
      window card in its own window color, drawn the way the popup draws Tint
@@ -21,39 +21,28 @@
   .hero .cta-row { justify-content: center; }
 
   .two { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 52px; align-items: center; }
-  .two.top { align-items: start; }
   .txt { display: grid; gap: 16px; }
   .txt .h2 { font-size: clamp(26px, 3vw, 36px); }
   @media (max-width: 920px) { .two { grid-template-columns: minmax(0, 1fr); gap: 30px; } }
 
 
-  .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 24px; margin-top: 28px; }
-  .grid4 .t-ico { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; margin-bottom: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); box-shadow: var(--shadow); }
-  .grid4 b { display: block; font-weight: 600; font-size: 15px; margin-bottom: 3px; }
-  .grid4 span { color: var(--muted); font-size: 14px; }
-  @media (max-width: 960px) { .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 520px) { .grid4 { grid-template-columns: minmax(0, 1fr); } }
-
   .closing { text-align: center; padding: 120px 0 20px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
   .closing .cta-row { justify-content: center; }
-  /* Tiles like And the rest (.grid4): icon on top, equal columns, and a short
-     last row stays left-aligned instead of stretching. */
-  .ways { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 24px; }
-  @media (max-width: 960px) { .ways { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 520px) { .ways { grid-template-columns: minmax(0, 1fr); } }
-  .ways .t-ico { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; margin-bottom: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); box-shadow: var(--shadow); }
-  .stack-txt { max-width: 640px; margin-bottom: 32px; }
-  .ways b { display: block; font-weight: 600; font-size: 15px; margin-bottom: 3px; }
-  .ways .d { display: block; color: var(--muted); font-size: 14px; }
-  .eg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
-  .eg .chip { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); color: var(--text); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-  .eg .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
-  .eg .chip.old { color: var(--muted); text-decoration: line-through; }
-  .eg .tagx { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 6px; font-weight: 500; }
-  .carry { list-style: none; padding: 0; margin: 4px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; }
-  .carry li { display: flex; align-items: center; gap: 8px; font-size: 14.5px; }
-  .carry li i, .carry li svg { color: var(--wc); flex: none; }
-  @media (max-width: 380px) { .carry { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Auto-Park: what never parks, as a short list beside the demo */
+  .never { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .never li { display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--text-2); }
+  .never b { color: var(--text); font-weight: 600; }
+  .n-ico { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; flex: none; background: color-mix(in srgb, var(--wc) 12%, var(--surface)); color: color-mix(in srgb, var(--wc) 75%, var(--text)); }
+  .n-ico svg { width: 15px; height: 15px; }
+  #autopark .ap-stacked { grid-template-columns: minmax(0, 1fr); padding-bottom: 52px; }
+
+  /* Session restore: three short points beside the banner */
+  .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: s; }
+  .steps li { position: relative; padding-left: 34px; font-size: 15px; color: var(--muted); line-height: 1.55; }
+  .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 1px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: #00796b; background: rgba(0, 150, 136, .1); }
+  .steps b { color: var(--text); font-weight: 600; }
+
   @media (max-width: 520px) { #saved .fav-strip { display: none; } #saved .win-title { flex-shrink: 0; } #saved .win-meta { display: none; } #saved .win-actions { margin-left: auto; } }
   @media (max-width: 900px) { .nav-links { display: none; } .site-nav .wrap { justify-content: space-between; } }
 </style>
@@ -65,7 +54,7 @@
 <header class="site-nav lined"><div class="wrap">
   <a class="wordmark" href="#top"><span class="logo-tile">TS</span>TabSidecar</a>
   <nav class="nav-links" aria-label="Page">
-    <a href="#autopark">Auto-Park</a><a href="#restore">Session restore</a><a href="#saved">Saved Windows</a><a href="#cloud">Cloud Sync</a><a href="#organize">Organize</a><a href="#faq">FAQ</a>
+    <a href="#autopark">Auto-Park</a><a href="#restore">Session restore</a><a href="#saved">Saved Windows</a><a href="#cloud">Cloud Sync</a><a href="#faq">FAQ</a>
   </nav>
   <a class="b sm" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Add to Chrome</a>
 </div></header>
@@ -82,8 +71,8 @@
   </section>
 
   <div class="list-bar">
-    <span class="lb-title">This page</span><span class="count">7 windows</span>
-    <span class="swatch-row" aria-hidden="true"><i style="--c:#3b82f6"></i><i style="--c:#f59e0b"></i><i style="--c:#009688"></i><i style="--c:#0ea5e9"></i><i style="--c:#ec4899"></i><i style="--c:#8b5cf6"></i><i style="--c:#6366f1"></i></span>
+    <span class="lb-title">This page</span><span class="count">5 windows</span>
+    <span class="swatch-row" aria-hidden="true"><i style="--c:#3b82f6"></i><i style="--c:#f59e0b"></i><i style="--c:#009688"></i><i style="--c:#0ea5e9"></i><i style="--c:#ec4899"></i></span>
     <span class="sp"></span>
     <button class="ibtn" data-all="close" title="Collapse all"><i data-icon="collapse-all"></i></button>
     <button class="ibtn" data-all="open" title="Expand all"><i data-icon="expand-all"></i></button>
@@ -109,12 +98,19 @@
           <span class="menu-wrap"><button class="ibtn" aria-label="Jump to"><i data-icon="more"></i></button><nav class="pop-menu" data-jump></nav></span></span>
       </header>
       <div class="swin-body" data-demo>
-        <div class="txt" style="max-width:640px;margin-bottom:30px">
-          <h3 class="h2">Tabs you haven’t touched park themselves.</h3>
-          <p class="copy">Pick a limit, from an hour to a few weeks. When a tab sits unused that long, TabSidecar closes it and keeps it under AutoParked, where you can search it and reopen it in one click. <b>Pinned, locked and playing tabs never park.</b></p>
+        <div class="two">
+          <div class="txt">
+            <h3 class="h2">Tabs you haven’t touched park themselves.</h3>
+            <p class="copy">Pick a limit, from an hour to a few weeks. When a tab sits unused that long, TabSidecar closes it and keeps it under AutoParked, where you can search it and reopen it in one click.</p>
+            <ul class="never">
+              <li><span class="n-ico"><i data-icon="pin"></i></span><span><b>Pinned tabs</b> never park.</span></li>
+              <li><span class="n-ico"><i data-icon="lock"></i></span><span><b>Locked tabs</b> never park, however long they sit.</span></li>
+              <li><span class="n-ico"><i data-icon="audio"></i></span><span><b>Tabs playing sound</b> never park.</span></li>
+            </ul>
+            <div><button class="b quiet sm" data-replay><i data-icon="refresh"></i>Replay</button></div>
+          </div>
+          <div data-mock="autopark" class="ap-stacked"></div>
         </div>
-        <div data-mock="autopark"></div>
-        <button class="b quiet sm" data-replay><i data-icon="refresh"></i>Replay</button>
       </div>
     </article>
 
@@ -130,9 +126,14 @@
           <div class="txt">
             <h3 class="h2">Chrome restarts. Your windows come back.</h3>
             <p class="copy">A crash, a force-quit, an update, a laptop that ran out of battery. TabSidecar keeps a copy of every window as you work and matches each one back when Chrome opens again, with its name, color and locked tabs.</p>
+            <ul class="steps">
+              <li><b>Named windows first.</b> The windows you named, saved or anchored are listed on top, ready to restore.</li>
+              <li><b>The rest folds away.</b> Untitled windows wait under Other windows. Hide one and it moves to Closed Windows.</li>
+              <li><b>Nothing is lost.</b> The Last session page lists every window your last session had, and whether it came back.</li>
+            </ul>
             <p class="copy">Anchor the window you open every morning. It’s the only one that gets this teal, and it always comes back.</p>
           </div>
-          <div data-mock="restored"></div>
+          <div data-mock="restored" data-state="missing"></div>
         </div>
       </div>
     </article>
@@ -164,80 +165,18 @@
         <span class="end"><span class="menu-wrap"><button class="ibtn" aria-label="Jump to"><i data-icon="more"></i></button><nav class="pop-menu" data-jump></nav></span></span>
       </header>
       <div class="swin-body">
-        <div class="txt stack-txt">
-          <h3 class="h2">New laptop. Same windows.</h3>
-          <p class="copy">Sign in and TabSidecar keeps a snapshot of your setup in the cloud, updated every hour. On a new computer or a fresh browser profile, sign in again and import it. Everything comes back the way you left it.</p>
-        </div>
         <div class="two">
-          <div>
-            <div class="group-title">What comes along</div>
-            <ul class="carry">
-                <li><i data-icon="check"></i>Open windows and tabs</li>
-                <li><i data-icon="check"></i>Window names and colors</li>
-                <li><i data-icon="check"></i>Saved Windows</li>
-                <li><i data-icon="check"></i>Closed Windows</li>
-                <li><i data-icon="check"></i>AutoParked tabs</li>
-                <li><i data-icon="check"></i>Save for later</li>
-                <li><i data-icon="check"></i>Nicknames and labels</li>
-                <li><i data-icon="check"></i>Rules and settings</li>
-            </ul>
+          <div class="txt">
+            <h3 class="h2">New laptop. Same windows.</h3>
+            <p class="copy">Sign in and TabSidecar keeps a snapshot of your setup in the cloud, updated every hour. On a new computer or a fresh browser profile, sign in again and import it. Everything comes back the way you left it.</p>
+            <p class="copy">Each device keeps about a week of snapshots, so you can go back to an earlier one. Cloud Sync is optional and stays off unless you sign in.</p>
           </div>
-          <div data-mock="feature" data-feature="cloud"></div>
+          <div data-mock="feature" data-feature="cloudMany"></div>
         </div>
       </div>
     </article>
 
-    <!-- 6. Organize: violet -->
-    <article class="swin" style="--wc:#8b5cf6" id="organize">
-      <header class="swin-head">
-        <button class="caret" aria-label="Collapse"><i data-icon="chev"></i></button><span class="swin-dot"></span>
-        <h2 class="swin-title">Organize</h2><span class="swin-meta">5 ways</span>
-        <span class="end"><span class="fav-row"><span><i data-icon="edit"></i></span><span><i data-icon="label"></i></span><span><i data-icon="wand"></i></span></span>
-          <span class="menu-wrap"><button class="ibtn" aria-label="Jump to"><i data-icon="more"></i></button><nav class="pop-menu" data-jump></nav></span></span>
-      </header>
-      <div class="swin-body">
-        <div class="txt stack-txt">
-          <h3 class="h2">Five ways to keep your windows tidy.</h3>
-          <p class="copy">Give windows names that mean something and let rules do the sorting. Everything here is one right-click away, on any window or tab.</p>
-        </div>
-        <ul class="ways">
-          <li><span class="t-ico"><i data-icon="edit"></i></span><div><b>Name and color windows</b><span class="d">Know which window is which at a glance.</span>
-            <div class="eg"><span class="chip"><span class="dot" style="--c:#8b5cf6"></span>Launch week</span><span class="chip"><span class="dot" style="--c:#0ea5e9"></span>Reading list</span><span class="chip"><span class="dot" style="--c:#f97316"></span>Home</span></div></div></li>
-          <li><span class="t-ico"><i data-icon="pin"></i></span><div><b>Anchor a window</b><span class="d">The one you open every morning. It always comes back.</span>
-            <div class="eg"><span class="chip"><span class="dot" style="--c:#009688"></span>Daily</span><span class="tagx anchor"><i data-icon="pin"></i>Anchored</span></div></div></li>
-          <li><span class="t-ico"><i data-icon="wand"></i></span><div><b>Rules that sort for you</b><span class="d">New tabs move to the right window on their own.</span>
-            <div class="eg"><span class="chip">github.com</span>→<span class="chip"><span class="dot" style="--c:#f59e0b"></span>Work</span></div></div></li>
-          <li><span class="t-ico"><i data-icon="label"></i></span><div><b>Labels</b><span class="d">Tag tabs across windows, then filter by label.</span>
-            <div class="eg"><span class="chip"><span class="dot" style="--c:#0ea5e9"></span>Research</span><span class="chip"><span class="dot" style="--c:#ec4899"></span>Design</span><span class="chip"><span class="dot" style="--c:#f59e0b"></span>Work</span></div></div></li>
-          <li><span class="t-ico"><i data-icon="note"></i></span><div><b>Nicknames and notes</b><span class="d">Rename tabs with useless titles. Leave a note where you need one.</span>
-            <div class="eg"><span class="chip old">Booking.com: Hotels in Lisbon</span>→<span class="chip">Lisbon hotel shortlist</span></div></div></li>
-        </ul>
-      </div>
-    </article>
-
-    <!-- 7. The rest: indigo -->
-    <article class="swin" style="--wc:#6366f1" id="more">
-      <header class="swin-head">
-        <button class="caret" aria-label="Collapse"><i data-icon="chev"></i></button><span class="swin-dot"></span>
-        <h2 class="swin-title">And the rest</h2><span class="swin-meta">8 small things</span>
-        <span class="end"><span class="menu-wrap"><button class="ibtn" aria-label="Jump to"><i data-icon="more"></i></button><nav class="pop-menu" data-jump></nav></span></span>
-      </header>
-      <div class="swin-body">
-        <h3 class="h2">Small things that add up.</h3>
-        <div class="grid4">
-          <div><div class="t-ico"><i data-icon="search"></i></div><b>Search</b><span>Press <kbd>/</kbd> to search titles, addresses and labels in every window.</span></div>
-          <div><div class="t-ico"><i data-icon="history"></i></div><b>Closed Windows</b><span>Closed one by mistake? Bring it back, tabs and all.</span></div>
-          <div><div class="t-ico"><i data-icon="clock"></i></div><b>Save for later</b><span>Snooze a tab until tonight, tomorrow or the weekend.</span></div>
-          <div><div class="t-ico"><i data-icon="lock"></i></div><b>Lock tabs</b><span>Lock a tab and Auto-Park leaves it alone, however long it sits.</span></div>
-          <div><div class="t-ico"><i data-icon="chat"></i></div><b>AI chats</b><span>One button filters to your Claude, ChatGPT and Gemini tabs.</span></div>
-          <div><div class="t-ico"><i data-icon="palette"></i></div><b>Light or dark</b><span>Pick a theme, tinted or striped window colors, and roomy or compact rows.</span></div>
-          <div><div class="t-ico"><i data-icon="archive"></i></div><b>Backups</b><span>Automatic local backups, plus export and restore.</span></div>
-          <div><div class="t-ico"><i data-icon="keyboard"></i></div><b>Keyboard first</b><span>Open TabSidecar and move through your tabs without the mouse.</span></div>
-        </div>
-      </div>
-    </article>
-
-    <!-- 8. FAQ: neutral, like the All tabs group -->
+    <!-- 6. FAQ: neutral, like the All tabs group -->
     <article class="swin neutral" id="faq">
       <header class="swin-head">
         <button class="caret" aria-label="Collapse"><i data-icon="chev"></i></button><span class="swin-dot"></span>
@@ -248,7 +187,7 @@
         <details><summary>Which tabs never park?<i data-icon="chev"></i></summary><div class="a">Pinned tabs, locked tabs and tabs playing audio. Lock any tab from its right-click menu.</div></details>
         <details><summary>What happens if Chrome crashes?<i data-icon="chev"></i></summary><div class="a">TabSidecar saves your windows in the background. When Chrome starts again, it matches each window back and shows you what it restored.</div></details>
         <details><summary>Where are my tabs stored?<i data-icon="chev"></i></summary><div class="a">In your browser, on your computer. Cloud Sync is optional and stays off unless you sign in.</div></details>
-        <details><summary>What does Cloud Sync leave out?<i data-icon="chev"></i></summary><div class="a">Your sign-in session and the history of single tabs you closed. Closed windows are included. Each device keeps its 20 most recent snapshots, so you can go back to an earlier one.</div></details>
+        <details><summary>What does Cloud Sync leave out?<i data-icon="chev"></i></summary><div class="a">Your sign-in session and the history of single tabs you closed. Closed windows are included. Each device keeps about a week of snapshots, so you can go back to an earlier one.</div></details>
         <details><summary>Does it cost anything?<i data-icon="chev"></i></summary><div class="a">No. TabSidecar is free. You only need an account if you want Cloud Sync.</div></details>
       </div>
     </article>
