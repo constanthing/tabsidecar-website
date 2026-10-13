@@ -29,7 +29,7 @@
       { t: 'Deep focus — lofi mix', u: 'youtube.com/watch?v=jfKfPfyJRdk', f: '▶', c: '#ff0000', time: '3h 20m', when: '1m ago', audio: true },
     ] },
     reading: { name: 'Reading list', color: C.sky, saved: true, tabs: [
-      { t: 'A field guide to calm interfaces', u: 'uxdesign.cc/calm-interfaces', f: 'U', c: '#111827', time: '12m', when: '3h ago', later: 'Tonight' },
+      { t: 'A field guide to calm interfaces', u: 'uxdesign.cc/calm-interfaces', f: 'U', c: '#111827', time: '12m', when: '3h ago', later: 'Later' },
       { t: 'Rust async book — Pinning', u: 'rust-lang.github.io/async-book/pinning', f: 'R', c: '#b7410e', time: '35m', when: '4h ago', note: 'Re-read before Thursday' },
       { t: 'Things to do in Lisbon', u: 'timeout.com/lisbon/things-to-do', f: 'T', c: '#e4002b', time: '18m', when: '1h ago', lbl: ['Research'] },
       { t: 'Best budget travel cameras (2026)', u: 'theverge.com/travel-cameras', f: 'V', c: '#5200ff', time: '8m', when: '5h 58m ago', soon: true },
@@ -39,7 +39,7 @@
       { t: 'Flights to Lisbon', u: 'google.com/travel/flights', f: 'G', c: '#4285f4', time: '26m', when: '40m ago' },
       { t: 'Booking.com: Hotels in Lisbon', nick: 'Lisbon hotel shortlist', u: 'booking.com/city/pt/lisbon', f: 'B', c: '#003580', time: '15m', when: '52m ago', pri: 'Medium' },
       { t: 'Inbox (12) — Gmail', u: 'mail.google.com/mail/u/0', f: 'M', c: '#ea4335', time: '4h', when: '6m ago', pin: true },
-      { t: 'KALLAX shelf unit', u: 'ikea.com/us/en/p/kallax', f: 'I', c: '#0058a3', time: '4m', when: '3h ago', later: 'Weekend' },
+      { t: 'KALLAX shelf unit', u: 'ikea.com/us/en/p/kallax', f: 'I', c: '#0058a3', time: '4m', when: '3h ago', later: 'Later' },
     ] },
     daily: { name: 'Daily', color: C.anchor, anchored: true, tabs: [
       { t: 'Calendar — Week of Sep 21', u: 'calendar.google.com', f: '31', c: '#1a73e8', lock: true, when: '20m ago' },
@@ -61,6 +61,7 @@
   /* ------------------------------------------------------------------
      Building blocks (markup follows popup-tabs-calm-redesign.html)
      ------------------------------------------------------------------ */
+  const fv = (f, c) => ({ f, c });
   const fav = t => `<span class="fav" style="--c:${t.c}">${esc(t.f)}</span>`;
   const favStrip = (tabs, n = 5) => `<span class="fav-strip">${tabs.slice(0, n).map(fav).join('')}${tabs.length > n ? `<span class="more">+${tabs.length - n}</span>` : ''}</span>`;
   const sw = (on, key = '') => `<button class="switch" role="switch" aria-checked="${!!on}"${key ? ` data-sw="${key}"` : ''}><i></i></button>`;
@@ -144,23 +145,91 @@
       <div class="rows" data-parked>${list.map(p => parkedRow(p)).join('')}</div></div>`;
 
   // The session restore banner at the top of Tabs (recovery-ui.js): green
-  // when every window came back, amber while some are still missing.
+  // when every window came back, amber while some are still missing. The
+  // amber one follows the restore redesign (#267-#275): the summary with when
+  // the browser started, Restore all, then Named windows and a folding Other
+  // windows (N) group, each row with Restore this window, Hide and a menu.
   const circleCheck = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>`;
+  const RB_RESTORED = ['daily', 'launch', 'reading', 'home'];
+  const RB_MISSING = {
+    named: [
+      { name: 'Tax return 2024', intent: 'File before Oct 15', meta: '11 tabs · Sun 6:02 PM', to: 'closed', favs: [fv('I', '#1a73e8'), fv('T', '#2ca01c'), fv('D', '#4285f4')] },
+      { name: 'Q4 planning', meta: '9 tabs · Yesterday', to: 'saved', favs: [fv('S', '#0f9d58'), fv('N', '#191919'), fv('F', '#f24e1e')] },
+    ],
+    other: [
+      { name: 'Laptop research', ai: true, meta: '6 tabs · 3h ago', to: 'closed', favs: [fv('V', '#5200ff'), fv('R', '#e0301e'), fv('W', '#111827')] },
+      { name: 'Untitled Window', meta: '4 tabs · 6h ago', to: 'closed', favs: [fv('W', '#636466'), fv('G', '#24292f'), fv('Y', '#ff6600')] },
+      { name: 'Untitled Window', meta: '2 tabs · Sat 11:40 AM', to: 'closed', favs: [fv('M', '#ea4335'), fv('▶', '#ff0000')] },
+    ],
+  };
+  const HIDE_TIP = { saved: 'Already in Saved Windows', closed: 'Moves to Closed Windows' };
   function restoredBanner({ missing = false, open = true } = {}) {
-    const keys = ['daily', 'launch', 'reading', 'home'];
-    const list = `<details class="rb-restored"${open ? ' open' : ''}><summary><span class="rb-chev">${icon('chev-r')}</span>Show restored windows</summary>
+    const keys = RB_RESTORED;
+    const list = (o = open) => `<details class="rb-restored"${o ? ' open' : ''}><summary><span class="rb-chev">${icon('chev-r')}</span>Show restored windows</summary>
       <ul>${keys.map(k => `<li><span class="rb-title">${esc(WINDOWS[k].name)}</span><span class="win-meta">${WINDOWS[k].tabs.length} tabs</span></li>`).join('')}</ul></details>`;
     if (!missing) {
-      return `<div class="rb rb-ok"><div class="rb-head"><span class="rb-icon">${circleCheck}</span><span class="rb-title-main">${keys.length} windows restored from your last session</span><button class="btn sm quiet rb-dismiss">Dismiss</button></div>${list}</div>`;
+      return `<div class="rb rb-ok"><div class="rb-head"><span class="rb-icon">${circleCheck}</span><span class="rb-title-main">${keys.length} windows restored from your last session</span><button class="btn sm quiet rb-dismiss">Dismiss</button></div>${list()}</div>`;
     }
-    const gone = [
-      { name: 'Untitled Window', meta: '4 tabs · 6h ago', favs: [{ f: 'W', c: '#636466' }, { f: 'G', c: '#24292f' }, { f: 'Y', c: '#ff6600' }] },
-      { name: 'Tax return 2024', meta: '11 tabs · 09/20 Sun 6p', favs: [{ f: 'I', c: '#1a73e8' }, { f: 'T', c: '#2ca01c' }, { f: 'D', c: '#4285f4' }] },
-    ];
-    return `<div class="rb rb-missing"><div class="rb-head"><span class="rb-icon">${icon('history')}</span><span class="rb-title-main">${keys.length} windows restored · ${gone.length} still missing</span><button class="btn sm quiet rb-dismiss">Dismiss</button></div>
-      ${list.replace(' open', '')}
-      <div class="rb-missing-head"><button class="btn sm">Restore all</button></div>
-      ${gone.map(g => `<div class="rb-window"><span class="fav-strip">${g.favs.map(fav).join('')}</span><span class="rb-wtxt"><b>${esc(g.name)}</b><span>${esc(g.meta)}</span></span><button class="btn sm">Restore</button><button class="icon-btn" title="More">${icon('more')}</button></div>`).join('')}</div>`;
+    const row = (w, i) => `<div class="rb-window" data-rb="${i}">
+        <span class="fav-strip">${w.favs.map(fav).join('')}</span>
+        <span class="rb-wtxt"><b>${w.ai ? `<span class="rb-ai" title="AI title">${icon('sparkle')}</span>` : ''}${esc(w.name)}</b>${w.intent ? `<i>${esc(w.intent)}</i>` : ''}<span>${esc(w.meta)}</span></span>
+        <span class="rb-acts"><button class="btn sm" data-rb-act="restore">Restore this window</button><button class="btn sm" data-rb-act="hide" title="${HIDE_TIP[w.to]}">Hide</button><button class="icon-btn" title="More">${icon('more')}</button></span>
+        <span class="rb-done">Restored</span>
+      </div>`;
+    let n = 0;
+    const named = RB_MISSING.named.map(w => row(w, n++)).join('');
+    const other = RB_MISSING.other.map(w => row(w, n++)).join('');
+    return `<div class="rb rb-missing rb-groups">
+      <div class="rb-head"><span class="rb-icon">${icon('history')}</span><span class="rb-title-main" data-rb-title></span><button class="btn sm quiet rb-dismiss">Dismiss</button></div>
+      ${list(false)}
+      <div class="rb-missing-head"><button class="btn sm" data-rb-act="all">Restore all</button></div>
+      <div class="rb-group"><div class="rb-group-head">Named windows</div><div class="rb-group-list">${named}</div></div>
+      <details class="rb-group rb-other"><summary class="rb-group-head"><span class="rb-chev">${icon('chev-r')}</span><span>Other windows (<span data-rb-other>${RB_MISSING.other.length}</span>)</span></summary><div class="rb-group-list">${other}</div></details>
+      <div class="toast" data-toast></div>
+    </div>`;
+  }
+  // Restore, Hide and Restore all work in the mockup, with the popup's words.
+  function wireBanner(el) {
+    const rb = el.querySelector('.rb-groups');
+    if (!rb) return;
+    const all = [...RB_MISSING.named, ...RB_MISSING.other];
+    const restored = new Set(), hidden = new Set();
+    const title = () => {
+      const left = all.length - restored.size - hidden.size, back = RB_RESTORED.length + restored.size;
+      rb.querySelector('[data-rb-title]').innerHTML = (left ? `${back} windows restored · ${left} still missing` : `${back} windows restored from your last session`) + ' · <span class="rb-when">Chrome started Mon 9:02 AM</span>';
+      rb.querySelector('[data-rb-other]').textContent = RB_MISSING.other.filter((_, i) => !hidden.has(RB_MISSING.named.length + i)).length;
+      rb.querySelector('.rb-missing-head').hidden = left < 2;
+    };
+    let timer;
+    const toast = msg => {
+      const t = rb.querySelector('[data-toast]');
+      t.innerHTML = msg; t.classList.add('show');
+      clearTimeout(timer); timer = setTimeout(() => t.classList.remove('show'), 2400);
+    };
+    const restore = i => { restored.add(i); rb.querySelector(`[data-rb="${i}"]`).classList.add('is-done'); };
+    rb.addEventListener('click', e => {
+      const b = e.target.closest('[data-rb-act]');
+      if (!b) return;
+      const act = b.dataset.rbAct;
+      if (act === 'undo') {
+        const row = rb.querySelector(`[data-rb="${b.dataset.i}"]`);
+        hidden.delete(+b.dataset.i); row.classList.remove('is-gone');
+        rb.querySelector('[data-toast]').classList.remove('show');
+        if (!e.detail) row.querySelector('[data-rb-act="hide"]').focus();
+      } else if (act === 'all') all.forEach((_, i) => { if (!restored.has(i) && !hidden.has(i)) restore(i); });
+      else {
+        const i = +b.closest('[data-rb]').dataset.rb;
+        if (act === 'restore') restore(i);
+        else {
+          hidden.add(i); rb.querySelector(`[data-rb="${i}"]`).classList.add('is-gone');
+          toast(`${all[i].to === 'saved' ? 'Hidden. It stays in Saved Windows.' : 'Moved to Closed Windows.'} <button type="button" class="toast-undo" data-rb-act="undo" data-i="${i}">Undo</button>`);
+          // From the keyboard the focus goes to Undo, as on the popup's banner (#338).
+          if (!e.detail) rb.querySelector('.toast-undo').focus();
+        }
+      }
+      title();
+    });
+    title();
   }
 
   // The tab right-click menu, and its Label submenu.
@@ -281,7 +350,6 @@
 
   // Saved-only windows for the longer Saved Windows list on the home page.
   // They never appear in the popup's tab list, so only favicons are needed.
-  const fv = (f, c) => ({ f, c });
   const SAVED_EXTRA = {
     q4: { name: 'Q4 planning', color: C.indigo, tabs: [fv('S', '#0f9d58'), fv('N', '#191919'), fv('F', '#f24e1e'), fv('L', '#5e6ad2'), fv('S', '#4a154b'), fv('D', '#4285f4'), fv('G', '#24292f'), fv('M', '#ea4335'), fv('C', '#d97757')] },
     trip: { name: 'Trip to Lisbon', color: C.amber, tabs: [fv('G', '#4285f4'), fv('B', '#003580'), fv('A', '#ff5a5f'), fv('M', '#34a853'), fv('T', '#e4002b'), fv('W', '#3366cc')] },
@@ -545,6 +613,7 @@
     // data-state="missing" shows the amber banner with windows still to restore.
     el.classList.add('ts', 'restored');
     el.innerHTML = restoredBanner({ missing: el.dataset.state === 'missing', open: el.dataset.open !== 'false' });
+    wireBanner(el);
   }
 
   function mountWindow(el) {
@@ -564,6 +633,9 @@
 
   // One small picture per "Everything else" feature, drawn with the same
   // pieces as the popup page that holds it.
+  // The Cloud Sync page's This device card (cloud-sync.js renderDashboard).
+  const thisDevice = body => `<div class="card"><div class="card-head"><h3>This device</h3><span class="r"><span class="status">Synced 2 min ago</span><button class="btn sm primary">${icon('refresh')}Sync now</button></span></div>
+          <div class="card-body" style="color:var(--muted);font-size:12.5px">${body}</div></div>`;
   function featureHTML(key) {
     const s = { stab: 'backup', theme: 'light', wstyle: 'tint', density: 'comfortable' };
     const groups = html => (html.match(/<section class="set-group">[\s\S]*<\/section>/) || [''])[0];
@@ -581,9 +653,17 @@
           [{ t: 'Summarize this paper', u: 'gemini.google.com/app/5e2', f: 'G', c: '#1a73e8', time: '9m', when: '3h ago' }, W.reading]])
         + `<div class="f-fab"><span class="fab" style="position:static">${icon('chat')}Chats</span><span class="f-cap" style="margin:0">One click filters the list to these, wherever they are.</span></div>`;
       case 'backups': return groups(settingsBody(s));
-      case 'cloud': return `<div class="card"><div class="card-head"><h3>This device</h3><span class="r"><span class="status">Synced 2 min ago</span><button class="btn sm primary">${icon('refresh')}Sync now</button></span></div>
-          <div class="card-body" style="color:var(--muted);font-size:12.5px">This PC · Chrome on Windows · 4 windows · 20 tabs</div></div>
+      case 'cloud': return `${thisDevice('This PC · Chrome on Windows · 4 windows · 20 tabs')}
         <div class="card"><div class="link-row"><span class="ico">${icon('laptop')}</span><span class="txt"><b>Work laptop</b><span>3 windows · 17 tabs · Today 9:40 AM</span></span><button class="btn sm">${icon('download')}Import</button></div></div>`;
+      // Cloud Sync on the home page: This device, then Latest snapshots as the
+      // Cloud Sync page lists them (cloud-sync.js renderSnapshots).
+      case 'cloudMany': {
+        const snaps = [['This PC', 'auto', 4, 20, 'Today 10:00 AM'], ['Work laptop', 'auto', 3, 17, 'Today 9:40 AM'],
+          ['Home desktop', 'auto', 5, 26, 'Yesterday 11:02 PM'], ['Home desktop', 'manual', 5, 24, 'Oct 9 9:15 PM']];
+        return `${thisDevice('This PC · Chrome on Windows · Automatic sync every hour')}
+          <div class="f-snaps-head">Latest snapshots <span>${snaps.length}</span></div>
+          <div class="card">${snaps.map(([d, type, w, t, when]) => `<div class="link-row"><span class="ico">${icon('laptop')}</span><span class="txt"><b>${d}</b><span>${type} · ${w} windows · ${t} tabs · ${when}</span></span><button class="btn sm">${icon('download')}Restore</button></div>`).join('')}</div>`;
+      }
       case 'keyboard': return `<div class="dialog" style="width:auto;box-shadow:var(--shadow);border-color:var(--border)"><h2>Keyboard Shortcuts</h2><p class="d-desc">In the tab list</p><div class="kbd-list">
           <div><span>Move to next tab</span><kbd>↓</kbd></div><div><span>Move to previous tab</span><kbd>↑</kbd></div><div><span>Switch to selected tab</span><kbd>Enter</kbd></div>
           <div><span>Deselect / close dialog</span><kbd>Esc</kbd></div><div><span>Search tabs</span><kbd>/</kbd></div></div>
