@@ -35,6 +35,12 @@ strip from there.
 `icons/` stays here and isn't built: the favicons and the account emails load
 `icons/icon48.png` from the live site.
 
+`assets/common-passwords.txt` isn't a prototype file either: the build copies
+the extension's own `background/common-passwords.txt`, so the site and the
+extension refuse the same passwords. Never edit the live pages here directly;
+a fix made only here is undone by the next build (that happened to the #178
+fixes until October 13, 2026).
+
 ---
 
 ## The idea: the page is a window list
@@ -154,8 +160,11 @@ account · Cloud Sync", so a page opened from an email link clearly belongs to
 TabSidecar. Popup-sized controls, requirements checked off as you type
 (8-character minimum, matching `MIN_PASSWORD_LENGTH` in the extension), and a
 state for every outcome: ready, working, failed, done, expired link, no link.
-Both pages drop the token from the address bar on load and sign out the
-account's other sessions after a password is set.
+Both pages drop the token from the address bar on load, refuse a common
+password (the extension's list, `assets/common-passwords.js`; if the list
+can't load, the password is allowed), and after a password is set sign out
+every session, the link's own included, so the link can't set another password
+without the current one (#178).
 
 ## Account emails
 
