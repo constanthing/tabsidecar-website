@@ -5,21 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TabSidecar Privacy Policy</title>
 <meta name="description" content="How TabSidecar handles your data: what it accesses, what stays on your computer, and what it sends when you use an optional feature.">
-<link rel="stylesheet" href="assets/mock.css?v=202610130355">
-<link rel="stylesheet" href="assets/site.css?v=202610130355">
-<link rel="stylesheet" href="assets/windows.css?v=202610130355">
-<script src="assets/site.js?v=202610130355"></script>
-<script src="assets/icons.js?v=202610130355" defer></script>
-<script src="assets/mock.js?v=202610130355" defer></script>
+<link rel="stylesheet" href="assets/mock.css?v=202610300611">
+<link rel="stylesheet" href="assets/site.css?v=202610300611">
+<link rel="stylesheet" href="assets/windows.css?v=202610300611">
+<script src="assets/site.js?v=202610300611"></script>
+<script src="assets/icons.js?v=202610300611" defer></script>
+<script src="assets/mock.js?v=202610300611" defer></script>
 <style>
   /* Privacy policy in the Windows design, read as a document: At a glance is
      the one window (assets/windows.css, blue); every other section is a plain
      heading and text, never collapsed, so find-in-page reaches all of it. A
-     contents list under At a glance jumps to each section. The text is the
-     published tabsidecar.com/privacy.html (tabsidecar-website 29d890e); the
-     review note under the heading lists what differs in presentation only.
-     The note and its switch are not part of the page and get deleted before
-     this ships. */
+     contents list under At a glance jumps to each section. The review note
+     under the heading says what the last update changed (#194). The note and
+     its switch are not part of the page; the build strips them. */
   .doc-wrap { max-width: 880px; }
   .hero { padding: 64px 0 40px; display: grid; gap: 14px; justify-items: start; }
   .hero .h1 { font-size: clamp(34px, 4.4vw, 48px); margin: 0; }
@@ -102,7 +100,7 @@
       <span class="eyebrow"><i data-icon="shield"></i>Privacy policy</span>
       <h1 class="h1">How TabSidecar handles your data.</h1>
       <p class="lede">TabSidecar runs in your browser and keeps your tabs and windows on your device unless you choose a feature that sends them elsewhere, like cloud sync.</p>
-      <p class="meta">Last updated September 27, 2026</p>
+      <p class="meta">Last updated October 30, 2026</p>
     </section>
 
     <article class="swin" style="--wc:#3b82f6" id="glance">
@@ -156,7 +154,7 @@
         <div class="row"><span class="ico"><i data-icon="windows"></i></span><div class="txt"><div class="label">Open tabs and windows</div><div class="sub">Open tab and window information, including tab URLs, titles, favicon URLs, pinned state, tab position, tab groups and window grouping.</div></div></div>
         <div class="row"><span class="ico"><i data-icon="edit"></i></span><div class="txt"><div class="label">What you add in TabSidecar</div><div class="sub">Window metadata created inside the product, such as window names, saved windows, labels, nicknames, notes, priorities and filter rules.</div></div></div>
         <div class="row"><span class="ico"><i data-icon="park"></i></span><div class="txt"><div class="label">Closed and auto-parked tabs</div><div class="sub">Closed-tab and auto-park history, including URLs, titles, timestamps and time-accumulation data used for tab management features.</div></div></div>
-        <div class="row"><span class="ico"><i data-icon="history"></i></span><div class="txt"><div class="label">Limited browsing history</div><div class="sub">Limited Chrome history data used for the extension's closed-URL backfill and history-management features.</div></div></div>
+        <div class="row"><span class="ico"><i data-icon="history"></i></span><div class="txt"><div class="label">Browsing history</div><div class="sub">Your Chrome history (addresses, titles and visit times), read to show it in TabSidecar's history views and to delete entries you choose. It is not included in cloud snapshots.</div></div></div>
         <div class="row"><span class="ico"><i data-icon="gear"></i></span><div class="txt"><div class="label">Settings and preferences</div><div class="sub">Settings and preferences you choose inside the extension.</div></div></div>
         <div class="row"><span class="ico"><i data-icon="user"></i></span><div class="txt"><div class="label">Your account, only if you create one</div><div class="sub">If you create an account: your email address, your password (handled by our sign-in provider, never stored by the extension in readable form), and the cloud snapshots described below.</div></div></div>
         <div class="row"><span class="ico"><i data-icon="sparkle"></i></span><div class="txt"><div class="label">A random install ID</div><div class="sub">An install-scoped random identifier used by the AI title feature for rate limiting.</div></div></div>
@@ -172,10 +170,11 @@
         <div class="row perm"><span class="pname"><code>windows</code></span><div class="txt"><div class="sub">Used to inspect, name, restore, focus, create and remove browser windows.</div></div></div>
         <div class="row perm"><span class="pname"><code>alarms</code></span><div class="txt"><div class="sub">Used for scheduled tasks such as auto-park checks, automatic backups, automatic cloud sync and delayed processing.</div></div></div>
         <div class="row perm"><span class="pname"><code>storage</code></span><div class="txt"><div class="sub">Used to keep window and tab identities, recovery state and diagnostics on your device, so windows can be matched back after a restart.</div></div></div>
-        <div class="row perm"><span class="pname"><code>scripting</code></span><div class="txt"><div class="sub">Used to add TabSidecar's two page scripts (described below) to tabs that were already open when the extension was installed or updated.</div></div></div>
-        <div class="row perm"><span class="pname"><code>history</code></span><div class="txt"><div class="sub">Used to search browser history for closed-URL backfill and to support history deletion features you trigger.</div></div></div>
+        <div class="row perm"><span class="pname"><code>unlimitedStorage</code></span><div class="txt"><div class="sub">Keeps Chrome from deleting TabSidecar's data on your device when the disk runs low on space. It doesn't let TabSidecar read or send anything more.</div></div></div>
+        <div class="row perm"><span class="pname"><code>scripting</code></span><div class="txt"><div class="sub">Used to add TabSidecar's two page scripts (described below) to tabs that were already open when the extension was installed or updated, and to read two things from open tabs: TabSidecar's own IDs, and when the page started loading, which tells TabSidecar whether the browser has restarted.</div></div></div>
+        <div class="row perm"><span class="pname"><code>history</code></span><div class="txt"><div class="sub">Used to show your browser history in TabSidecar's history views and to delete the history entries you choose.</div></div></div>
         <div class="row perm"><span class="pname"><code>favicon</code></span><div class="txt"><div class="sub">Used to display site icons for tabs and saved items.</div></div></div>
-        <div class="row perm"><span class="pname"><code>downloads</code></span><div class="txt"><div class="sub">Used to export backup files that you choose to generate.</div></div></div>
+        <div class="row perm"><span class="pname"><code>downloads</code></span><div class="txt"><div class="sub">Used to save the backup files you export, and the automatic backups you turn on, to your downloads folder.</div></div></div>
       </div></div>
       <div class="grp"><h3>Host permissions</h3><div class="panel">
         <div class="row perm"><span class="pname"><code>http://*/*</code><br><code>https://*/*</code></span><div class="txt"><div class="sub">All websites. This also covers Local Bridge's local address (<code>127.0.0.1</code>), and exists for the two page scripts below.</div></div></div>
@@ -202,10 +201,10 @@
       <div class="grp"><div class="panel">
         <dl class="kv">
           <div><dt>Sign-in</dt><dd>Accounts use an email address and password through Supabase Auth, our database and sign-in provider. To sign up, we email you a one-time code to confirm the address, then you set a password. Changing your password signs out your other sessions. Sign-ups whose email is never confirmed are deleted automatically after a day.</dd></div>
-          <div><dt>What a cloud snapshot contains</dt><dd>Your open tabs (URLs and titles) and windows, window names, saved, kept and closed windows, saved-for-later items, auto-parked tabs, nicknames, labels, priorities, notes, filter rules and extension settings. Each snapshot also records a device ID, a device name such as “Chrome on Windows”, and tab and window counts. Closed-tab history from Chrome and your sign-in session are not included.</dd></div>
+          <div><dt>What a cloud snapshot contains</dt><dd>Your open tabs (address, title, site icon and when you last used each) and windows, window names, saved, kept and closed windows, saved-for-later items, auto-parked tabs, nicknames, labels, priorities, notes, filter rules and extension settings. Each snapshot also records a device ID, a device name such as “Chrome on Windows”, and tab and window counts. Closed-tab history from Chrome and your sign-in session are not included.</dd></div>
           <div><dt>Devices</dt><dd>For each device we store its random ID, device name, extension version, browser name, platform and when it last synced.</dd></div>
           <div><dt>When it syncs</dt><dd>While you're signed in, the extension uploads a snapshot automatically (every hour by default; you can change the interval or turn it off) and whenever you sync manually.</dd></div>
-          <div><dt>How many are kept</dt><dd>The extension keeps your 20 most recent snapshots per device and deletes older ones. The database also caps each account at 10 devices and 50 MB of snapshots, removing the oldest snapshots first.</dd></div>
+          <div><dt>How many are kept</dt><dd>For each device, the extension keeps your 12 newest snapshots and the last snapshot of each of the 8 earlier days that have one: usually 20, covering about a week, and up to 28 if you often sync by hand. It deletes older ones after each upload. The database also caps each account at 40 snapshots per device, 10 devices and 50 MB of snapshots, removing the oldest snapshots first. A new device past the tenth replaces the one that synced least recently.</dd></div>
         </dl>
       </div></div>
     </section>
@@ -223,7 +222,7 @@
       <h2>AI window titles</h2>
       <p>AI window titles are off until you turn them on, either during setup or in Settings → Artificial Intelligence. Asking for an AI title for a single window also sends that window's request.</p>
       <p>When they're on, the extension sends a request to <code>api.tabsidecar.com</code> containing an install-scoped random identifier, the window's tab titles and the site name of each tab (for example <code>github.com</code>, not the full address), and your existing window titles. If you're signed in, the request also carries your sign-in token so your account gets a higher daily limit. Our server passes the tab titles and site names to Google's Gemini API to generate the title and returns it to the extension.</p>
-      <p>Our server does not store tab titles or site names. To enforce daily limits it keeps a count of requests per day for your install identifier, account and network address, and deletes those counts after 7 days.</p>
+      <p>Our server does not save tab titles or site names. It keeps each generated title in memory for up to 10 minutes, filed under a one-way fingerprint of the tabs, so the same tabs get the same title without asking Gemini again. To enforce daily limits it keeps a count of requests per day: for your account if you're signed in, otherwise (or when your sign-in can't be checked) for your install identifier and your network address (IP address). It deletes those counts after 7 days. Like most web servers, it also records each request's network address, time, the page it asked for, and your browser and operating system versions in its access logs, and deletes those logs within 5 weeks.</p>
     </section>
 
     <section class="sec doc" id="emails">
@@ -233,10 +232,12 @@
 
     <section class="sec doc" id="sharing">
       <h2>Service providers and data sharing</h2>
-      <p>TabSidecar does not sell your personal information and does not include advertising SDKs, behavior analytics, cross-site tracking pixels or general-purpose telemetry. We use two service providers:</p>
+      <p>TabSidecar does not sell your personal information and does not include advertising SDKs, behavior analytics, cross-site tracking pixels or general-purpose telemetry. We use four service providers:</p>
       <div class="grp"><div class="panel">
         <dl class="kv">
-          <div><dt>Supabase</dt><dd>Hosts accounts, sign-in, cloud snapshots, devices and the update-email list, and sends account emails.</dd></div>
+          <div><dt>Supabase</dt><dd>Hosts accounts, sign-in, cloud snapshots, devices and the update-email list, and sends account emails through Resend.</dd></div>
+          <div><dt>Resend</dt><dd>Delivers the account emails Supabase sends, such as sign-up codes and password reset links. It receives your email address and the email's contents.</dd></div>
+          <div><dt>DigitalOcean</dt><dd>Hosts our AI title server, <code>api.tabsidecar.com</code>. The AI title requests described above, and that server's daily counts and access logs, are processed and kept on DigitalOcean's computers.</dd></div>
           <div><dt>Google (Gemini API)</dt><dd>Generates AI window titles from the tab titles and site names described above, if you turn them on.</dd></div>
         </dl>
       </div></div>
@@ -259,12 +260,12 @@
     <section class="sec doc" id="retention">
       <h2>Data retention and deletion</h2>
       <p>Local data remains in the extension's storage until you delete it, clear the extension's data or uninstall the extension. Exported backup files remain wherever you save them.</p>
-      <p>Cloud snapshots are kept as described under <a href="#accounts">“Accounts and cloud sync”</a> until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
+      <p>Cloud snapshots are kept as described under <a href="#accounts">“Accounts and cloud sync”</a> until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. On the AI server, daily counts are deleted after 7 days and access logs within 5 weeks, whether or not you have an account. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
     </section>
 
     <section class="sec doc" id="security">
       <h2>Security</h2>
-      <p>Account data is protected by the encryption and per-account access rules described above. Deleting an account requires a password sign-in within the last few minutes, so a stolen session alone can't delete it. No software can guarantee absolute security, but TabSidecar keeps most tab-management data on your device unless you use a feature that sends it to a backend service.</p>
+      <p>Account data is protected by the encryption and per-account access rules described above. Deleting an account needs your password: the extension asks for it, and our database refuses the deletion unless your password was entered in the last 5 minutes, so a copied sign-in session can't delete the account once those 5 minutes have passed. No software can guarantee absolute security, but TabSidecar keeps most tab-management data on your device unless you use a feature that sends it to a backend service.</p>
     </section>
 
     <section class="sec doc" id="children">
