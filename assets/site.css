@@ -59,6 +59,12 @@ kbd { font: 12px var(--mono); color: var(--muted); border: 1px solid var(--borde
 .b.sm { height: 34px; padding: 0 13px; font-size: 14px; border-radius: 8px; }
 .cta-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
+/* A phone or tablet can't add a Chrome extension (#506), so the store buttons
+   and the lines beside them come in two versions: .on-computer, and .on-phone
+   for a touch screen with no mouse, narrower than a laptop. */
+@media not all and (max-width: 1023px) and (hover: none) and (pointer: coarse) { .on-phone { display: none; } }
+@media (max-width: 1023px) and (hover: none) and (pointer: coarse) { .on-computer { display: none; } }
+
 /* ---------- Site nav ---------- */
 .site-nav { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px); }
 .site-nav .wrap { display: flex; align-items: center; gap: 28px; height: 64px; }

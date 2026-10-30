@@ -116,6 +116,11 @@
   box-shadow: var(--shadow-pop);
 }
 .pop-fit { width: 100%; min-width: 0; display: flex; justify-content: center; }
+/* The phone-sized popup (#506): the Tabs page alone, unscaled, as wide as its
+   box and as tall as its list. */
+.ts.pop.pop-phone { width: 100%; height: auto; }
+.ts.pop-phone .list { padding: 8px 8px 12px; }
+.ts.pop-phone .search kbd { display: none; }
 
 /* ---------- Sidebar ---------- */
 .ts .sidebar { width: 176px; flex: none; background: var(--side); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 12px 8px; }
@@ -400,6 +405,10 @@
 .ts .rb-icon { display: grid; color: var(--ok); }
 .ts .rb-missing .rb-icon { color: var(--warn); }
 .ts .rb-title-main { font-weight: 600; }
+/* Dismiss keeps its place at the right; where the title's longest piece
+   leaves no room for it (a phone), it moves to the next line (#506). */
+.ts .rb-head { flex-wrap: wrap; }
+.ts .rb-head .rb-title-main { flex: 1 1 0; }
 .ts .rb-ok .rb-title-main { font-weight: 400; color: var(--text-2); font-size: 13px; }
 .ts .rb-dismiss { margin-left: auto; }
 .ts .rb-restored > summary { display: flex; align-items: center; gap: 6px; padding: 2px 0; color: var(--muted); font-size: 12px; cursor: default; list-style: none; }

@@ -416,7 +416,7 @@
           <span class="tool-sep"></span><button class="icon-btn" title="Collapse all">${icon('collapse-all')}</button><button class="icon-btn" title="Expand all">${icon('expand-all')}</button>
           <button class="icon-btn" title="Show pinned tabs" aria-pressed="false" data-press>${icon('pin')}</button><button class="icon-btn" title="Show labels" aria-pressed="true" data-press>${icon('label')}</button>
           <span class="stats"><span><b data-parkcount>9</b> parked</span></span></div>
-        <div class="list">${winCard('launch', { closed: s.closed.has('launch') })}${winCard('reading', { closed: s.closed.has('reading') })}${winCard('home', { closed: !s.open.has('home') })}</div>
+        <div class="list">${winCard('launch', { closed: folded(s, 'launch') })}${winCard('reading', { closed: folded(s, 'reading') })}${winCard('home', { closed: folded(s, 'home') })}</div>
         <button class="fab">${icon('chat')}Chats</button>`;
       case 'saved': return topbar('Saved Windows', 'Search saved windows') + `<p class="subtitle">Reusable windows you saved for later. Opening one keeps it saved.</p><div class="list">${windowList('saved')}</div>`;
       case 'closed': return topbar('Closed Windows', 'Search closed windows') + `<p class="subtitle">Windows you recently closed, ready to restore.</p><div class="list"><div class="group-label">Today</div>${windowList('closed')}</div>`;
@@ -440,10 +440,29 @@
     return '';
   }
 
+  // The phone-sized popup (#506): the Tabs page alone at its real size, with
+  // the toolbar's first chip and the parked count, and only Launch week open.
+  const phoneHTML = s => topbar('Tabs', 'Search tabs') + `
+    <div class="toolbar"><span class="chip">${icon('windows')}Windows${icon('chev')}</span><span class="stats"><span><b data-parkcount>9</b> parked</span></span></div>
+    <div class="list">${['launch', 'reading', 'home'].map(key => winCard(key, { closed: folded(s, key) })).join('')}</div>`;
+
+  // Which windows start folded: Home in the full popup; Reading list too in
+  // the phone-sized one. A window the visitor has opened or folded since is
+  // in s.open or s.closed (never both), and keeps that in either size.
+  const STARTS_FOLDED = { full: ['home'], phone: ['reading', 'home'] };
+  const folded = (s, key) => {
+    if (s.open.has(key)) return false;
+    if (s.closed.has(key)) return true;
+    return STARTS_FOLDED[s.phone ? 'phone' : 'full'].includes(key);
+  };
+
   function renderPopup(el) {
     const s = el._ts;
     el.dataset.theme = s.theme; el.dataset.wstyle = s.wstyle; el.dataset.density = s.density;
-    el.innerHTML = sidebar(s) + `<section class="main">${mainHTML(s)}</section><div class="ts menu" data-ctx hidden></div><div class="toast" data-toast></div>`;
+    el.classList.toggle('pop-phone', s.phone);
+    const body = s.phone ? `<section class="main">${phoneHTML(s)}</section>` : sidebar(s) + `<section class="main">${mainHTML(s)}</section>`;
+    el.innerHTML = body + `<div class="ts menu" data-ctx hidden></div><div class="toast" data-toast></div>`;
+    if (s.phone) fitWindowHeads(el.querySelectorAll('.win'));
     document.querySelectorAll(`[data-target="#${el.id}"][data-mock="options"]`).forEach(renderOptions);
   }
 
@@ -452,7 +471,7 @@
     el._ts = {
       page: el.dataset.page || 'tabs', stab: el.dataset.stab || 'design',
       theme: el.dataset.theme || document.documentElement.dataset.theme || 'light', wstyle: el.dataset.wstyle || 'tint', density: el.dataset.density || 'comfortable',
-      closed: new Set(), open: new Set(),
+      closed: new Set(), open: new Set(), phone: false,
     };
     renderPopup(el);
     el.addEventListener('click', e => {
@@ -466,9 +485,10 @@
       const caret = e.target.closest('[data-caret]');
       if (caret) {
         const key = caret.closest('.win').dataset.win;
-        const set = key === 'home' ? s.open : s.closed;
-        set.has(key) ? set.delete(key) : set.add(key);
-        caret.closest('.win').classList.toggle('closed');
+        const fold = !folded(s, key);
+        (fold ? s.open : s.closed).delete(key);
+        (fold ? s.closed : s.open).add(key);
+        caret.closest('.win').classList.toggle('closed', fold);
         return;
       }
       const more = e.target.closest('[data-more]');
@@ -500,6 +520,9 @@
     });
     el.addEventListener('mouseleave', () => closeCtx(el));
   }
+  // The popup's size in its own (unzoomed) pixels: 752 x 600, or the
+  // phone-sized one's, which isn't zoomed.
+  const popSize = el => (el._ts.phone ? { w: el.clientWidth, h: el.clientHeight } : { w: 752, h: 600 });
   // Right-click menu inside a live popup. Positions are in the popup's own
   // (unzoomed) pixels.
   function openCtx(el, row, r) {
@@ -507,9 +530,9 @@
     const menu = el.querySelector('[data-ctx]');
     menu.innerHTML = ctxItems();
     menu.hidden = false;
-    const z = parseFloat(el.style.zoom) || 1, p = el.getBoundingClientRect();
+    const z = parseFloat(el.style.zoom) || 1, p = el.getBoundingClientRect(), { w, h } = popSize(el);
     const x = (r.left - p.left) / z, y = (r.bottom - p.top) / z;
-    const left = Math.min(x, 752 - menu.offsetWidth - 8), top = y + menu.offsetHeight > 592 ? Math.max(8, (r.top - p.top) / z - menu.offsetHeight) : y + 2;
+    const left = Math.min(x, w - menu.offsetWidth - 8), top = y + menu.offsetHeight > h - 8 ? Math.max(8, (r.top - p.top) / z - menu.offsetHeight) : y + 2;
     menu.style.left = left + 'px'; menu.style.top = top + 'px';
     row.classList.add('ctx-open');
   }
@@ -518,9 +541,9 @@
     const menu = el.querySelector('[data-ctx]');
     menu.innerHTML = winMenuItems();
     menu.hidden = false;
-    const z = parseFloat(el.style.zoom) || 1, p = el.getBoundingClientRect(), r = btn.getBoundingClientRect();
+    const z = parseFloat(el.style.zoom) || 1, p = el.getBoundingClientRect(), r = btn.getBoundingClientRect(), { h } = popSize(el);
     menu.style.left = Math.max(8, (r.right - p.left) / z - menu.offsetWidth) + 'px';
-    menu.style.top = Math.min((r.bottom - p.top) / z + 4, 592 - menu.offsetHeight) + 'px';
+    menu.style.top = Math.max(8, Math.min((r.bottom - p.top) / z + 4, h - 8 - menu.offsetHeight)) + 'px';
     btn.setAttribute('aria-expanded', 'true');
     btn.closest('.win')?.classList.add('menu-open');
   }
@@ -544,15 +567,21 @@
   }
 
   /* ------------------------------------------------------------------
-     Fit a 752px popup into narrower containers
+     Fit a 752px popup into narrower containers. Scaled under
+     FULL_POPUP_MIN_ZOOM, its smallest labels (10.5px) would draw under the
+     site's 9px minimum, so a box that narrow gets the phone-sized popup
+     instead, unscaled (#506).
      ------------------------------------------------------------------ */
+  const FULL_POPUP_MIN_ZOOM = 0.86;
   function fit(box) {
     const pop = box.querySelector('.pop');
     if (!pop) return;
     const max = parseFloat(box.dataset.max || '1');
     const apply = () => {
       const z = Math.min(max, box.clientWidth / 752);
-      pop.style.zoom = z.toFixed(4);
+      const phone = box.clientWidth / 752 < FULL_POPUP_MIN_ZOOM;
+      if (phone !== pop._ts.phone) { pop._ts.phone = phone; renderPopup(pop); }
+      pop.style.zoom = phone ? '' : z.toFixed(4);
     };
     new ResizeObserver(apply).observe(box);
     apply();
