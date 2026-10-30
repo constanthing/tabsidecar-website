@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TabSidecar: close tabs without losing them</title>
 <meta name="description" content="TabSidecar parks the tabs you've stopped using, brings your windows back after Chrome restarts, and keeps every tab one search away.">
-<link rel="stylesheet" href="assets/mock.css?v=202610300658">
-<link rel="stylesheet" href="assets/site.css?v=202610300658">
-<link rel="stylesheet" href="assets/windows.css?v=202610300658">
-<script src="assets/site.js?v=202610300658"></script>
-<script src="assets/icons.js?v=202610300658" defer></script>
-<script src="assets/mock.js?v=202610300658" defer></script>
-<script src="assets/windows.js?v=202610300658" defer></script>
+<link rel="stylesheet" href="assets/mock.css?v=202610300733">
+<link rel="stylesheet" href="assets/site.css?v=202610300733">
+<link rel="stylesheet" href="assets/windows.css?v=202610300733">
+<script src="assets/site.js?v=202610300733"></script>
+<script src="assets/icons.js?v=202610300733" defer></script>
+<script src="assets/mock.js?v=202610300733" defer></script>
+<script src="assets/windows.js?v=202610300733" defer></script>
 <style>
   /* Windows: the page is a window list. One background; every section is a
      window card in its own window color, drawn the way the popup draws Tint
@@ -46,6 +46,12 @@
   .restore-pic { display: grid; gap: 10px; }
   .restore-cap { margin: 0 2px 4px; font-size: 13px; color: var(--muted); }
 
+  /* AI window titles: a new window, then the same window with its AI title */
+  .ai-pic { display: grid; gap: 10px; }
+  .ai-cap { margin: 4px 2px 0; font-size: 13px; color: var(--muted); }
+  .ai-cap svg { width: 13px; height: 13px; vertical-align: -2px; margin-right: 4px; }
+  .fine { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
   @media (max-width: 900px) { .nav-links { display: none; } .site-nav .wrap { justify-content: space-between; } }
 </style>
 <link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
@@ -56,7 +62,7 @@
 <header class="site-nav lined"><div class="wrap">
   <a class="wordmark" href="#top"><span class="logo-tile">TS</span>TabSidecar</a>
   <nav class="nav-links" aria-label="Page">
-    <a href="#autopark">Auto-Park</a><a href="#restore">Session restore</a><a href="#saved">Saved Windows</a><a href="#cloud">Cloud Sync</a><a href="#faq">FAQ</a>
+    <a href="#autopark">Auto-Park</a><a href="#restore">Session restore</a><a href="#ai">AI titles</a><a href="#saved">Saved Windows</a><a href="#cloud">Cloud Sync</a><a href="#faq">FAQ</a>
   </nav>
   <a class="b sm" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Add to Chrome</a>
 </div></header>
@@ -73,8 +79,8 @@
   </section>
 
   <div class="list-bar">
-    <span class="lb-title">This page</span><span class="count">5 windows</span>
-    <span class="swatch-row" aria-hidden="true"><i style="--c:#3b82f6"></i><i style="--c:#f59e0b"></i><i style="--c:#009688"></i><i style="--c:#0ea5e9"></i><i style="--c:#ec4899"></i></span>
+    <span class="lb-title">This page</span><span class="count">6 windows</span>
+    <span class="swatch-row" aria-hidden="true"><i style="--c:#3b82f6"></i><i style="--c:#f59e0b"></i><i style="--c:#009688"></i><i style="--c:#8b5cf6"></i><i style="--c:#0ea5e9"></i><i style="--c:#ec4899"></i></span>
     <span class="sp"></span>
     <button class="ibtn" data-all="close" title="Collapse all"><i data-icon="collapse-all"></i></button>
     <button class="ibtn" data-all="open" title="Expand all"><i data-icon="expand-all"></i></button>
@@ -144,7 +150,35 @@
       </div>
     </article>
 
-    <!-- 4. Saved Windows: sky -->
+    <!-- 4. AI window titles: violet -->
+    <article class="swin" style="--wc:#8b5cf6" id="ai">
+      <header class="swin-head">
+        <button class="caret" aria-label="Collapse"><i data-icon="chev"></i></button><span class="swin-dot"></span>
+        <h2 class="swin-title">AI window titles</h2><span class="swin-meta">off until you turn them on</span>
+        <span class="end"><span class="menu-wrap"><button class="ibtn" aria-label="Jump to"><i data-icon="more"></i></button><nav class="pop-menu" data-jump></nav></span></span>
+      </header>
+      <div class="swin-body">
+        <div class="two">
+          <div class="txt">
+            <h3 class="h2">Windows that name themselves.</h3>
+            <p class="copy">Turn on AI window titles and TabSidecar names each window from the tabs in it, like Trip planning or Tax forms. As tabs come and go, it updates the name.</p>
+            <ul class="never">
+              <li><span class="n-ico"><i data-icon="edit"></i></span><span><b>Your names stay.</b> Rename a window and AI titles won’t change it unless you ask.</span></li>
+              <li><span class="n-ico"><i data-icon="sparkle"></i></span><span><b>One window at a time.</b> With them off, Generate AI Title in a window’s menu names just that window.</span></li>
+              <li><span class="n-ico"><i data-icon="restore"></i></span><span><b>Names last.</b> An AI title stays with its window when Chrome restarts.</span></li>
+            </ul>
+            <p class="fine">AI window titles are off until you turn them on, during setup or in Settings → Artificial Intelligence. To name a window, TabSidecar sends its tab titles and site names (like github.com) to our AI server, which asks Google Gemini. Never page contents or full addresses. <a href="privacy.html#ai">Everything a request holds is in the privacy policy.</a></p>
+          </div>
+          <div class="ai-pic">
+            <div data-mock="window" data-win="laptops" data-name="Window 1042"></div>
+            <p class="ai-cap"><i data-icon="sparkle"></i>A few seconds later, the same window:</p>
+            <div data-mock="window" data-win="laptops" data-closed></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 5. Saved Windows: sky -->
     <article class="swin" style="--wc:#0ea5e9" id="saved">
       <header class="swin-head">
         <button class="caret" aria-label="Collapse"><i data-icon="chev"></i></button><span class="swin-dot"></span>
@@ -163,7 +197,7 @@
       </div>
     </article>
 
-    <!-- 5. Cloud Sync: pink -->
+    <!-- 6. Cloud Sync: pink -->
     <article class="swin" style="--wc:#ec4899" id="cloud">
       <header class="swin-head">
         <button class="caret" aria-label="Collapse"><i data-icon="chev"></i></button><span class="swin-dot"></span>
@@ -182,11 +216,11 @@
       </div>
     </article>
 
-    <!-- 6. FAQ: neutral, like the All tabs group -->
+    <!-- 7. FAQ: neutral, like the All tabs group -->
     <article class="swin neutral" id="faq">
       <header class="swin-head">
         <button class="caret" aria-label="Collapse"><i data-icon="chev"></i></button><span class="swin-dot"></span>
-        <h2 class="swin-title">Questions</h2><span class="swin-meta">6</span>
+        <h2 class="swin-title">Questions</h2><span class="swin-meta">7</span>
       </header>
       <div class="swin-body faq" style="padding:0">
         <details open><summary>Does Auto-Park delete my tabs?<i data-icon="chev"></i></summary><div class="a">No. A parked tab is closed, not forgotten. It’s saved under AutoParked with its title and address, and reopens in one click.</div></details>
@@ -194,6 +228,7 @@
         <details><summary>What happens if Chrome crashes?<i data-icon="chev"></i></summary><div class="a">TabSidecar saves your windows in the background. When Chrome starts again, it matches each window back and shows you what it restored.</div></details>
         <details><summary>Where are my tabs stored?<i data-icon="chev"></i></summary><div class="a">In your browser, on your computer. Cloud Sync is optional and stays off unless you sign in.</div></details>
         <details><summary>What does Cloud Sync leave out?<i data-icon="chev"></i></summary><div class="a">Your sign-in session and the history of single tabs you closed. Closed windows are included. Each device keeps about a week of snapshots, so you can go back to an earlier one.</div></details>
+        <details><summary>What do AI window titles send?<i data-icon="chev"></i></summary><div class="a">Nothing until you turn them on or pick Generate AI Title for a window. Then, for that window: its tab titles and site names, your other windows’ titles and a random install ID, plus your sign-in token if you’re signed in. Never page contents or full addresses. Our AI server asks Google Gemini for a title and doesn’t save your tab titles. The <a href="privacy.html#ai">privacy policy</a> has the details.</div></details>
         <details><summary>Does it cost anything?<i data-icon="chev"></i></summary><div class="a">No. TabSidecar is free. You only need an account if you want Cloud Sync.</div></details>
       </div>
     </article>

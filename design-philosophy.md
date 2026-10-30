@@ -4,7 +4,8 @@ Reference for the pages in this repo. Captures the *why* behind the design,
 layout and copy so future edits stay consistent. Last rewritten September 27,
 2026, when the site moved to the Windows design; home page sections reworked
 October 13, 2026; Chrome only, Session restore picture and whole window titles
-October 30, 2026 (TabSentry #504).
+October 30, 2026 (TabSentry #504); AI window titles section the same day
+(TabSentry #505).
 
 ---
 
@@ -59,9 +60,10 @@ One white background, no color bands. Color only appears where it means
 something:
 
 - **Window colors** name the sections, like window colors in the popup:
-  popup blue `#3b82f6`, Auto-Park amber `#f59e0b`, Saved Windows sky
-  `#0ea5e9`, Cloud Sync pink `#ec4899`. The FAQ is neutral, like the All tabs
-  group.
+  popup blue `#3b82f6`, Auto-Park amber `#f59e0b`, AI window titles violet
+  `#8b5cf6`, Saved Windows sky `#0ea5e9`, Cloud Sync pink `#ec4899`. The FAQ
+  is neutral, like the All tabs group. Each section has its own color; the
+  list bar shows them in page order.
 - **Anchor teal** `#009688` belongs to recovery and anchored windows only
   (Session restore). Don't use it for anything else.
 - **One blue button** per view for the main action (`--brand #3b82f6`).
@@ -111,14 +113,33 @@ Order, top to bottom:
    colors ("this teal"): the teal means something because the picture shows
    the anchored window in it (TabSentry #504). The banner stays amber, as in
    the popup, where amber means "needs you".
-5. **Saved Windows** (sky): got its own section instead of a tile. A strong
+5. **AI window titles** (violet, "off until you turn them on"): *Windows that
+   name themselves.* One sentence on what it does (names each window from its
+   tabs, with the setup card's examples, and updates the name as tabs come
+   and go), three short points (your names stay unless you ask; Generate AI
+   Title for one window; the name stays after a restart), then one muted line: off until
+   you turn it on, what a request sends (tab titles and site names, not page
+   contents or full addresses, to our AI server, which asks Google Gemini)
+   and a link to the privacy policy's AI section for the full list. The copy
+   must read as opt-in everywhere and agree with the privacy policy. On the
+   right, a before/after: a new window as the popup names it before it has a
+   title ("Window 1042", six tabs, the AI tag), a caption, then the same
+   window folded with its AI title, **Laptop research** (the restore banner
+   lists the same window). The Questions add "What do AI window titles
+   send?". TabSentry #505.
+6. **Saved Windows** (sky): got its own section instead of a tile. A strong
    reason to install on its own. Six saved windows, each with its title,
    meta, favicons and Open.
-6. **Cloud Sync** (pink): text on the left (snapshot every hour, import on a
+7. **Cloud Sync** (pink): text on the left (snapshot every hour, import on a
    new machine or profile, about a week of snapshots per device, off unless you
    sign in); on the right the Cloud Sync page's This device card and Latest
    snapshots, four rows from three devices.
-7. **Questions** (neutral FAQ), then a closing call to action.
+8. **Questions** (neutral FAQ), then a closing call to action.
+
+The nav, the list bar ("N windows" and its swatches) and every ⋮ jump menu
+follow the sections: a new section goes in all three, and the nav lists every
+feature section (the ones with a jump menu). `website-check.mjs` checks it on
+every page (TabSentry #505).
 
 Removed on purpose:
 - A Search section (the hero promises search and the popup mockup shows it)
@@ -148,6 +169,8 @@ Removed on purpose:
   (TabSentry #504). A window card that runs short of room drops its meta
   first, then its plain tags (Saved, locks; never Current or Anchored), then
   its favicons one at a time (the "+N" counts the rest), then the whole strip.
+  On narrow cards (under 460px) the plain tags are hidden anyway, except
+  Current, Anchored and AI, which say what a picture is about.
   It measures the card itself, not the page width, so it holds at every width
   and wherever the card sits (`fitWindowHead` in `assets/mock.js`).
   `website-check.mjs` checks every title at every width.
