@@ -63,7 +63,8 @@
      ------------------------------------------------------------------ */
   const fv = (f, c) => ({ f, c });
   const fav = t => `<span class="fav" style="--c:${t.c}">${esc(t.f)}</span>`;
-  const favStrip = (tabs, n = 5) => `<span class="fav-strip">${tabs.slice(0, n).map(fav).join('')}${tabs.length > n ? `<span class="more">+${tabs.length - n}</span>` : ''}</span>`;
+  const FAV_MAX = 5;  // favicons a window row shows before "+N"
+  const favStrip = (tabs, n = FAV_MAX) => `<span class="fav-strip">${tabs.slice(0, n).map(fav).join('')}${tabs.length > n ? `<span class="more">+${tabs.length - n}</span>` : ''}</span>`;
   const sw = (on, key = '') => `<button class="switch" role="switch" aria-checked="${!!on}"${key ? ` data-sw="${key}"` : ''}><i></i></button>`;
   const select = label => `<span class="select">${esc(label)}${icon('chev')}</span>`;
   const seg = (opts, on) => `<span class="seg">${opts.map(o => `<button aria-pressed="${o === on}">${esc(o)}</button>`).join('')}</span>`;
@@ -364,11 +365,38 @@
     kind = kind === 'savedMany' ? 'saved' : kind;
     return rows.map(([k, when]) => {
       const w = WINDOWS[k] || SAVED_EXTRA[k];
-      return `<article class="win" style="--wc:${w.color}"><div class="win-head"><span class="wdot" style="margin-left:6px"></span><span class="win-title">${esc(w.name)}</span>
+      return `<article class="win" style="--wc:${w.color}" data-win="${k}"><div class="win-head"><span class="wdot" style="margin-left:6px"></span><span class="win-title">${esc(w.name)}</span>
         <span class="win-meta">${w.tabs.length} tabs · ${when}</span>${favStrip(w.tabs)}
         <span class="win-actions"><button class="btn sm">${icon(kind === 'saved' ? 'popout' : 'restore')}${kind === 'saved' ? 'Open' : 'Restore'}</button></span></div></article>`;
     }).join('');
   }
+
+  // A window card's title wins the room (#504). Where it would be cut, the
+  // meta goes first, then the plain tags (Saved, locks, AI; never Current or
+  // Anchored), then the favicons one at a time, then the whole strip.
+  // Measured on the card itself, so it holds wherever the card sits.
+  function fitWindowHead(card) {
+    const tabs = (WINDOWS[card.dataset.win] || SAVED_EXTRA[card.dataset.win]).tabs;
+    const title = card.querySelector('.win-title');
+    const meta = card.querySelector('.win-meta');
+    const plainTags = [...card.querySelectorAll('.win-head .tag:not(.brand):not(.anchor)')];
+    const hasStrip = !!card.querySelector('.win-head .fav-strip');
+    const cut = () => title.scrollWidth > title.clientWidth;
+    const showFavs = n => {
+      card.querySelector('.win-head .fav-strip').outerHTML = favStrip(tabs, n);
+      card.querySelector('.win-head .fav-strip').hidden = n === 0;
+    };
+    meta.hidden = false;
+    plainTags.forEach(tag => { tag.hidden = false; });
+    if (hasStrip) showFavs(FAV_MAX);
+    if (!cut()) return;
+    meta.hidden = true;
+    if (!cut()) return;
+    plainTags.forEach(tag => { tag.hidden = true; });
+    if (!hasStrip) return;
+    for (let n = FAV_MAX - 1; n >= 0 && cut(); n--) showFavs(n);
+  }
+  const fitWindowHeads = cards => cards.forEach(card => new ResizeObserver(() => fitWindowHead(card)).observe(card));
 
   function mainHTML(s) {
     switch (s.page) {
@@ -620,6 +648,7 @@
     el.classList.add('ts', 'win-mock');
     const rows = el.dataset.rows ? el.dataset.rows.split('-').map(Number) : undefined;
     el.innerHTML = winCard(el.dataset.win, { rows, name: el.dataset.name });
+    fitWindowHeads(el.querySelectorAll('.win'));
     el.addEventListener('click', e => { if (e.target.closest('[data-caret]')) e.target.closest('.win').classList.toggle('closed'); });
   }
 
@@ -674,6 +703,7 @@
   function mountFeature(el) {
     el.classList.add('ts', 'feature-mock');
     el.innerHTML = featureHTML(el.dataset.feature);
+    fitWindowHeads(el.querySelectorAll('.win[data-win]'));
     el.addEventListener('click', toggleControls);
   }
 
