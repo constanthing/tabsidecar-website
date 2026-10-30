@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TabSidecar: close tabs without losing them</title>
 <meta name="description" content="TabSidecar parks the tabs you've stopped using, brings your windows back after Chrome restarts, and keeps every tab one search away.">
-<link rel="stylesheet" href="assets/mock.css?v=202610300611">
-<link rel="stylesheet" href="assets/site.css?v=202610300611">
-<link rel="stylesheet" href="assets/windows.css?v=202610300611">
-<script src="assets/site.js?v=202610300611"></script>
-<script src="assets/icons.js?v=202610300611" defer></script>
-<script src="assets/mock.js?v=202610300611" defer></script>
-<script src="assets/windows.js?v=202610300611" defer></script>
+<link rel="stylesheet" href="assets/mock.css?v=202610300658">
+<link rel="stylesheet" href="assets/site.css?v=202610300658">
+<link rel="stylesheet" href="assets/windows.css?v=202610300658">
+<script src="assets/site.js?v=202610300658"></script>
+<script src="assets/icons.js?v=202610300658" defer></script>
+<script src="assets/mock.js?v=202610300658" defer></script>
+<script src="assets/windows.js?v=202610300658" defer></script>
 <style>
   /* Windows: the page is a window list. One background; every section is a
      window card in its own window color, drawn the way the popup draws Tint
@@ -42,8 +42,10 @@
   .steps li { position: relative; padding-left: 34px; font-size: 15px; color: var(--muted); line-height: 1.55; }
   .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 1px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: #00796b; background: rgba(0, 150, 136, .1); }
   .steps b { color: var(--text); font-weight: 600; }
+  /* The anchored window, back on its own, above the banner that lists the rest */
+  .restore-pic { display: grid; gap: 10px; }
+  .restore-cap { margin: 0 2px 4px; font-size: 13px; color: var(--muted); }
 
-  @media (max-width: 520px) { #saved .fav-strip { display: none; } #saved .win-title { flex-shrink: 0; } #saved .win-meta { display: none; } #saved .win-actions { margin-left: auto; } }
   @media (max-width: 900px) { .nav-links { display: none; } .site-nav .wrap { justify-content: space-between; } }
 </style>
 <link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
@@ -61,7 +63,7 @@
 
 <main id="top" class="wrap">
   <section class="hero">
-    <span class="pill"><span class="dot"></span>Free for Chrome and Edge</span>
+    <span class="pill"><span class="dot"></span>Free for Chrome</span>
     <h1 class="h1">Close tabs without<br>losing them.</h1>
     <p class="lede">TabSidecar parks the tabs you’ve stopped using, brings your windows back after Chrome restarts, and keeps every tab one search away.</p>
     <div class="cta-row">
@@ -131,9 +133,13 @@
               <li><b>The rest folds away.</b> Untitled windows wait under Other windows. Hide one and it moves to Closed Windows.</li>
               <li><b>Nothing is lost.</b> The Last session page lists every window your last session had, and whether it came back.</li>
             </ul>
-            <p class="copy">Anchor the window you open every morning. It’s the only one that gets this teal, and it always comes back.</p>
+            <p class="copy">Anchor the window you open every morning. When Chrome starts, it comes back on its own, without a click.</p>
           </div>
-          <div data-mock="restored" data-state="missing"></div>
+          <div class="restore-pic">
+            <div data-mock="window" data-win="daily" data-rows="0-2"></div>
+            <p class="restore-cap">Daily is anchored, so it came back on its own.</p>
+            <div data-mock="restored" data-state="missing"></div>
+          </div>
         </div>
       </div>
     </article>
@@ -197,7 +203,7 @@
     <h2 class="h2">Start with the tabs you have.</h2>
     <p class="lede">Install in a few seconds. Nothing changes until you’re ready.</p>
     <div class="cta-row"><a class="b primary" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb"><i data-icon="plus"></i>Add to Chrome</a></div>
-    <p class="meta">Free · Chrome and Edge</p>
+    <p class="meta">Free · Chrome</p>
   </section>
 </main>
 

@@ -235,6 +235,7 @@
 .ts .fav-strip { display: flex; gap: 3px; align-items: center; flex: none; }
 .ts .fav-strip .fav { width: 14px; height: 14px; font-size: 8px; border-radius: 3px; }
 .ts .fav-strip .more { font-size: 11px; color: var(--faint); margin-left: 2px; }
+.ts .win-head .fav-strip[hidden], .ts .win-head .tag[hidden] { display: none; }
 
 /* buttons */
 .ts .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 12.5px; font-weight: 500; white-space: nowrap; flex: none; }

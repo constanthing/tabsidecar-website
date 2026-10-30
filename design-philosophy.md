@@ -3,7 +3,8 @@
 Reference for the pages in this repo. Captures the *why* behind the design,
 layout and copy so future edits stay consistent. Last rewritten September 27,
 2026, when the site moved to the Windows design; home page sections reworked
-October 13, 2026.
+October 13, 2026; Chrome only, Session restore picture and whole window titles
+October 30, 2026 (TabSentry #504).
 
 ---
 
@@ -87,21 +88,32 @@ The one exception is the hero and closing "Add to Chrome" calls to action.
 
 Order, top to bottom:
 
-1. **Hero:** "Free for Chrome and Edge" pill, *Close tabs without losing
-   them.*, one lead sentence, Add to Chrome.
+1. **Hero:** "Free for Chrome" pill, *Close tabs without losing them.*, one
+   lead sentence, Add to Chrome. The site names Chrome only: the launch and
+   the testing are Chrome only for now (Mario, October 30, 2026), so no other
+   browser is named anywhere on it, the closing's "Free · Chrome" included
+   (`website-check.mjs` checks every page, TabSentry #504).
 2. **TabSidecar** (blue, "Current"): the clickable popup mockup.
 3. **Auto-Park** (amber): the headline feature. Text on the left with a short
    "never park" list (pinned, locked, playing sound) and Replay; on the right
    the animated demo, the window stacked above AutoParked.
 4. **Session restore** (teal, "Anchored"): three numbered points (named
-   windows first, the rest folds away, the Last session page) beside the
-   restore banner as the popup draws it after the restore redesign
-   (TabSentry #267-#275): the summary with "Chrome started …", Show restored
-   windows, Restore all, **Named windows**, then **Other windows (N)**, folded.
-   Just the banner, no popup frame around it. Restore, Hide (with the popup's
-   toast and Undo) and Restore all work, with the popup's words.
+   windows first, the rest folds away, the Last session page), then one line
+   on anchoring (the anchored window comes back on its own each time Chrome
+   starts). On the right, the anchored window **Daily** as a teal window card
+   with the Anchored tag and two of its tabs, a one-line caption ("Daily is
+   anchored, so it came back on its own."), then the restore banner as the
+   popup draws it after the restore redesign (TabSentry #267-#275): the
+   summary with "Chrome started …", Show restored windows, Restore all,
+   **Named windows**, then **Other windows (N)**, folded. No popup frame
+   around them. Restore, Hide (with the popup's toast and Undo) and Restore
+   all work, with the popup's words. The copy never points at the page's
+   colors ("this teal"): the teal means something because the picture shows
+   the anchored window in it (TabSentry #504). The banner stays amber, as in
+   the popup, where amber means "needs you".
 5. **Saved Windows** (sky): got its own section instead of a tile. A strong
-   reason to install on its own.
+   reason to install on its own. Six saved windows, each with its title,
+   meta, favicons and Open.
 6. **Cloud Sync** (pink): text on the left (snapshot every hour, import on a
    new machine or profile, about a week of snapshots per device, off unless you
    sign in); on the right the Cloud Sync page's This device card and Latest
@@ -132,6 +144,13 @@ Removed on purpose:
 - **Phones:** check 375px and 320px. Columns stack, text first. Mock rows drop
   secondary text before anything overflows (banner rows put their buttons on
   a second line); the top nav hides below 900px; nothing may scroll sideways.
+- **Window titles are never cut** in a picture outside the popup mockup
+  (TabSentry #504). A window card that runs short of room drops its meta
+  first, then its plain tags (Saved, locks; never Current or Anchored), then
+  its favicons one at a time (the "+N" counts the rest), then the whole strip.
+  It measures the card itself, not the page width, so it holds at every width
+  and wherever the card sits (`fitWindowHead` in `assets/mock.js`).
+  `website-check.mjs` checks every title at every width.
 
 ---
 
@@ -189,6 +208,9 @@ Plain, grounded, un-corny. Avoid slogan-style or "AI-coded" lines.
 - Lead with the promise, not the disclaimer.
 - Short headings that say what happens: *Chrome restarts. Your windows come
   back.* *New laptop. Same windows.*
+- Name Chrome only (see Home page, item 1).
+- Copy describes the product, not the page: no "this teal" or "the card
+  below".
 
 ---
 
