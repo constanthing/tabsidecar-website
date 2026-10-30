@@ -5,7 +5,7 @@ layout and copy so future edits stay consistent. Last rewritten September 27,
 2026, when the site moved to the Windows design; home page sections reworked
 October 13, 2026; Chrome only, Session restore picture and whole window titles
 October 30, 2026 (TabSentry #504); AI window titles section the same day
-(TabSentry #505).
+(TabSentry #505); uninstall page the same day (TabSentry #507).
 
 ---
 
@@ -20,6 +20,7 @@ extension repo:
 | `privacy.html` | `privacy.html` |
 | `reset-password.html` | `reset-password.html` |
 | `email-confirmed.html` | `email-confirmed.html` |
+| `uninstall.html` | `uninstall.html` |
 | `assets/*` | `shared/*` |
 
 Edit the prototype, preview it with `python website/serve.py` (no-cache server
@@ -231,6 +232,26 @@ password (the extension's list, `assets/common-passwords.js`; if the list
 can't load, the password is allowed), and after a password is set sign out
 every session, the link's own included, so the link can't set another password
 without the current one (#178).
+
+## Uninstall page (`uninstall.html`)
+
+Where Chrome sends someone who removes TabSidecar: the extension sets
+`uninstall.html?v=<version>` as its uninstall address on every start
+(TabSentry #507). Same look as the account pages: one blue window card titled
+"TabSidecar · Removed", popup-sized controls. It asks why, storing nothing about the person: eight
+one-click reasons (toggle buttons, pick any, 32px like the popup's), an
+optional note of up to 500 characters and Send. A state for every outcome:
+ready, sending, sent, failed (names the support address and keeps the answer),
+busy database, and sent twice (a reload shows "Already sent" and sends
+nothing). It sends only the reasons, the note and the version from the
+address, and says so under the button with a link to the privacy policy's
+Uninstall feedback section. Under the form, on every state: what went with
+the extension, what stays (exported backups, cloud snapshots until the
+account is deleted, and how to delete it), and "Removed by mistake? Add it
+back" as a plain link to the store. The page answers to the table in
+`TabSentry/supabase/migrations/20261030_uninstall_feedback.sql`; keep its
+reason codes and limits in step with it, and never publish the page before
+that migration is applied.
 
 ## Account emails
 

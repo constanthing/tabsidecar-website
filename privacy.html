@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TabSidecar Privacy Policy</title>
 <meta name="description" content="How TabSidecar handles your data: what it accesses, what stays on your computer, and what it sends when you use an optional feature.">
-<link rel="stylesheet" href="assets/mock.css?v=202610301647">
-<link rel="stylesheet" href="assets/site.css?v=202610301647">
-<link rel="stylesheet" href="assets/windows.css?v=202610301647">
-<script src="assets/site.js?v=202610301647"></script>
-<script src="assets/icons.js?v=202610301647" defer></script>
-<script src="assets/mock.js?v=202610301647" defer></script>
+<link rel="stylesheet" href="assets/mock.css?v=202610301921">
+<link rel="stylesheet" href="assets/site.css?v=202610301921">
+<link rel="stylesheet" href="assets/windows.css?v=202610301921">
+<script src="assets/site.js?v=202610301921"></script>
+<script src="assets/icons.js?v=202610301921" defer></script>
+<script src="assets/mock.js?v=202610301921" defer></script>
 <style>
   /* Privacy policy in the Windows design, read as a document: At a glance is
      the one window (assets/windows.css, blue); every other section is a plain
@@ -132,6 +132,7 @@
         <li><a href="#encryption">Encryption and who can access your data</a></li>
         <li><a href="#ai">AI window titles</a></li>
         <li><a href="#emails">Update emails</a></li>
+        <li><a href="#uninstall">Uninstall feedback</a></li>
         <li><a href="#sharing">Service providers and data sharing</a></li>
         <li><a href="#choices">Your choices</a></li>
         <li><a href="#retention">Data retention and deletion</a></li>
@@ -145,7 +146,7 @@
     <section class="sec doc" id="overview">
       <h2>Overview</h2>
       <p>TabSidecar is a tab and window management extension. It helps you organize open tabs, restore windows, auto-park inactive tabs, save browser state, export your own backup files and, if you create an account, back up your tabs and windows to the cloud.</p>
-      <p>Most extension data stays in your browser, in the extension's own storage. Data leaves your device only when you turn on a feature that needs it, each described below: cloud sync if you sign in to an account, AI-generated window titles if you turn them on, and the update-email list if you join it.</p>
+      <p>Most extension data stays in your browser, in the extension's own storage. Data leaves your device only when you turn on a feature that needs it, each described below: cloud sync if you sign in to an account, AI-generated window titles if you turn them on, and the update-email list if you join it. If you remove TabSidecar, the page that opens on our website asks why, and sends your answer only if you choose to.</p>
     </section>
 
     <section class="sec doc" id="access">
@@ -230,12 +231,19 @@
       <p>If you choose to join the update-email list, the extension sends that email address to our Supabase database. We use it only to send product updates.</p>
     </section>
 
+    <section class="sec doc" id="uninstall">
+      <h2>Uninstall feedback</h2>
+      <p>When you remove TabSidecar, Chrome opens a page on tabsidecar.com that asks why. Its address carries the TabSidecar version and nothing else. Answering is optional, and nothing is sent unless you choose Send.</p>
+      <p>If you send an answer, the page sends the reasons you picked, your note if you wrote one, and the TabSidecar version to our Supabase database. We don't store your name, email address, network address, account or install ID with it, so please leave personal details out of the note. Answers are deleted after 12 months.</p>
+      <p>Like every request to our database, it passes through Supabase's servers, whose request logs record each request's network address (IP address) and time. On our current Supabase plan those logs are deleted after 1 day. The page itself is served by GitHub Pages, which hosts tabsidecar.com and logs each visitor's network address for security purposes, whether or not you send an answer.</p>
+    </section>
+
     <section class="sec doc" id="sharing">
       <h2>Service providers and data sharing</h2>
       <p>TabSidecar does not sell your personal information and does not include advertising SDKs, behavior analytics, cross-site tracking pixels or general-purpose telemetry. We use four service providers:</p>
       <div class="grp"><div class="panel">
         <dl class="kv">
-          <div><dt>Supabase</dt><dd>Hosts accounts, sign-in, cloud snapshots, devices and the update-email list, and sends account emails through Resend.</dd></div>
+          <div><dt>Supabase</dt><dd>Hosts accounts, sign-in, cloud snapshots, devices, the update-email list and uninstall feedback, and sends account emails through Resend.</dd></div>
           <div><dt>Resend</dt><dd>Delivers the account emails Supabase sends, such as sign-up codes and password reset links. It receives your email address and the email's contents.</dd></div>
           <div><dt>DigitalOcean</dt><dd>Hosts our AI title server, <code>api.tabsidecar.com</code>. The AI title requests described above, and that server's daily counts and access logs, are processed and kept on DigitalOcean's computers.</dd></div>
           <div><dt>Google (Gemini API)</dt><dd>Generates AI window titles from the tab titles and site names described above, if you turn them on.</dd></div>
@@ -260,7 +268,7 @@
     <section class="sec doc" id="retention">
       <h2>Data retention and deletion</h2>
       <p>Local data remains in the extension's storage until you delete it, clear the extension's data or uninstall the extension. Exported backup files remain wherever you save them.</p>
-      <p>Cloud snapshots are kept as described under <a href="#accounts">“Accounts and cloud sync”</a> until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. On the AI server, daily counts are deleted after 7 days and access logs within 5 weeks, whether or not you have an account. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
+      <p>Cloud snapshots are kept as described under <a href="#accounts">“Accounts and cloud sync”</a> until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. On the AI server, daily counts are deleted after 7 days and access logs within 5 weeks, whether or not you have an account. Uninstall feedback is deleted after 12 months. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
     </section>
 
     <section class="sec doc" id="security">
