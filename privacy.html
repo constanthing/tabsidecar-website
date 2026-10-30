@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TabSidecar Privacy Policy</title>
 <meta name="description" content="How TabSidecar handles your data: what it accesses, what stays on your computer, and what it sends when you use an optional feature.">
-<link rel="stylesheet" href="assets/mock.css?v=202610300405">
-<link rel="stylesheet" href="assets/site.css?v=202610300405">
-<link rel="stylesheet" href="assets/windows.css?v=202610300405">
-<script src="assets/site.js?v=202610300405"></script>
-<script src="assets/icons.js?v=202610300405" defer></script>
-<script src="assets/mock.js?v=202610300405" defer></script>
+<link rel="stylesheet" href="assets/mock.css?v=202610300611">
+<link rel="stylesheet" href="assets/site.css?v=202610300611">
+<link rel="stylesheet" href="assets/windows.css?v=202610300611">
+<script src="assets/site.js?v=202610300611"></script>
+<script src="assets/icons.js?v=202610300611" defer></script>
+<script src="assets/mock.js?v=202610300611" defer></script>
 <style>
   /* Privacy policy in the Windows design, read as a document: At a glance is
      the one window (assets/windows.css, blue); every other section is a plain
@@ -222,7 +222,7 @@
       <h2>AI window titles</h2>
       <p>AI window titles are off until you turn them on, either during setup or in Settings → Artificial Intelligence. Asking for an AI title for a single window also sends that window's request.</p>
       <p>When they're on, the extension sends a request to <code>api.tabsidecar.com</code> containing an install-scoped random identifier, the window's tab titles and the site name of each tab (for example <code>github.com</code>, not the full address), and your existing window titles. If you're signed in, the request also carries your sign-in token so your account gets a higher daily limit. Our server passes the tab titles and site names to Google's Gemini API to generate the title and returns it to the extension.</p>
-      <p>Our server does not save tab titles or site names. It keeps each generated title in memory for up to 10 minutes, filed under a one-way fingerprint of the tabs, so the same tabs get the same title without asking Gemini again. To enforce daily limits it keeps a count of requests per day: for your account if you're signed in, otherwise (or when your sign-in can't be checked) for your install identifier and your network address (IP address). It deletes those counts after 7 days. Like most web servers, it also records each request's network address, time, the page it asked for, and your browser and operating system versions in its access logs, and deletes those logs after 15 days.</p>
+      <p>Our server does not save tab titles or site names. It keeps each generated title in memory for up to 10 minutes, filed under a one-way fingerprint of the tabs, so the same tabs get the same title without asking Gemini again. To enforce daily limits it keeps a count of requests per day: for your account if you're signed in, otherwise (or when your sign-in can't be checked) for your install identifier and your network address (IP address). It deletes those counts after 7 days. Like most web servers, it also records each request's network address, time, the page it asked for, and your browser and operating system versions in its access logs, and deletes those logs within 5 weeks.</p>
     </section>
 
     <section class="sec doc" id="emails">
@@ -260,7 +260,7 @@
     <section class="sec doc" id="retention">
       <h2>Data retention and deletion</h2>
       <p>Local data remains in the extension's storage until you delete it, clear the extension's data or uninstall the extension. Exported backup files remain wherever you save them.</p>
-      <p>Cloud snapshots are kept as described under <a href="#accounts">“Accounts and cloud sync”</a> until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. On the AI server, daily counts are deleted after 7 days and access logs after 15 days, whether or not you have an account. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
+      <p>Cloud snapshots are kept as described under <a href="#accounts">“Accounts and cloud sync”</a> until you delete your account. To delete it, open Account in the extension and choose to delete your account; you'll be asked for your password. This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your device are kept. On the AI server, daily counts are deleted after 7 days and access logs within 5 weeks, whether or not you have an account. You can also ask us to delete your data by emailing <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
     </section>
 
     <section class="sec doc" id="security">
