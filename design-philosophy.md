@@ -91,11 +91,16 @@ The one exception is the hero and closing "Add to Chrome" calls to action.
 Order, top to bottom:
 
 1. **Hero:** "Free for Chrome" pill, *Close tabs without losing them.*, one
-   lead sentence, Add to Chrome. The site names Chrome only: the launch and
+   lead sentence, Add to Chrome (on a phone, View in Chrome Web Store: see
+   Phones below). The site names Chrome only: the launch and
    the testing are Chrome only for now (Mario, October 30, 2026), so no other
    browser is named anywhere on it, the closing's "Free · Chrome" included
    (`website-check.mjs` checks every page, TabSentry #504).
-2. **TabSidecar** (blue, "Current"): the clickable popup mockup.
+2. **TabSidecar** (blue, "Current"): the clickable popup mockup. Where the
+   full popup would be scaled so far that its text can't be read (a box under
+   about 650px: phones and tablets), a phone-sized popup takes its place: the
+   Tabs page alone at its real size, filling the section, with Launch week
+   open and Reading list and Home folded (TabSentry #506).
 3. **Auto-Park** (amber): the headline feature. Text on the left with a short
    "never park" list (pinned, locked, playing sound) and Replay; on the right
    the animated demo, the window stacked above AutoParked.
@@ -162,9 +167,28 @@ Removed on purpose:
   cards. Check the extension before showing a control: window colors are
   assigned automatically (there is no color picker), and Save for later puts
   a tab on a list with a "Later" chip (there is no timed snooze).
-- **Phones:** check 375px and 320px. Columns stack, text first. Mock rows drop
-  secondary text before anything overflows (banner rows put their buttons on
-  a second line); the top nav hides below 900px; nothing may scroll sideways.
+- **Phones:** check 375px and 320px, as a phone (with touch). Columns stack,
+  text first. Mock rows drop secondary text before anything overflows (banner
+  rows put their buttons on a second line, and so does the banner's Dismiss
+  when the summary leaves no room); the top nav hides below 900px; nothing
+  may scroll sideways. TabSentry #506 added these, each checked by
+  `website-check.mjs` on every page at every width:
+  - **Text in a picture is 9px or more** as drawn, scaling included: a
+    picture that would shrink below that draws a smaller version instead
+    (the phone-sized popup). Favicon letters are the one exception: they
+    stand for a site's icon.
+  - **No control is cut.** No button, tag or link in a picture or a section
+    header runs past an edge that hides it. A section header whose tag
+    doesn't fit beside its title and ⋮ puts the tag under the title (never
+    drops it). The desktop popup's tab list is the exception: it is cut at
+    the popup's height, as in the extension, where it scrolls.
+  - **A phone isn't asked to install.** A phone or tablet can't add a Chrome
+    extension, so on a touch screen with no mouse under 1024px the store
+    buttons say "View in store" / "View in Chrome Web Store", the hero adds
+    "It runs in Chrome on your computer." and the closing says to add it on
+    the computer. On a computer every store button says "Add to Chrome".
+    The phone is told apart by the screen (width, `hover: none`,
+    `pointer: coarse`), never by the user agent.
 - **Window titles are never cut** in a picture outside the popup mockup
   (TabSentry #504). A window card that runs short of room drops its meta
   first, then its plain tags (Saved, locks; never Current or Anchored), then

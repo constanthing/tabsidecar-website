@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TabSidecar: close tabs without losing them</title>
 <meta name="description" content="TabSidecar parks the tabs you've stopped using, brings your windows back after Chrome restarts, and keeps every tab one search away.">
-<link rel="stylesheet" href="assets/mock.css?v=202610300733">
-<link rel="stylesheet" href="assets/site.css?v=202610300733">
-<link rel="stylesheet" href="assets/windows.css?v=202610300733">
-<script src="assets/site.js?v=202610300733"></script>
-<script src="assets/icons.js?v=202610300733" defer></script>
-<script src="assets/mock.js?v=202610300733" defer></script>
-<script src="assets/windows.js?v=202610300733" defer></script>
+<link rel="stylesheet" href="assets/mock.css?v=202610301647">
+<link rel="stylesheet" href="assets/site.css?v=202610301647">
+<link rel="stylesheet" href="assets/windows.css?v=202610301647">
+<script src="assets/site.js?v=202610301647"></script>
+<script src="assets/icons.js?v=202610301647" defer></script>
+<script src="assets/mock.js?v=202610301647" defer></script>
+<script src="assets/windows.js?v=202610301647" defer></script>
 <style>
   /* Windows: the page is a window list. One background; every section is a
      window card in its own window color, drawn the way the popup draws Tint
@@ -25,6 +25,14 @@
   .txt .h2 { font-size: clamp(26px, 3vw, 36px); }
   @media (max-width: 920px) { .two { grid-template-columns: minmax(0, 1fr); gap: 30px; } }
 
+
+  /* The popup section: the full popup floats in the section; the phone-sized
+     one fills it, out to the body's padding (windows.css), so its window
+     titles get the room. Margins, not padding, so the box mock.js measures
+     to pick a popup keeps its width. */
+  #popup .swin-body { padding-top: 36px; padding-bottom: 36px; }
+  #popup .pop-phone { border: 0; border-radius: 0; box-shadow: none; margin: -36px -44px; width: calc(100% + 88px); }
+  @media (max-width: 700px) { #popup .pop-phone { margin: -36px -18px; width: calc(100% + 36px); } }
 
   .closing { text-align: center; padding: 120px 0 20px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
   .closing .cta-row { justify-content: center; }
@@ -64,16 +72,17 @@
   <nav class="nav-links" aria-label="Page">
     <a href="#autopark">Auto-Park</a><a href="#restore">Session restore</a><a href="#ai">AI titles</a><a href="#saved">Saved Windows</a><a href="#cloud">Cloud Sync</a><a href="#faq">FAQ</a>
   </nav>
-  <a class="b sm" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Add to Chrome</a>
+  <a class="b sm on-computer" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Add to Chrome</a><a class="b sm on-phone" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">View in store</a>
 </div></header>
 
 <main id="top" class="wrap">
   <section class="hero">
     <span class="pill"><span class="dot"></span>Free for Chrome</span>
     <h1 class="h1">Close tabs without<br>losing them.</h1>
-    <p class="lede">TabSidecar parks the tabs you’ve stopped using, brings your windows back after Chrome restarts, and keeps every tab one search away.</p>
+    <p class="lede">TabSidecar parks the tabs you’ve stopped using, brings your windows back after Chrome restarts, and keeps every tab one search away.<span class="on-phone"> It runs in Chrome on your computer.</span></p>
     <div class="cta-row">
-      <a class="b primary" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb" id="install"><i data-icon="plus"></i>Add to Chrome</a>
+      <a class="b primary on-computer" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb" id="install"><i data-icon="plus"></i>Add to Chrome</a>
+      <a class="b primary on-phone" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">View in Chrome Web Store</a>
       <a class="b quiet" href="#autopark">See how it works<i data-icon="chev"></i></a>
     </div>
   </section>
@@ -94,7 +103,7 @@
         <h2 class="swin-title">TabSidecar</h2><span class="swin-meta">the popup</span><span class="tagx brand">Current</span>
         <span class="end"><span class="meta">Click around, it works</span></span>
       </header>
-      <div class="swin-body" style="padding-top:36px;padding-bottom:36px"><div class="pop-fit"><div data-mock="popup" id="heroPop"></div></div></div>
+      <div class="swin-body"><div class="pop-fit"><div data-mock="popup" id="heroPop"></div></div></div>
     </article>
 
     <!-- 2. Auto-Park: amber -->
@@ -236,8 +245,9 @@
 
   <section class="closing">
     <h2 class="h2">Start with the tabs you have.</h2>
-    <p class="lede">Install in a few seconds. Nothing changes until you’re ready.</p>
-    <div class="cta-row"><a class="b primary" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb"><i data-icon="plus"></i>Add to Chrome</a></div>
+    <p class="lede on-computer">Install in a few seconds. Nothing changes until you’re ready.</p>
+    <p class="lede on-phone">Add it to Chrome on your computer in a few seconds. Nothing changes until you’re ready.</p>
+    <div class="cta-row"><a class="b primary on-computer" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb"><i data-icon="plus"></i>Add to Chrome</a><a class="b primary on-phone" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">View in Chrome Web Store</a></div>
     <p class="meta">Free · Chrome</p>
   </section>
 </main>

@@ -41,6 +41,11 @@
 .tagx.anchor { color: #00796b; background: rgba(0, 150, 136, .1); }
 [data-theme="dark"] .tagx.anchor { color: #4db6ac; background: rgba(0, 150, 136, .2); }
 .tagx svg { width: 13px; height: 13px; }
+/* A header whose tag doesn't fit beside its title and ⋮ puts the tag on a
+   second line, under the title (windows.js, #506). The indent is the caret,
+   the dot and their gaps. */
+.swin-head.tag-below { flex-wrap: wrap; height: auto; min-height: 58px; padding-top: 10px; padding-bottom: 10px; row-gap: 2px; }
+.swin-head.tag-below .tagx { order: 1; margin-left: calc(30px + 10px + 2 * 12px); }
 .swin-head .end { margin-left: auto; display: flex; align-items: center; gap: 6px; position: relative; }
 .swin-body { border-top: 1px solid color-mix(in srgb, var(--wc) 14%, var(--border)); padding: 40px 44px 44px; }
 .swin.neutral .swin-body { border-top-color: var(--border); }
