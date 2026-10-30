@@ -443,11 +443,12 @@
 
 .ts.restored { overflow: hidden; }
 
-/* Narrow window cards (phones): drop the URL and chips, tighten the columns */
+/* Narrow window cards (phones): drop the URL and chips, tighten the columns.
+   Current, Anchored and AI stay: they say what the picture is about. */
 .ts .win, .ts.win { container-type: inline-size; }
 @container (max-width: 460px) {
   .ts .tab { grid-template-columns: 34px 16px minmax(0, 1fr) auto; gap: 8px; padding-left: 8px; }
-  .ts .tab .t-url, .ts .tab .lbl, .ts .tab .pri, .ts .tab .later, .ts .win-head .tag:not(.brand):not(.anchor) { display: none; }
+  .ts .tab .t-url, .ts .tab .lbl, .ts .tab .pri, .ts .tab .later, .ts .win-head .tag:not(.brand):not(.anchor):not(.ai) { display: none; }
   .ts .t-right { min-width: 0; }
 }
 

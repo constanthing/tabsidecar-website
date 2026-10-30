@@ -47,6 +47,16 @@
       { t: 'Linear — Cycle 14', u: 'linear.app/acme/cycle/14', f: 'L', c: '#5e6ad2', lock: true, when: '1h ago' },
       { t: 'Inbox (12) — Gmail', u: 'mail.google.com/mail/u/0', f: 'M', c: '#ea4335', lock: true, when: '6m ago' },
     ] },
+    // The home page's AI window titles picture: a new window, then the name AI
+    // titles gave it. The restore banner lists the same window by that name.
+    laptops: { name: 'Laptop research', color: C.violet, ai: true, tabs: [
+      { t: 'The best laptops for 2026', u: 'theverge.com/best-laptop', f: 'V', c: '#5200ff', time: '12m', when: '4m ago' },
+      { t: 'Laptop battery life, tested', u: 'rtings.com/laptop/tests/battery', f: 'R', c: '#e0301e', time: '9m', when: '3m ago' },
+      { t: 'The best ultrabooks', u: 'nytimes.com/wirecutter/reviews/best-ultrabooks', f: 'W', c: '#111827', time: '6m', when: '2m ago' },
+      { t: 'ThinkPad X1 Carbon: tech specs', u: 'lenovo.com/us/en/p/laptops', f: 'L', c: '#e2231a', time: '3m', when: '1m ago' },
+      { t: 'Laptops on sale', u: 'bestbuy.com/site/laptops', f: 'B', c: '#0046be', when: 'Just now' },
+      { t: 'Which laptop should I buy?', u: 'reddit.com/r/SuggestALaptop', f: 'R', c: '#ff4500', when: 'Just now' },
+    ] },
   };
   const PARKED = [
     { t: 'Wireless earbuds, compared', u: 'rtings.com/headphones/earbuds', f: 'R', c: '#e0301e', when: '1h ago' },
@@ -119,7 +129,7 @@
         ${w.anchored ? `<span class="tag anchor">${icon('pin')}Anchored</span>` : ''}
         ${w.saved ? `<span class="tag">${icon('bookmark')}Saved</span>` : ''}
         ${locked ? `<span class="tag" title="Locked tabs">${icon('lock')}${locked}/${w.tabs.length}</span>` : ''}
-        ${w.ai ? `<span class="tag">${icon('sparkle')}AI</span>` : ''}
+        ${w.ai ? `<span class="tag ai">${icon('sparkle')}AI</span>` : ''}
         ${o.closed ? favStrip(w.tabs) : ''}
         <span class="win-actions"><button class="icon-btn" title="Window options" data-winmenu>${icon('more')}</button></span>
       </div>
@@ -644,10 +654,11 @@
     wireBanner(el);
   }
 
+  // data-closed draws the window folded: its header with the favicon strip.
   function mountWindow(el) {
     el.classList.add('ts', 'win-mock');
     const rows = el.dataset.rows ? el.dataset.rows.split('-').map(Number) : undefined;
-    el.innerHTML = winCard(el.dataset.win, { rows, name: el.dataset.name });
+    el.innerHTML = winCard(el.dataset.win, { rows, name: el.dataset.name, closed: 'closed' in el.dataset });
     fitWindowHeads(el.querySelectorAll('.win'));
     el.addEventListener('click', e => { if (e.target.closest('[data-caret]')) e.target.closest('.win').classList.toggle('closed'); });
   }
