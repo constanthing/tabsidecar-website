@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-variant="not-found" data-bg="white">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found · TabSidecar</title>
+<meta name="description" content="There’s no page at this address on tabsidecar.com. Go to the home page, or find answers on the Support page.">
+<link rel="stylesheet" href="/assets/mock.css?v=202610310531">
+<link rel="stylesheet" href="/assets/site.css?v=202610310531">
+<link rel="stylesheet" href="/assets/windows.css?v=202610310531">
+<script src="/assets/site.js?v=202610310531"></script>
+<style>
+  /* Page not found: GitHub Pages answers every address the site doesn't have, at any
+     depth (/a/b/c too), with this page and status 404. One window card in the brand
+     blue, like the account and uninstall pages, with the way back: the home page,
+     Support and Privacy. The build writes this page's links from the site root
+     (ROOT_ABSOLUTE in build_site.py), so they work from any depth. TabSentry #509. */
+  main { padding: 96px var(--gutter) 72px; }
+  .col { width: 100%; max-width: 520px; margin: 0 auto; }
+  .card .swin-body { padding: 24px 24px 22px; }
+  .card h1 { margin: 0 0 6px; font: 650 24px/1.2 var(--display); letter-spacing: -.02em; }
+  .card .copy { font-size: 14.5px; margin-bottom: 18px; }
+
+  /* Popup-sized buttons, like Sync now and Restore */
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .card .b { height: 32px; padding: 0 12px; gap: 6px; border-radius: 7px; font-size: 13.5px; box-shadow: none; }
+  @media (max-width: 520px) { main { padding-top: 40px; } .card .swin-body { padding: 20px 16px; } }
+</style>
+<link rel="canonical" href="https://tabsidecar.com/404.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TabSidecar">
+<meta property="og:title" content="Page not found · TabSidecar">
+<meta property="og:description" content="There’s no page at this address on tabsidecar.com. Go to the home page, or find answers on the Support page.">
+<meta property="og:url" content="https://tabsidecar.com/404.html">
+<meta property="og:image" content="https://tabsidecar.com/icons/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="TabSidecar: Close tabs without losing them. The TabSidecar popup with a window of tabs.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon32.png">
+</head>
+<body>
+
+<header class="site-nav lined"><div class="wrap">
+  <a class="wordmark" href="/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <nav class="nav-links" aria-label="Site">
+    <a href="/#autopark">Features</a><a href="/#faq">FAQ</a><a href="/privacy.html">Privacy</a>
+  </nav>
+  <a class="b sm on-computer" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Add to Chrome</a><a class="b sm on-phone" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">View in store</a>
+</div></header>
+
+<main>
+  <div class="col">
+    <section class="card swin" style="--wc:#3b82f6" aria-labelledby="not-found-title">
+      <header class="swin-head"><span class="swin-dot" style="margin-left:4px"></span><span class="swin-title">TabSidecar</span><span class="swin-meta">404</span></header>
+      <div class="swin-body">
+        <h1 id="not-found-title">Page not found</h1>
+        <p class="copy">There’s no page at this address. Check it for a typo, or go to the home page.</p>
+        <div class="actions">
+          <a class="b primary" href="/">Go to the home page</a>
+          <a class="b" href="/support.html">Support</a>
+          <a class="b" href="/privacy.html">Privacy policy</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-foot"><div class="wrap">
+  <a class="wordmark" href="/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <span class="grow"></span>
+  <a href="/privacy.html">Privacy</a><a href="/support.html">Support</a><a href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Chrome Web Store</a>
+  <span>© 2026</span>
+</div></footer>
+
+</body>
+</html>
