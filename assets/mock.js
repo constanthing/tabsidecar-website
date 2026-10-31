@@ -173,7 +173,22 @@
       { name: 'Untitled Window', meta: '2 tabs · Sat 11:40 AM', to: 'closed', favs: [fv('M', '#ea4335'), fv('▶', '#ff0000')] },
     ],
   };
+  // When the browser started, on the banner and the Last session page alike.
+  const LAUNCHED = 'Chrome started Mon 9:02 AM';
   const HIDE_TIP = { saved: 'Already in Saved Windows', closed: 'Moves to the Closed page' };
+
+  // The Last session page (last-session.js, #272): the same session as the
+  // banner, each window with what became of it, in the banner's two groups.
+  // Statuses are STATUS_LABEL's words; a missing window has Restore and Hide,
+  // one moved to Closed has Restore.
+  const LS_STATUS = { 'restored-auto': 'Restored automatically', 'restored-by-you': 'Restored by you', missing: 'Missing', 'moved-to-closed': 'Moved to Closed' };
+  const LS_RESTORE_TIP = 'Opens this window again with all its tabs, its name and its locks';
+  const lsOpen = (key, status) => ({ name: WINDOWS[key].name, count: WINDOWS[key].tabs.length, favs: WINDOWS[key].tabs, status });
+  const lsGone = (w, count, status) => ({ ...w, count, status });
+  const LAST_SESSION = {
+    named: [lsOpen('launch', 'restored-auto'), lsOpen('daily', 'restored-auto'), lsOpen('reading', 'restored-auto'), lsOpen('home', 'restored-by-you'), lsGone(RB_MISSING.named[0], 11, 'missing')],
+    other: [lsGone(RB_MISSING.other[0], 6, 'moved-to-closed')],
+  };
   function restoredBanner({ missing = false, open = true } = {}) {
     const keys = RB_RESTORED;
     const list = (o = open) => `<details class="rb-restored"${o ? ' open' : ''}><summary><span class="rb-chev">${icon('chev-r')}</span>Show restored windows</summary>
@@ -207,7 +222,7 @@
     const restored = new Set(), hidden = new Set();
     const title = () => {
       const left = all.length - restored.size - hidden.size, back = RB_RESTORED.length + restored.size;
-      rb.querySelector('[data-rb-title]').innerHTML = (left ? `${back} windows restored · ${left} still missing` : `${back} windows restored from your last session`) + ' · <span class="rb-when">Chrome started Mon 9:02 AM</span>';
+      rb.querySelector('[data-rb-title]').innerHTML = (left ? `${back} windows restored · ${left} still missing` : `${back} windows restored from your last session`) + ` · <span class="rb-when">${LAUNCHED}</span>`;
       rb.querySelector('[data-rb-other]').textContent = RB_MISSING.other.filter((_, i) => !hidden.has(RB_MISSING.named.length + i)).length;
       rb.querySelector('.rb-missing-head').hidden = left < 2;
     };
@@ -291,7 +306,7 @@
      ------------------------------------------------------------------ */
   const NAV = [
     ['tabs', 'grid', 'Tabs', 20], null,
-    ['saved', 'bookmark', 'Saved Windows'], ['closed', 'history', 'Closed'], null,
+    ['saved', 'bookmark', 'Saved Windows'], ['closed', 'history', 'Closed'], ['last-session', 'restore', 'Last session'], null,
     ['autoparked', 'park', 'AutoParked', 9], ['cloud', 'cloud', 'Cloud Sync'],
   ];
   const NAV_BOTTOM = [['help', 'help', 'Help'], ['settings', 'gear', 'Settings'], ['account', 'user', 'Account']];
@@ -381,6 +396,18 @@
     }).join('');
   }
 
+  // Markup follows rowHtml() and groupsHtml() in last-session.js.
+  function lastSessionRow(w) {
+    const restore = w.status === 'missing' || w.status === 'moved-to-closed' ? `<button class="btn sm" title="${LS_RESTORE_TIP}">Restore</button>` : '';
+    const hide = w.status === 'missing' ? `<button class="btn sm" title="${HIDE_TIP[w.to]}">Hide</button>` : '';
+    return `<div class="ls-row"><span class="fav-strip">${w.favs.slice(0, 3).map(fav).join('')}</span>
+      <span class="ls-text"><span class="ls-title">${esc(w.name)}</span>${w.intent ? `<span class="ls-intent">${esc(w.intent)}</span>` : ''}</span>
+      <span class="sub-meta">${w.count} tabs</span><span class="ls-status" data-status="${w.status}">${LS_STATUS[w.status]}</span>
+      ${restore || hide ? `<span class="ls-actions">${restore}${hide}</span>` : ''}</div>`;
+  }
+  const lastSessionGroups = () => [['Named windows', LAST_SESSION.named], ['Other windows', LAST_SESSION.other]]
+    .map(([heading, list]) => `<div class="card"><div class="card-head"><h3>${heading}</h3><span class="sub-meta">${list.length}</span></div><div class="rows">${list.map(lastSessionRow).join('')}</div></div>`).join('');
+
   // A window card's title wins the room (#504). Where it would be cut, the
   // meta goes first, then the plain tags (Saved, locks, AI; never Current or
   // Anchored), then the favicons one at a time, then the whole strip.
@@ -420,6 +447,7 @@
         <button class="fab">${icon('chat')}Chats</button>`;
       case 'saved': return topbar('Saved Windows', 'Search saved windows') + `<p class="subtitle">Reusable windows you saved for later. Opening one keeps it saved.</p><div class="list">${windowList('saved')}</div>`;
       case 'closed': return topbar('Closed', 'Search closed windows') + `<p class="subtitle">Windows you recently closed, ready to restore.</p><div class="list"><div class="group-label">Today</div>${windowList('closed')}</div>`;
+      case 'last-session': return topbar('Last session') + `<p class="subtitle">Every window your last session had open, and whether it came back.<span class="subtitle-count"> ${LAUNCHED}.</span></p><div class="list">${lastSessionGroups()}</div>`;
       case 'autoparked': return topbar('AutoParked', 'Search parked tabs') + `<p class="subtitle">Tabs closed automatically after 6h of inactivity. Nothing is lost.</p>
         <div class="list">${statGrid()}
           <div class="card"><div class="card-head"><h3>Tabs parked over time</h3><span class="r">${seg(['7 days', '14 days', '30 days'], '7 days')}</span></div>

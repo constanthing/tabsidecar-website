@@ -237,6 +237,17 @@
 .ts .srow:hover .r-actions { display: flex; }
 .ts .srow:hover .r-hide { display: none; }
 .ts .sub-meta { color: var(--faint); font-size: 12px; white-space: nowrap; }
+/* Last session rows (the popup's pages.css .ls-*): only a missing window's status takes a color */
+.ts .ls-row { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 4px 10px 4px 14px; margin: 0 4px; border-radius: 6px; }
+.ts .ls-row:hover { background: var(--surface-hover); }
+.ts .ls-row .fav-strip { width: 48px; }
+.ts .ls-text { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ts .ls-title { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ts .ls-intent { color: var(--muted); font-size: 11.5px; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ts .ls-status { color: var(--muted); font-size: 12px; white-space: nowrap; flex: none; }
+.ts .ls-status[data-status="missing"] { color: var(--warn); font-weight: 500; }
+.ts .ls-actions { display: flex; gap: 6px; flex: none; }
+.ts .subtitle-count { color: var(--faint); }
 .ts .fav-strip { display: flex; gap: 3px; align-items: center; flex: none; }
 .ts .fav-strip .fav { width: 14px; height: 14px; font-size: 8px; border-radius: 3px; }
 .ts .fav-strip .more { font-size: 11px; color: var(--faint); margin-left: 2px; }
