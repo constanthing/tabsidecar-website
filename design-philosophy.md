@@ -6,7 +6,8 @@ layout and copy so future edits stay consistent. Last rewritten September 27,
 October 13, 2026; Chrome only, Session restore picture and whole window titles
 October 30, 2026 (TabSentry #504); AI window titles section the same day
 (TabSentry #505); uninstall page the same day (TabSentry #507); support page
-and one shared footer the same day (TabSentry #508).
+and one shared footer the same day (TabSentry #508); link previews and site
+icons October 31, 2026 (TabSentry #510).
 
 ---
 
@@ -38,7 +39,9 @@ left. Never write the literal marker text inside a comment; the build will
 strip from there.
 
 `icons/` stays here and isn't built: the favicons and the account emails load
-`icons/icon48.png` from the live site.
+`icons/icon48.png` from the live site, and link previews show
+`icons/og-image.png`. `favicon.ico` and `apple-touch-icon.png` at the root
+aren't built either (see Link previews and site icons).
 
 `assets/common-passwords.txt` isn't a prototype file either: the build copies
 the extension's own `background/common-passwords.txt`, so the site and the
@@ -293,6 +296,39 @@ need Support, and it links back to the store. The account pages don't: they
 are where an email link lands, with one task. `website-check.mjs` checks that
 every other page's footer links match the home page's and that each opens a
 page (TabSentry #508).
+
+## Link previews and site icons
+
+A shared link to any page shows a card (Slack, iMessage, X, LinkedIn,
+Discord). The build adds the tags to every page from the page's own `<title>`
+and `<meta name="description">`, so a new page only needs those two:
+`og:title`, `og:description`, `og:url` and `<link rel="canonical">` (the
+page's `https://tabsidecar.com/...` address, from `CNAME`), `og:type`,
+`og:site_name`, the preview image with its size and alt text, and
+`twitter:card` (`summary_large_image`). It refuses to build a page without a
+title or a description. Pages search engines shouldn't list (the account
+pages and the uninstall page) are named once, in `NOINDEX` in `build_site.py`,
+and the build adds `<meta name="robots" content="noindex">` to them; a
+prototype never carries its own robots tag. A new such page (the 404 page) is
+covered by adding it to that list.
+
+The preview image, `icons/og-image.png` (1200x630, under 300 KB), is the site
+in small: the wordmark, the home page heading, the "Free for Chrome" pill and
+a crop of the popup picture in its blue window card, on the page background.
+It's a live HTML page, `icons/render-og-image.html`, drawn with the site's own
+`assets/` (popup tokens only, no new colors), and rendered by
+`TabSentry/tests/browser/render-site-images.mjs`. That script also renders
+`apple-touch-icon.png` (180x180, from `icons/render-apple-touch-icon.html`:
+the icon tile full-bleed and square, because iOS rounds the corners itself)
+and packs `icons/icon16.png`, `icon32.png` and `icon48.png` into
+`favicon.ico`; some apps and crawlers ask for those two by name. Build the
+site first when the popup picture or the heading changes, then run
+
+    node tests/browser/render-site-images.mjs --site ../tabsidecar-website
+
+from the TabSentry repo and commit the images here. `website-check.mjs`
+checks the tags on every page, the noindex list, the image's size and the two
+root icons (TabSentry #510).
 
 ## Account emails
 

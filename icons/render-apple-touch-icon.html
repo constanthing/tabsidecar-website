@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- /apple-touch-icon.png (180x180): the icon-master.svg tile, full-bleed and square,
+     because iOS rounds the corners itself and fills transparent ones with black.
+     Render it with TabSentry/tests/browser/render-site-images.mjs (TabSentry #510). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Render apple-touch-icon</title>
+<style>
+  html, body { width: 180px; height: 180px; margin: 0; overflow: hidden; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="6" y1="0" x2="174" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2E63FF"/>
+      <stop offset="1" stop-color="#0A1FB8"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" fill="url(#bg)"/>
+  <text x="90" y="111" text-anchor="middle" fill="white" font-family="Arial, Helvetica, sans-serif"
+        font-size="77" font-weight="700" letter-spacing="-4.8">TS</text>
+</svg>
+</body>
+</html>
