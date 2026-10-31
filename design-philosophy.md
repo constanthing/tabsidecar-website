@@ -24,6 +24,7 @@ extension repo:
 | `email-confirmed.html` | `email-confirmed.html` |
 | `uninstall.html` | `uninstall.html` |
 | `support.html` | `support.html` |
+| `changelog.html` | `changelog.html` |
 | `assets/*` | `shared/*` |
 
 Edit the prototype, preview it with `python website/serve.py` (no-cache server
@@ -284,12 +285,25 @@ question and search the page for it:
 
 The store listing's support URL points here.
 
+## Changelog (`changelog.html`)
+
+Read as a document, like the privacy policy: one window per release (blue),
+newest first, the version as its title and the date beside it. Inside, the
+release notes' headings and 5 to 15 short lines, at most about 250 words,
+written for people who use TabSidecar, not for us. Each line traces to a bullet
+in the **Store / changelog** section of `docs/release-notes-next.md` and agrees
+with the extension's code; the release's PR lists both. Nothing is collapsed.
+It starts with the launch release; earlier versions aren't backfilled (Mario,
+2026-10-30). The entry is written before the release with `RELEASE_VERSION`
+and `RELEASE_DATE` as its version and date, and the build refuses to publish
+the page until both are filled in (TabSentry #511).
+
 ## Footer
 
 One footer, the same on every page except the account pages: the wordmark
 (to the home page), Privacy, Support (`support.html`, not an email link, so
 the store and visitors land on answers first; the address is on that page),
-Chrome Web Store and the year. Its sizes live in `assets/site.css`
+Changelog, Chrome Web Store and the year. Its sizes live in `assets/site.css`
 (`.site-foot`), so every page carries the same markup: copy it from another
 page. The uninstall page has it too: the people on it are the likeliest to
 need Support, and it links back to the store. The account pages don't: they
