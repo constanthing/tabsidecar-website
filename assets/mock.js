@@ -173,7 +173,7 @@
       { name: 'Untitled Window', meta: '2 tabs · Sat 11:40 AM', to: 'closed', favs: [fv('M', '#ea4335'), fv('▶', '#ff0000')] },
     ],
   };
-  const HIDE_TIP = { saved: 'Already in Saved Windows', closed: 'Moves to Closed Windows' };
+  const HIDE_TIP = { saved: 'Already in Saved Windows', closed: 'Moves to the Closed page' };
   function restoredBanner({ missing = false, open = true } = {}) {
     const keys = RB_RESTORED;
     const list = (o = open) => `<details class="rb-restored"${o ? ' open' : ''}><summary><span class="rb-chev">${icon('chev-r')}</span>Show restored windows</summary>
@@ -233,7 +233,7 @@
         if (act === 'restore') restore(i);
         else {
           hidden.add(i); rb.querySelector(`[data-rb="${i}"]`).classList.add('is-gone');
-          toast(`${all[i].to === 'saved' ? 'Hidden. It stays in Saved Windows.' : 'Moved to Closed Windows.'} <button type="button" class="toast-undo" data-rb-act="undo" data-i="${i}">Undo</button>`);
+          toast(`${all[i].to === 'saved' ? 'Hidden. It stays in Saved Windows.' : 'Moved to the Closed page.'} <button type="button" class="toast-undo" data-rb-act="undo" data-i="${i}">Undo</button>`);
           // From the keyboard the focus goes to Undo, as on the popup's banner (#338).
           if (!e.detail) rb.querySelector('.toast-undo').focus();
         }
@@ -291,7 +291,7 @@
      ------------------------------------------------------------------ */
   const NAV = [
     ['tabs', 'grid', 'Tabs', 20], null,
-    ['saved', 'bookmark', 'Saved Windows'], ['closed', 'history', 'Closed Windows'], null,
+    ['saved', 'bookmark', 'Saved Windows'], ['closed', 'history', 'Closed'], null,
     ['autoparked', 'park', 'AutoParked', 9], ['cloud', 'cloud', 'Cloud Sync'],
   ];
   const NAV_BOTTOM = [['help', 'help', 'Help'], ['settings', 'gear', 'Settings'], ['account', 'user', 'Account']];
@@ -419,7 +419,7 @@
         <div class="list">${winCard('launch', { closed: folded(s, 'launch') })}${winCard('reading', { closed: folded(s, 'reading') })}${winCard('home', { closed: folded(s, 'home') })}</div>
         <button class="fab">${icon('chat')}Chats</button>`;
       case 'saved': return topbar('Saved Windows', 'Search saved windows') + `<p class="subtitle">Reusable windows you saved for later. Opening one keeps it saved.</p><div class="list">${windowList('saved')}</div>`;
-      case 'closed': return topbar('Closed Windows', 'Search closed windows') + `<p class="subtitle">Windows you recently closed, ready to restore.</p><div class="list"><div class="group-label">Today</div>${windowList('closed')}</div>`;
+      case 'closed': return topbar('Closed', 'Search closed windows') + `<p class="subtitle">Windows you recently closed, ready to restore.</p><div class="list"><div class="group-label">Today</div>${windowList('closed')}</div>`;
       case 'autoparked': return topbar('AutoParked', 'Search parked tabs') + `<p class="subtitle">Tabs closed automatically after 6h of inactivity. Nothing is lost.</p>
         <div class="list">${statGrid()}
           <div class="card"><div class="card-head"><h3>Tabs parked over time</h3><span class="r">${seg(['7 days', '14 days', '30 days'], '7 days')}</span></div>
