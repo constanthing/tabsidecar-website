@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- The link-preview picture (og-image.png, 1200x630): the wordmark, the homepage's
+     heading and a crop of its popup picture, drawn with the site's own assets.
+     Render it with TabSentry/tests/browser/render-site-images.mjs (TabSentry #510). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Render link-preview image</title>
+<link rel="stylesheet" href="../assets/mock.css">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/windows.css">
+<script src="../assets/icons.js" defer></script>
+<script src="../assets/mock.js" defer></script>
+<style>
+  html, body { width: 1200px; height: 630px; margin: 0; overflow: hidden; }
+  .card { position: relative; width: 1200px; height: 630px; overflow: hidden; }
+  .txt { position: absolute; left: 72px; top: 0; bottom: 0; width: 480px; display: flex; flex-direction: column; justify-content: center; gap: 30px; }
+  .txt .wordmark { gap: 14px; font-size: 30px; }
+  .txt .logo-tile { width: 50px; height: 50px; border-radius: 13px; font-size: 20px; }
+  .txt .h1 { font-size: 58px; }
+  .txt .pill { align-self: flex-start; height: 36px; padding: 0 15px; font-size: 17px; gap: 9px; }
+  .txt .pill .dot { width: 9px; height: 9px; }
+  .shot { position: absolute; left: 590px; top: 64px; width: 700px; }
+  .shot .pop-fit { width: 677px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="txt">
+    <span class="wordmark"><span class="logo-tile">TS</span>TabSidecar</span>
+    <h1 class="h1">Close tabs without<br>losing them.</h1>
+    <span class="pill"><span class="dot"></span>Free for Chrome</span>
+  </div>
+  <article class="swin shot" style="--wc:#3b82f6">
+    <header class="swin-head">
+      <span class="swin-dot"></span>
+      <h2 class="swin-title">TabSidecar</h2><span class="swin-meta">the popup</span><span class="tagx brand">Current</span>
+    </header>
+    <div class="swin-body"><div class="pop-fit"><div data-mock="popup"></div></div></div>
+  </article>
+</div>
+</body>
+</html>
