@@ -7,7 +7,8 @@ October 13, 2026; Chrome only, Session restore picture and whole window titles
 October 30, 2026 (TabSentry #504); AI window titles section the same day
 (TabSentry #505); uninstall page the same day (TabSentry #507); support page
 and one shared footer the same day (TabSentry #508); link previews and site
-icons October 31, 2026 (TabSentry #510).
+icons October 31, 2026 (TabSentry #510); page not found the same day
+(TabSentry #509).
 
 ---
 
@@ -24,6 +25,7 @@ extension repo:
 | `email-confirmed.html` | `email-confirmed.html` |
 | `uninstall.html` | `uninstall.html` |
 | `support.html` | `support.html` |
+| `404.html` | `404.html` |
 | `assets/*` | `shared/*` |
 
 Edit the prototype, preview it with `python website/serve.py` (no-cache server
@@ -284,6 +286,23 @@ question and search the page for it:
 
 The store listing's support URL points here.
 
+## Page not found (`404.html`)
+
+GitHub Pages shows this page, with status 404, for any address the site
+doesn't have, at any depth (`/changelog`, `/a/b/c`). Same look as the
+uninstall page: one blue window card titled "TabSidecar · 404", the heading
+*Page not found*, one line (check the address for a typo, or go to the home
+page), then the way back as popup-sized buttons: Go to the home page (the one
+blue button), Support and Privacy policy. The site's nav and footer as on
+every other page. No search.
+
+Because the page answers at any depth, the build writes its asset, icon and
+page links from the site root (`/assets/site.css`, `/privacy.html`):
+`ROOT_ABSOLUTE` in `build_site.py`, for this page only. Every other page keeps
+relative links. It's in `NOINDEX`. `website-check.mjs` opens `/no-such-page`
+and `/a/b/no-such-page` at every width: each answers 404 with this page, a
+drawn link home, and every file it loads answers (TabSentry #509).
+
 ## Footer
 
 One footer, the same on every page except the account pages: the wordmark
@@ -307,10 +326,10 @@ page's `https://tabsidecar.com/...` address, from `CNAME`), `og:type`,
 `og:site_name`, the preview image with its size and alt text, and
 `twitter:card` (`summary_large_image`). It refuses to build a page without a
 title or a description. Pages search engines shouldn't list (the account
-pages and the uninstall page) are named once, in `NOINDEX` in `build_site.py`,
-and the build adds `<meta name="robots" content="noindex">` to them; a
-prototype never carries its own robots tag. A new such page (the 404 page) is
-covered by adding it to that list.
+pages, the uninstall page and the 404 page) are named once, in `NOINDEX` in
+`build_site.py`, and the build adds `<meta name="robots" content="noindex">` to
+them; a prototype never carries its own robots tag. A new such page is covered
+by adding it to that list.
 
 The preview image, `icons/og-image.png` (1200x630, under 300 KB), is the site
 in small: the wordmark, the home page heading, the "Free for Chrome" pill and
