@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" data-variant="support" data-bg="white">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TabSidecar Support</title>
+<meta name="description" content="How to reach TabSidecar support, and answers to common questions: windows after a restart, AutoParked and closed tabs, backups, Cloud Sync and your account.">
+<link rel="stylesheet" href="assets/mock.css?v=202610302212">
+<link rel="stylesheet" href="assets/site.css?v=202610302212">
+<link rel="stylesheet" href="assets/windows.css?v=202610302212">
+<script src="assets/site.js?v=202610302212"></script>
+<script src="assets/icons.js?v=202610302212" defer></script>
+<script src="assets/mock.js?v=202610302212" defer></script>
+<style>
+  /* Support, read as a document like the privacy policy: Contact is the one
+     window (blue); the questions are plain headings and text, never collapsed,
+     so find-in-page reaches every answer. Each answer names the popup's pages
+     and buttons as the extension does today (TabSentry #508; the PR lists the
+     code behind each one). */
+  .doc-wrap { max-width: 880px; }
+  .hero { padding: 64px 0 40px; display: grid; gap: 14px; justify-items: start; }
+  .hero .h1 { font-size: clamp(34px, 4.4vw, 48px); margin: 0; }
+  .hero .lede { max-width: 36em; margin: 0; }
+
+  .swin-head { padding-left: 22px; }
+  .swin-body { padding: 24px 28px 28px; }
+  @media (max-width: 700px) { .swin-body { padding: 20px 16px 22px; } }
+
+  /* Contact: the address and what to put in a report */
+  .contact { display: grid; gap: 14px; }
+  .contact p { margin: 0; color: var(--text-2); font-size: 15.5px; line-height: 1.6; }
+  .contact .b { justify-self: start; height: 32px; padding: 0 12px; gap: 6px; border-radius: 7px; font-size: 13.5px; box-shadow: none; }
+  .contact .b svg { width: 15px; height: 15px; }
+  .include { margin: 0; padding: 0 0 0 20px; display: grid; gap: 6px; color: var(--text-2); font-size: 15px; line-height: 1.55; }
+  .contact .tip { color: var(--muted); font-size: 14px; }
+
+  /* Contents, one column per group */
+  .toc { margin: 36px 0 8px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 32px; }
+  .toc h2 { margin: 0 0 6px; font-size: 13.5px; font-weight: 600; color: var(--muted); }
+  .toc ul { margin: 0; padding: 0; list-style: none; }
+  .toc a { display: block; padding: 4px 0; color: var(--text-2); font-size: 15px; text-decoration: none; }
+  .toc a:hover { color: var(--text); text-decoration: underline; }
+  @media (max-width: 560px) { .toc { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Groups of questions: a heading, then each question and its answer */
+  .sec { padding-top: 40px; margin-top: 40px; border-top: 1px solid var(--border); scroll-margin-top: 72px; }
+  .sec > h2 { margin: 0 0 6px; font: 650 24px/1.25 var(--display); letter-spacing: -.02em; }
+  .qa { padding-top: 22px; scroll-margin-top: 72px; }
+  .qa h3 { margin: 0 0 8px; font: 600 17px/1.35 var(--font); color: var(--text); }
+  .doc p { margin: 0 0 10px; color: var(--text-2); font-size: 15.5px; line-height: 1.65; max-width: 44em; }
+  .doc p:last-child { margin-bottom: 0; }
+  .doc code { font: 13px var(--mono); background: var(--app); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; color: var(--text-2); white-space: nowrap; }
+  .doc-end { height: 40px; }
+
+  /* Where to click: a page, then the setting or button on it */
+  .path { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; color: var(--text); font-weight: 500; }
+  .path svg { width: 12px; height: 12px; color: var(--faint); }
+</style>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
+</head>
+<body>
+
+<header class="site-nav lined"><div class="wrap">
+  <a class="wordmark" href="/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <nav class="nav-links" aria-label="Site">
+    <a href="/#autopark">Features</a><a href="/#faq">FAQ</a><a href="privacy.html">Privacy</a>
+  </nav>
+  <a class="b sm on-computer" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Add to Chrome</a><a class="b sm on-phone" href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">View in store</a>
+</div></header>
+
+<main class="wrap doc-wrap" id="top">
+    <section class="hero">
+      <span class="eyebrow"><i data-icon="help"></i>Support</span>
+      <h1 class="h1">Help with TabSidecar.</h1>
+      <p class="lede">Answers to the questions people ask most, and how to reach us when they don’t cover yours.</p>
+    </section>
+
+    <article class="swin" style="--wc:#3b82f6" id="contact">
+      <header class="swin-head"><span class="swin-dot"></span><h2 class="swin-title">Contact</h2><span class="swin-meta">by email</span></header>
+      <div class="swin-body contact">
+        <p>Email us at <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>. To help us find the problem, include:</p>
+        <ul class="include">
+          <li>Your TabSidecar version. It’s at the bottom of the Settings menu in TabSidecar, and on <code>chrome://extensions</code> under Details.</li>
+          <li>Your Chrome version, from <code>chrome://settings/help</code>.</li>
+          <li>What happened, step by step.</li>
+          <li>What you expected to happen.</li>
+        </ul>
+        <p class="tip">In TabSidecar, <span class="path">Help<i data-icon="chev-r"></i>Bug Report</span> opens an email to us with your version already filled in.</p>
+        <a class="b primary" href="mailto:support@tabsidecar.com"><i data-icon="mail"></i>Email support</a>
+      </div>
+    </article>
+
+    <nav class="toc" aria-label="Questions">
+      <div><h2>Windows and tabs</h2><ul>
+        <li><a href="#restart">My windows didn’t come back after a restart</a></li>
+        <li><a href="#autoparked">Where did my AutoParked tabs go?</a></li>
+        <li><a href="#closed">Reopening a closed window or tab</a></li>
+        <li><a href="#saved">Saving a window</a></li>
+      </ul></div>
+      <div><h2>Backups</h2><ul>
+        <li><a href="#backup">Making a backup and restoring it</a></li>
+        <li><a href="#before-uninstall">Before you uninstall</a></li>
+      </ul></div>
+      <div><h2>Cloud Sync and your account</h2><ul>
+        <li><a href="#sign-in">Signing in</a></li>
+        <li><a href="#email">The email with my code didn’t arrive</a></li>
+        <li><a href="#password">Resetting your password</a></li>
+        <li><a href="#new-computer">Moving to a new computer</a></li>
+        <li><a href="#delete-account">Deleting your account</a></li>
+      </ul></div>
+      <div><h2>AI window titles</h2><ul>
+        <li><a href="#ai-titles">Turning AI window titles on or off</a></li>
+      </ul></div>
+    </nav>
+
+    <div class="doc">
+    <section class="sec" id="windows">
+      <h2>Windows and tabs</h2>
+
+      <div class="qa" id="restart">
+        <h3>My windows didn’t come back after a restart</h3>
+        <p>Open TabSidecar. A window from your last session that didn’t reopen is listed on the restore banner at the top of the Tabs page: choose Restore this window, or Restore all when several are missing. It comes back with its tabs, its name and its locks.</p>
+        <p>The banner hides itself 4 hours after you first see it, or when you choose Dismiss. Every window from your last session stays on the <span class="path">Last session</span> page, where Restore brings back any that are still missing.</p>
+      </div>
+
+      <div class="qa" id="autoparked">
+        <h3>Where did my AutoParked tabs go?</h3>
+        <p>Auto-Park closes tabs you haven’t used for a while (by default, 24 hours while Chrome is running), and keeps each one on the <span class="path">AutoParked</span> page with its title and address. Choose Reopen to open it again. Locked tabs aren’t parked, and neither are pinned tabs unless you change that setting.</p>
+        <p>To change the time or turn Auto-Park off, go to <span class="path">Settings<i data-icon="chev-r"></i>Auto-Park</span>.</p>
+      </div>
+
+      <div class="qa" id="closed">
+        <h3>Reopening a closed window or tab</h3>
+        <p>Open the <span class="path">Closed</span> page. Under Windows, open a window’s ⋮ menu and choose Restore window: it comes back with its tabs, its name and its locks. The page keeps the last 20 windows you closed that had two or more tabs.</p>
+        <p>Under Tabs, choose Reopen on a tab you had locked or nicknamed. Other closed tabs are in Chrome’s own History.</p>
+      </div>
+
+      <div class="qa" id="saved">
+        <h3>Saving a window</h3>
+        <p>On the Tabs page, in the Windows layout, open a window’s ⋮ menu and choose Save window. Naming a window saves it too.</p>
+        <p>A saved window stays on the <span class="path">Saved Windows</span> page after you close it, and keeps up with its tabs while it’s open. To open it again, choose Open window in its ⋮ menu there.</p>
+      </div>
+    </section>
+
+    <section class="sec" id="backups">
+      <h2>Backups</h2>
+
+      <div class="qa" id="backup">
+        <h3>Making a backup and restoring it</h3>
+        <p>Go to <span class="path">Settings<i data-icon="chev-r"></i>Backup and Restore</span>. Tick JSON under File formats if no format is ticked, then choose Back up now. The file is saved in a tabsidecar folder in your Downloads.</p>
+        <p>To bring it back, choose Restore under Restore from a file, pick the file, and choose what to import. It adds windows and tabs to the ones you have instead of replacing them. Automatic backups can also save a file on a schedule, keeping the newest 30.</p>
+      </div>
+
+      <div class="qa" id="before-uninstall">
+        <h3>Before you uninstall</h3>
+        <p>Removing TabSidecar removes its tabs, windows and settings from this computer. To keep them, make a backup first (<span class="path">Settings<i data-icon="chev-r"></i>Backup and Restore<i data-icon="chev-r"></i>Back up now</span>). Backup files stay where they were saved, and if you have an account, your cloud snapshots stay until you delete it.</p>
+      </div>
+    </section>
+
+    <section class="sec" id="account">
+      <h2>Cloud Sync and your account</h2>
+
+      <div class="qa" id="sign-in">
+        <h3>Signing in</h3>
+        <p>Open the <span class="path">Account</span> page and sign in with your email and password. New here? Choose Create Account: we email you a code to confirm your address, then you choose a password.</p>
+        <p>Once you’re signed in, Cloud Sync saves a snapshot of your windows every hour, unless you change Interval on the <span class="path">Cloud Sync</span> page, where Sync now sends one right away.</p>
+      </div>
+
+      <div class="qa" id="email">
+        <h3>The email with my code didn’t arrive</h3>
+        <p>It comes from no-reply@tabsidecar.com with the subject “Your TabSidecar code”. Check your spam or junk folder, and check the address on the Check your email step; Use a different email changes it.</p>
+        <p>Resend code sends a new one after a minute. Only the newest code works, and it expires in 1 hour.</p>
+      </div>
+
+      <div class="qa" id="password">
+        <h3>Resetting your password</h3>
+        <p>On the <span class="path">Account</span> page, type your email and choose Forgot password?. We email you a link to a page where you choose a new password of at least 8 characters. The link works once and expires in 1 hour.</p>
+        <p>A new password signs you out on your other devices. If you’re signed in and know your password, choose Change… next to Password on the Account page instead.</p>
+      </div>
+
+      <div class="qa" id="new-computer">
+        <h3>Moving to a new computer</h3>
+        <p>On the old computer, choose Sync now on the <span class="path">Cloud Sync</span> page. Add TabSidecar to Chrome on the new one, sign in on the Account page, then on the Cloud Sync page choose Restore on the old computer’s newest snapshot under Latest snapshots, and pick what to import.</p>
+        <p>No account? Make a backup on the old computer and restore it on the new one (see <a href="#backup">Making a backup</a>).</p>
+      </div>
+
+      <div class="qa" id="delete-account">
+        <h3>Deleting your account</h3>
+        <p>On the <span class="path">Account</span> page, choose Delete… next to Delete account, enter your password, then choose Delete account permanently. That deletes your account, its cloud snapshots and devices, and your address on the update-email list. Tabs and windows on your computer are kept.</p>
+        <p>Can’t sign in? Email <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
+      </div>
+    </section>
+
+    <section class="sec" id="ai">
+      <h2>AI window titles</h2>
+
+      <div class="qa" id="ai-titles">
+        <h3>Turning AI window titles on or off</h3>
+        <p>Go to <span class="path">Settings<i data-icon="chev-r"></i>Artificial Intelligence</span> and use the AI window titles switch. It’s off until you turn it on. While it’s on, TabSidecar names windows from their tabs, sending tab titles and site names to our server and Google Gemini.</p>
+        <p>To name one window without turning it on, choose Generate AI Title in that window’s ⋮ menu on the Tabs page. The <a href="privacy.html#ai">privacy policy</a> lists exactly what is sent.</p>
+      </div>
+    </section>
+    </div>
+    <div class="doc-end"></div>
+</main>
+
+<footer class="site-foot"><div class="wrap">
+  <a class="wordmark" href="/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <span class="grow"></span>
+  <a href="privacy.html">Privacy</a><a href="support.html">Support</a><a href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Chrome Web Store</a>
+  <span>© 2026</span>
+</div></footer>
+
+</body>
+</html>

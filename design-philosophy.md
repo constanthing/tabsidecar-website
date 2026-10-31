@@ -5,7 +5,8 @@ layout and copy so future edits stay consistent. Last rewritten September 27,
 2026, when the site moved to the Windows design; home page sections reworked
 October 13, 2026; Chrome only, Session restore picture and whole window titles
 October 30, 2026 (TabSentry #504); AI window titles section the same day
-(TabSentry #505); uninstall page the same day (TabSentry #507).
+(TabSentry #505); uninstall page the same day (TabSentry #507); support page
+and one shared footer the same day (TabSentry #508).
 
 ---
 
@@ -21,6 +22,7 @@ extension repo:
 | `reset-password.html` | `reset-password.html` |
 | `email-confirmed.html` | `email-confirmed.html` |
 | `uninstall.html` | `uninstall.html` |
+| `support.html` | `support.html` |
 | `assets/*` | `shared/*` |
 
 Edit the prototype, preview it with `python website/serve.py` (no-cache server
@@ -252,6 +254,45 @@ back" as a plain link to the store. The page answers to the table in
 `TabSentry/supabase/migrations/20261030_uninstall_feedback.sql`; keep its
 reason codes and limits in step with it, and never publish the page before
 that migration is applied.
+
+## Support page (`support.html`)
+
+Read as a document, like the privacy policy, because people arrive with one
+question and search the page for it:
+
+- **Contact** is the only window (blue): the support address, what to put in
+  a report (the TabSidecar version, from the bottom of the Settings menu or
+  `chrome://extensions` → Details; the Chrome version; what happened; what
+  was expected), Help → Bug Report in the extension, which fills in the
+  version, and an Email support button.
+- A contents list in four groups (Windows and tabs, Backups, Cloud Sync and
+  your account, AI window titles), then each question as a plain heading
+  with an id and two short paragraphs. **Never collapse them**, for the same
+  reason as the policy: find-in-page must reach every answer.
+- Each answer says where to click, with the popup's own names for pages,
+  settings and buttons (Last session, Closed, Restore window, Back up now,
+  Forgot password?, Delete account permanently...). Paths are drawn as
+  *Settings › Backup and Restore*, as on the uninstall page. Check every
+  answer against the extension when a page or button it names changes; the
+  TabSentry #508 PR lists the code behind each one.
+- "Before you uninstall" says what the uninstall page says (tabs, windows
+  and settings go with the extension; backup files and cloud snapshots
+  stay), and keeps to that.
+
+The store listing's support URL points here.
+
+## Footer
+
+One footer, the same on every page except the account pages: the wordmark
+(to the home page), Privacy, Support (`support.html`, not an email link, so
+the store and visitors land on answers first; the address is on that page),
+Chrome Web Store and the year. Its sizes live in `assets/site.css`
+(`.site-foot`), so every page carries the same markup: copy it from another
+page. The uninstall page has it too: the people on it are the likeliest to
+need Support, and it links back to the store. The account pages don't: they
+are where an email link lands, with one task. `website-check.mjs` checks that
+every other page's footer links match the home page's and that each opens a
+page (TabSentry #508).
 
 ## Account emails
 
