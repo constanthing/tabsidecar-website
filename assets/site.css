@@ -116,9 +116,13 @@ a.row:hover { background: var(--surface-hover); }
 .faq details[open] summary svg { transform: rotate(180deg); }
 .faq .a { padding: 0 18px 16px; color: var(--muted); font-size: 15px; max-width: 62ch; }
 
-/* ---------- Footer ---------- */
+/* ---------- Footer ----------
+   One footer, the same markup on every page but the account pages; copy it
+   from another page. website-check.mjs fails if the links drift (#508). */
 .site-foot { padding: 36px 0 110px; color: var(--faint); font-size: 14px; }
 .site-foot .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
 .site-foot a { color: var(--muted); }
+.site-foot .wordmark { font-size: 14.5px; }
+.site-foot .logo-tile { width: 22px; height: 22px; border-radius: 6px; font-size: 9px; }
 .site-foot .grow { flex: 1; }
 
