@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-variant="uninstall" data-bg="white">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TabSidecar was removed · TabSidecar</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/mock.css?v=202610302113">
+<link rel="stylesheet" href="assets/site.css?v=202610302113">
+<link rel="stylesheet" href="assets/windows.css?v=202610302113">
+<script src="assets/site.js?v=202610302113"></script>
+<script src="assets/icons.js?v=202610302113" defer></script>
+<script src="assets/mock.js?v=202610302113" defer></script>
+<style>
+  /* Uninstall: the page Chrome opens after TabSidecar is removed
+     (background/uninstall-url.js sets tabsidecar.com/uninstall.html?v=<version>).
+     One window card in the brand blue, like the account pages; popup-sized
+     controls (32px buttons and reason toggles). It asks why, anonymously: the
+     reasons picked, an optional note and the version from ?v= go to
+     public.uninstall_feedback (supabase/migrations/20261030_uninstall_feedback.sql),
+     and nothing else. TabSentry #507. */
+  main { min-height: calc(100vh - 64px); padding: 72px var(--gutter) 120px; }
+  .col { width: 100%; max-width: 520px; margin: 0 auto; }
+  .card .swin-body { padding: 24px 24px 22px; }
+  .card h1 { margin: 0 0 6px; font: 650 24px/1.2 var(--display); letter-spacing: -.02em; }
+  .card .copy { font-size: 14.5px; margin-bottom: 18px; }
+  .card .q { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-2); }
+
+  /* Popup-sized buttons, like Sync now and Restore */
+  .card .b { height: 32px; padding: 0 12px; gap: 6px; border-radius: 7px; font-size: 13.5px; box-shadow: none; }
+  .card .b svg { width: 15px; height: 15px; }
+  [hidden] { display: none !important; }
+
+  /* Reasons: one click each, pick any */
+  .reasons { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; }
+  .reason { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 5px 11px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text-2); font: 500 13.5px/1.3 var(--font); text-align: left; cursor: pointer; transition: border-color .12s, background .12s; }
+  .reason:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+  .reason svg { width: 13px; height: 13px; display: none; }
+  .reason[aria-pressed="true"] { border-color: var(--brand-line); background: var(--brand-soft); color: var(--brand-strong); }
+  .reason[aria-pressed="true"] svg { display: block; }
+  .reason:disabled { opacity: .6; cursor: default; }
+
+  .field { display: grid; gap: 6px; margin-bottom: 16px; }
+  .field label { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-2); }
+  .field .count { font-weight: 400; color: var(--faint); }
+  .field textarea { min-height: 84px; resize: vertical; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 9px 11px; color: var(--text); font: 16px/1.4 var(--font); outline: 0; transition: border-color .12s, box-shadow .12s; }  /* 16px stops iOS zooming in */
+  .field textarea:focus { border-color: var(--brand-line); box-shadow: 0 0 0 3px var(--brand-soft); }
+  .field textarea:disabled { color: var(--faint); }
+
+  /* Status line, in the popup's banner colors */
+  .status { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; border: 1px solid; font-size: 14px; line-height: 1.45; margin-bottom: 16px; }
+  .status svg { width: 17px; height: 17px; margin-top: 1px; flex: none; }
+  .status.err { background: color-mix(in srgb, var(--danger) 7%, var(--surface)); border-color: color-mix(in srgb, var(--danger) 30%, transparent); color: var(--text-2); }
+  .status.err svg { color: var(--danger); }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .b[disabled] { opacity: .6; pointer-events: none; }
+  .spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .45); border-top-color: #fff; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .sends { color: var(--faint); font-size: 13px; line-height: 1.45; margin: 12px 0 0; }
+
+  .fine { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13.5px; line-height: 1.55; }
+  .fine p { margin: 0 0 8px; }
+  .fine p:last-child { margin: 0; }
+  .path { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; color: var(--text-2); font-weight: 500; }
+  .path svg { width: 12px; height: 12px; color: var(--faint); }
+
+  .big-ico { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 14px; }
+  .big-ico svg { width: 20px; height: 20px; }
+  .big-ico.ok { background: var(--ok-soft); color: var(--ok); border: 1px solid var(--ok-line); }
+
+  @media (max-width: 520px) { main { padding-top: 32px; } .card .swin-body { padding: 20px 16px; } }
+</style>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
+</head>
+<body>
+
+<header class="site-nav lined"><div class="wrap">
+  <a class="wordmark" href="/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <nav class="nav-links" aria-label="Site"><a href="/">Home</a><a href="privacy.html">Privacy</a></nav>
+  <a class="b sm" href="mailto:support@tabsidecar.com">Help</a>
+</div></header>
+
+<main>
+  <div class="col">
+
+    <section class="card swin" style="--wc:#3b82f6" aria-labelledby="uninstall-title">
+      <header class="swin-head"><span class="swin-dot" style="margin-left:4px"></span><span class="swin-title">TabSidecar</span><span class="swin-meta">Removed</span></header>
+      <div class="swin-body">
+
+      <!-- Ask why -->
+      <div id="viewForm">
+        <h1 id="uninstall-title">TabSidecar was removed</h1>
+        <p class="copy">Thanks for trying it. If you have a moment, tell us why you removed it. It helps us decide what to fix next.</p>
+        <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+        <form id="feedback-form" novalidate>
+          <p class="q" id="reasons-label">Why did you remove it? Pick any that apply.</p>
+          <ul class="reasons" id="reasons" aria-labelledby="reasons-label">
+            <li><button type="button" class="reason" data-reason="missing_feature" aria-pressed="false"><i data-icon="check"></i>It didn’t do what I needed</button></li>
+            <li><button type="button" class="reason" data-reason="hard_to_understand" aria-pressed="false"><i data-icon="check"></i>Hard to understand</button></li>
+            <li><button type="button" class="reason" data-reason="slowed_browser" aria-pressed="false"><i data-icon="check"></i>It slowed my browser</button></li>
+            <li><button type="button" class="reason" data-reason="lost_tabs" aria-pressed="false"><i data-icon="check"></i>I lost tabs or windows</button></li>
+            <li><button type="button" class="reason" data-reason="something_broke" aria-pressed="false"><i data-icon="check"></i>Something broke</button></li>
+            <li><button type="button" class="reason" data-reason="another_tool" aria-pressed="false"><i data-icon="check"></i>I use another tool</button></li>
+            <li><button type="button" class="reason" data-reason="just_trying" aria-pressed="false"><i data-icon="check"></i>I was just trying it</button></li>
+            <li><button type="button" class="reason" data-reason="other" aria-pressed="false"><i data-icon="check"></i>Something else</button></li>
+          </ul>
+          <div class="field"><label for="note">Anything else? (optional) <span class="count" id="noteCount">0/500</span></label>
+            <textarea id="note" maxlength="500" rows="3" placeholder="What would have made you keep it?"></textarea></div>
+          <div class="actions">
+            <button class="b primary" type="submit" id="send">Send</button>
+          </div>
+          <p class="sends">Sends only the reasons you pick, your note and the TabSidecar version. We don’t store your name, email or network address with it. <a href="privacy.html#uninstall">Privacy policy</a></p>
+        </form>
+      </div>
+
+      <!-- Sent -->
+      <div id="viewSent" hidden>
+        <div class="big-ico ok"><i data-icon="check"></i></div>
+        <h1 id="sentTitle">Thanks for telling us</h1>
+        <p class="copy" id="sentCopy">Your answer was sent.</p>
+      </div>
+
+      <div class="fine">
+        <p>Your tabs, windows and settings in TabSidecar were removed from this computer along with it. Backup files, the ones you exported and any automatic backups, stay in the folder they were saved to.</p>
+        <p>If you had an account, your cloud snapshots stay until you delete it: add TabSidecar back and use <span class="path">Account<i data-icon="chev-r"></i>Delete account</span>, or email <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.</p>
+        <p>Removed by mistake? <a href="https://chromewebstore.google.com/detail/fcgiclcbpjeccamoihlbhcihommdfame?utm_source=item-share-cb">Add it back</a></p>
+      </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://quqhdnkypnuxvmibnzhn.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2O_Jk16JhJLmK7bFtLHsNQ_ifUzkz1Z';
+  // Keep in step with the table's checks (supabase/migrations/20261030_uninstall_feedback.sql).
+  const NOTE_MAX = 500;
+  const VERSION_PATTERN = /^[0-9]{1,5}(\.[0-9]{1,5}){0,3}$/;
+  const SENT_KEY = 'uninstallFeedbackSent';  // this tab's session storage: a reload can't send it twice
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const $ = id => document.getElementById(id);
+    const form = $('feedback-form'), send = $('send'), statusEl = $('status'), note = $('note');
+    const reasonButtons = [...document.querySelectorAll('[data-reason]')];
+    const icon = n => window.TS ? TS.icon(n) : '';
+
+    // The version the extension put in the address, if it looks like one.
+    const asked = new URLSearchParams(location.search).get('v');
+    const version = asked && asked.length <= 20 && VERSION_PATTERN.test(asked) ? asked : null;
+
+    const view = name => ['Form', 'Sent'].forEach(v => { $('view' + v).hidden = v !== name; });
+    const status = text => {
+      if (!text) { statusEl.hidden = true; return; }
+      statusEl.className = 'status err';
+      statusEl.innerHTML = `${icon('x')}<span></span>`;
+      statusEl.querySelector('span').innerHTML = text;
+      statusEl.hidden = false;
+    };
+    const busy = on => {
+      send.disabled = on;
+      send.innerHTML = on ? '<span class="spin"></span>Sending…' : 'Send';
+      note.disabled = on;
+      reasonButtons.forEach(b => { b.disabled = on; });
+    };
+    const sentView = again => {
+      $('sentTitle').textContent = again ? 'Already sent' : 'Thanks for telling us';
+      $('sentCopy').textContent = again ? 'Your answer from this page was already sent, so it isn’t sent twice. Thanks again.' : 'Your answer was sent.';
+      view('Sent');
+    };
+    const picked = () => reasonButtons.filter(b => b.getAttribute('aria-pressed') === 'true').map(b => b.dataset.reason);
+    const countNote = () => { $('noteCount').textContent = `${note.value.length}/${NOTE_MAX}`; };
+    const alreadySent = () => { try { return sessionStorage.getItem(SENT_KEY) === '1'; } catch { return false; } };
+    const markSent = () => { try { sessionStorage.setItem(SENT_KEY, '1'); } catch { /* the page still refuses until it reloads */ } };
+
+    reasonButtons.forEach(b => b.addEventListener('click', () => {
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true');
+      status(null);
+    }));
+    note.addEventListener('input', () => { countNote(); status(null); });
+
+    let sending = false, sent = false;
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (sending) return;
+      if (sent || alreadySent()) return sentView(true);
+      const reasons = picked();
+      const text = note.value.trim().slice(0, NOTE_MAX);
+      if (!reasons.length && !text) return status('Pick a reason or write a note first.');
+      sending = true; busy(true); status(null);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/uninstall_feedback`, {
+          method: 'POST',
+          referrerPolicy: 'no-referrer',
+          headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ reasons, note: text || null, extension_version: version })
+        });
+        if (!res.ok) {
+          const body = await res.text();
+          if (body.includes('uninstall_feedback_rate_limited')) {
+            return status('A lot of answers arrived in the last hour, so we couldn’t take yours. Please try again later, or email <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.');
+          }
+          throw new Error(`HTTP ${res.status}`);
+        }
+        sent = true; markSent(); sentView(false);
+      } catch (err) {
+        console.warn('[TabSidecar] Could not send uninstall feedback:', err);
+        status('We couldn’t send that. Try again, or email <a href="mailto:support@tabsidecar.com">support@tabsidecar.com</a>.');
+      } finally {
+        sending = false; busy(false);
+      }
+    });
+
+    countNote();
+    if (alreadySent()) sentView(true); else view('Form');
+
+  });
+</script>
+</body>
+</html>
