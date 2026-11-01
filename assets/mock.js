@@ -164,30 +164,42 @@
   const RB_RESTORED = ['daily', 'launch', 'reading', 'home'];
   const RB_MISSING = {
     named: [
-      { name: 'Tax return 2024', intent: 'File before Oct 15', meta: '11 tabs · Sun 6:02 PM', to: 'closed', favs: [fv('I', '#1a73e8'), fv('T', '#2ca01c'), fv('D', '#4285f4')] },
-      { name: 'Q4 planning', meta: '9 tabs · Yesterday', to: 'saved', favs: [fv('S', '#0f9d58'), fv('N', '#191919'), fv('F', '#f24e1e')] },
+      { name: 'Tax return 2024', intent: 'File before Oct 15', count: 11, seen: 'Sun 6:02 PM', to: 'closed', favs: [fv('I', '#1a73e8'), fv('T', '#2ca01c'), fv('D', '#4285f4')] },
+      { name: 'Q4 planning', count: 9, seen: 'Yesterday', to: 'saved', favs: [fv('S', '#0f9d58'), fv('N', '#191919'), fv('F', '#f24e1e')] },
     ],
     other: [
-      { name: 'Laptop research', ai: true, meta: '6 tabs · 3h ago', to: 'closed', favs: [fv('V', '#5200ff'), fv('R', '#e0301e'), fv('W', '#111827')] },
-      { name: 'Untitled Window', meta: '4 tabs · 6h ago', to: 'closed', favs: [fv('W', '#636466'), fv('G', '#24292f'), fv('Y', '#ff6600')] },
-      { name: 'Untitled Window', meta: '2 tabs · Sat 11:40 AM', to: 'closed', favs: [fv('M', '#ea4335'), fv('▶', '#ff0000')] },
+      { name: 'Laptop research', ai: true, count: 6, seen: '3h ago', to: 'closed', favs: [fv('V', '#5200ff'), fv('R', '#e0301e'), fv('W', '#111827')] },
+      { name: 'Untitled Window', count: 4, seen: '6h ago', to: 'closed', favs: [fv('W', '#636466'), fv('G', '#24292f'), fv('Y', '#ff6600')] },
+      { name: 'Untitled Window', count: 2, seen: 'Sat 11:40 AM', to: 'closed', favs: [fv('M', '#ea4335'), fv('▶', '#ff0000')] },
     ],
+  };
+  // A window of the same session hidden from the banner earlier: it moved to
+  // the Closed page and left the banner, so the Last session page shows it as
+  // Moved to Closed and the picture's Closed page lists it. Its name is an AI
+  // title, so it is one of the Other windows, as Laptop research is.
+  const MOVED_TO_CLOSED = {
+    kitchen: { name: 'Kitchen remodel', ai: true, color: C.fuchsia, tabs: [fv('H', '#4dbc15'), fv('I', '#0058a3'), fv('P', '#e60023'), fv('L', '#004990'), fv('▶', '#ff0000')] },
   };
   // When the browser started, on the banner and the Last session page alike.
   const LAUNCHED = 'Chrome started Mon 9:02 AM';
   const HIDE_TIP = { saved: 'Already in Saved Windows', closed: 'Moves to the Closed page' };
 
   // The Last session page (last-session.js, #272): the same session as the
-  // banner, each window with what became of it, in the banner's two groups.
-  // Statuses are STATUS_LABEL's words; a missing window has Restore and Hide,
-  // one moved to Closed has Restore.
+  // banner, built from its lists so the two can't disagree (#543): its
+  // restored windows, its missing ones, and the window moved to Closed, each
+  // with what became of it, in the banner's two groups. Statuses are
+  // STATUS_LABEL's words; a missing window has Restore and Hide, one moved to
+  // Closed has Restore. The website check compares these copies with the
+  // popup's.
   const LS_STATUS = { 'restored-auto': 'Restored automatically', 'restored-by-you': 'Restored by you', missing: 'Missing', 'moved-to-closed': 'Moved to Closed' };
   const LS_RESTORE_TIP = 'Opens this window again with all its tabs, its name and its locks';
-  const lsOpen = (key, status) => ({ name: WINDOWS[key].name, count: WINDOWS[key].tabs.length, favs: WINDOWS[key].tabs, status });
-  const lsGone = (w, count, status) => ({ ...w, count, status });
+  // Of the banner's restored windows, the ones you restored; the rest came back on their own.
+  const RESTORED_BY_YOU = ['home'];
+  const lsWindow = (w, status) => ({ name: w.name, count: w.tabs.length, favs: w.tabs, status });
+  const lsMissing = w => ({ ...w, status: 'missing' });
   const LAST_SESSION = {
-    named: [lsOpen('launch', 'restored-auto'), lsOpen('daily', 'restored-auto'), lsOpen('reading', 'restored-auto'), lsOpen('home', 'restored-by-you'), lsGone(RB_MISSING.named[0], 11, 'missing')],
-    other: [lsGone(RB_MISSING.other[0], 6, 'moved-to-closed')],
+    named: [...RB_RESTORED.map(key => lsWindow(WINDOWS[key], RESTORED_BY_YOU.includes(key) ? 'restored-by-you' : 'restored-auto')), ...RB_MISSING.named.map(lsMissing)],
+    other: [...RB_MISSING.other.map(lsMissing), ...Object.values(MOVED_TO_CLOSED).map(w => lsWindow(w, 'moved-to-closed'))],
   };
   function restoredBanner({ missing = false, open = true } = {}) {
     const keys = RB_RESTORED;
@@ -198,7 +210,7 @@
     }
     const row = (w, i) => `<div class="rb-window" data-rb="${i}">
         <span class="fav-strip">${w.favs.map(fav).join('')}</span>
-        <span class="rb-wtxt"><b>${w.ai ? `<span class="rb-ai" title="AI title">${icon('sparkle')}</span>` : ''}${esc(w.name)}</b>${w.intent ? `<i>${esc(w.intent)}</i>` : ''}<span>${esc(w.meta)}</span></span>
+        <span class="rb-wtxt"><b>${w.ai ? `<span class="rb-ai" title="AI title">${icon('sparkle')}</span>` : ''}${esc(w.name)}</b>${w.intent ? `<i>${esc(w.intent)}</i>` : ''}<span>${w.count} tabs · ${esc(w.seen)}</span></span>
         <span class="rb-acts"><button class="btn sm" data-rb-act="restore">Restore this window</button><button class="btn sm" data-rb-act="hide" title="${HIDE_TIP[w.to]}">Hide</button><button class="icon-btn" title="More">${icon('more')}</button></span>
         <span class="rb-done">Restored</span>
       </div>`;
@@ -383,13 +395,15 @@
     recipes: { name: 'Weekend recipes', color: C.pink, tabs: [fv('N', '#111111'), fv('S', '#d52b1e'), fv('▶', '#ff0000')] },
   };
 
+  const windowOf = key => WINDOWS[key] || SAVED_EXTRA[key] || MOVED_TO_CLOSED[key];
+
   function windowList(kind) {
     const rows = kind === 'saved' ? [['launch', 'Opened 2d ago'], ['daily', 'Opened today']]
       : kind === 'savedMany' ? [['daily', 'Opened today'], ['launch', 'Opened 2d ago'], ['q4', 'Opened 3d ago'], ['trip', 'Opened last week'], ['jobs', 'Opened Sep 18'], ['recipes', 'Opened Sep 14']]
-      : [['home', 'Closed 2h ago'], ['reading', 'Closed yesterday']];
+      : [['kitchen', 'Closed 1h ago'], ['home', 'Closed 2h ago'], ['reading', 'Closed yesterday']];
     kind = kind === 'savedMany' ? 'saved' : kind;
     return rows.map(([k, when]) => {
-      const w = WINDOWS[k] || SAVED_EXTRA[k];
+      const w = windowOf(k);
       return `<article class="win" style="--wc:${w.color}" data-win="${k}"><div class="win-head"><span class="wdot" style="margin-left:6px"></span><span class="win-title">${esc(w.name)}</span>
         <span class="win-meta">${w.tabs.length} tabs · ${when}</span>${favStrip(w.tabs)}
         <span class="win-actions"><button class="btn sm">${icon(kind === 'saved' ? 'popout' : 'restore')}${kind === 'saved' ? 'Open' : 'Restore'}</button></span></div></article>`;
@@ -413,7 +427,7 @@
   // Anchored), then the favicons one at a time, then the whole strip.
   // Measured on the card itself, so it holds wherever the card sits.
   function fitWindowHead(card) {
-    const tabs = (WINDOWS[card.dataset.win] || SAVED_EXTRA[card.dataset.win]).tabs;
+    const tabs = windowOf(card.dataset.win).tabs;
     const title = card.querySelector('.win-title');
     const meta = card.querySelector('.win-meta');
     const plainTags = [...card.querySelectorAll('.win-head .tag:not(.brand):not(.anchor)')];
