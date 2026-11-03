@@ -1,0 +1,8 @@
+# Written by TabSentry/website/build_site.py; edit it there.
+/*
+  Strict-Transport-Security: max-age=300; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
