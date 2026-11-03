@@ -1,0 +1,5 @@
+# The files this site publishes, written by TabSentry/website/build_site.py.
+# deploy_check.py (the Pages build command) publishes exactly these.
+404.html
+_headers
+index.html
