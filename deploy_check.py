@@ -17,9 +17,12 @@ The checks, on the headers Pages will send (_headers, merged as Pages merges the
   - every account page (all pages of the account site; on the main site the pages
     publish.txt marks "account", and any page with a password field, a CSP meta tag or
     the account pages' script): ACCOUNT_POLICY (frame-ancestors 'none' among it),
-    Cache-Control: no-store and Referrer-Policy: no-referrer. A page that looks like an
-    account page and isn't marked is refused;
-  - no header set twice for a page (Pages would join the values with a comma).
+    Cache-Control: no-store (except on a 404 answer, where Pages removes it),
+    Referrer-Policy: no-referrer, and no Access-Control-Allow-Origin (Pages sends "*"
+    unless _headers removes it). A page that looks like an account page and isn't
+    marked is refused;
+  - no header set twice for a page (Pages would join the values with a comma), and no
+    path with two rules.
 The allow-list: publish.txt names every file the site publishes, and only those are
 staged. A listed file that is missing, a dot file and a path outside the site are refused.
 """
@@ -54,6 +57,8 @@ ACCOUNT_SIGNS = [
 ]
 # An address no page has: the 404 page's headers are those Pages sends there.
 UNKNOWN_PATH = '/no-such-page-554'
+# What Pages sends on every answer before _headers applies (its attachHeaders).
+PAGES_DEFAULTS = {'access-control-allow-origin': '*'}
 
 
 def read_rules(text):
@@ -66,6 +71,8 @@ def read_rules(text):
         if not line[0].isspace():
             if not line.startswith('/') or ':' in line:
                 problems.append(f'_headers line {number}: "{line}" is not a path this check reads (a /path, * allowed)')
+            if any(rule[0] == line.strip() for rule in rules):
+                problems.append(f'_headers line {number}: "{line.strip()}" has a rule already; Pages keys rules by path')
             rules.append((line.strip(), {}, []))
             continue
         if not rules:
@@ -87,11 +94,12 @@ def matches(pattern, path):
     return re.match(regex, path) is not None
 
 
-def headers_for(rules, path):
+def headers_for(rules, path, not_found=False):
     """The headers Pages sends on a path, and the names more than one rule set (which Pages
-    joins with a comma). Mirrors Pages' attachHeaders: matching rules in file order, each
-    removing its "! Name" headers, then setting its own (appending to one already set)."""
-    headers, set_once, twice = {}, set(), set()
+    joins with a comma). Mirrors Pages' attachHeaders: its defaults, then matching rules in
+    file order, each removing its "! Name" headers, then setting its own (appending to one
+    already set); on a 404 answer it removes Cache-Control."""
+    headers, set_once, twice = dict(PAGES_DEFAULTS), set(), set()
     for pattern, set_headers, unset in rules:
         if not matches(pattern, path):
             continue
@@ -104,6 +112,8 @@ def headers_for(rules, path):
             else:
                 headers[name] = value
                 set_once.add(name)
+    if not_found:
+        headers.pop('cache-control', None)
     return headers, twice
 
 
@@ -118,8 +128,8 @@ def connect_problems(csp):
     return [f'CSP connect-src allows {" ".join(loose)}; only \'self\' and https origins'] if loose else []
 
 
-def page_problems(headers, twice, account):
-    """What one page's headers lack, as Pages would send them."""
+def page_problems(headers, twice, account, not_found=False):
+    """What one page's headers lack, as Pages would send them (not_found: a 404 answer)."""
     problems = [f'{name} is set by more than one rule' for name in sorted(twice)]
     hsts = headers.get('strict-transport-security', '')
     age = re.search(r'max-age=(\d+)', hsts)
@@ -146,8 +156,10 @@ def page_problems(headers, twice, account):
     if account:
         if referrer != 'no-referrer':
             problems.append(f'Referrer-Policy is "{referrer}", wanted "no-referrer"')
-        if 'no-store' not in headers.get('cache-control', '').lower():
+        if not not_found and 'no-store' not in headers.get('cache-control', '').lower():
             problems.append(f'Cache-Control is "{headers.get("cache-control", "")}", wanted no-store')
+        if 'access-control-allow-origin' in headers:
+            problems.append(f'Access-Control-Allow-Origin is "{headers["access-control-allow-origin"]}", wanted none ("! Access-Control-Allow-Origin")')
     elif referrer not in SITE_REFERRER:
         problems.append(f'Referrer-Policy is "{referrer}", wanted one of {", ".join(SITE_REFERRER)}')
     return problems
@@ -159,8 +171,6 @@ def page_paths(name):
     paths = [f'/{name}', f'/{stem}']
     if name == 'index.html':
         paths = ['/', '/index.html']
-    elif name.endswith('/index.html'):
-        paths = [f'/{name}', f'/{stem[:-len("index")]}']
     if name == '404.html':
         paths.append(UNKNOWN_PATH)
     return paths
@@ -206,8 +216,9 @@ def check(site, read):
             problems.append(f'{path}: an account page (password field, CSP meta tag or account-page.js) that {MANIFEST} does not mark "{ACCOUNT_MARK}"')
         account = marked or looks_account or site == 'account'
         for address in page_paths(path):
-            headers, twice = headers_for(rules, address)
-            problems += [f'{address}: {p}' for p in page_problems(headers, twice, account)]
+            not_found = address == UNKNOWN_PATH
+            headers, twice = headers_for(rules, address, not_found)
+            problems += [f'{address}: {p}' for p in page_problems(headers, twice, account, not_found)]
     if site == 'account' and '404.html' not in files:
         problems.append('no 404.html: Pages would answer every unknown address with index.html')
     return problems

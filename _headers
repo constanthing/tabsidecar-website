@@ -4,11 +4,20 @@
   X-Content-Type-Options: nosniff
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'
+
+/uninstall.html
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; frame-ancestors 'self'
+
+/uninstall
+  ! Content-Security-Policy
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; frame-ancestors 'self'
 
 /reset-password.html
   ! Content-Security-Policy
   ! Referrer-Policy
+  ! Access-Control-Allow-Origin
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   Referrer-Policy: no-referrer
   Cache-Control: no-store
@@ -16,6 +25,7 @@
 /reset-password
   ! Content-Security-Policy
   ! Referrer-Policy
+  ! Access-Control-Allow-Origin
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   Referrer-Policy: no-referrer
   Cache-Control: no-store
@@ -23,6 +33,7 @@
 /email-confirmed.html
   ! Content-Security-Policy
   ! Referrer-Policy
+  ! Access-Control-Allow-Origin
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   Referrer-Policy: no-referrer
   Cache-Control: no-store
@@ -30,6 +41,7 @@
 /email-confirmed
   ! Content-Security-Policy
   ! Referrer-Policy
+  ! Access-Control-Allow-Origin
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   Referrer-Policy: no-referrer
   Cache-Control: no-store

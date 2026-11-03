@@ -1,5 +1,6 @@
 # Written by TabSentry/website/build_site.py; edit it there.
 /*
+  ! Access-Control-Allow-Origin
   Strict-Transport-Security: max-age=300; includeSubDomains
   X-Content-Type-Options: nosniff
   Permissions-Policy: camera=(), microphone=(), geolocation=()
