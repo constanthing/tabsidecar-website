@@ -39,6 +39,8 @@ svg { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; s
 .b:hover { border-color: var(--border-strong); background: var(--surface-hover); }
 .b.primary { background: var(--brand); border-color: transparent; color: #fff; }
 .b.primary:hover { background: #2f74e6; }
+.b.danger { background: var(--danger); border-color: transparent; color: #fff; }
+.b.danger:hover { background: #b91c1c; }
 .b.quiet { background: none; border-color: transparent; color: var(--muted); }
 .b.quiet:hover { background: var(--surface-hover); color: var(--text); }
 .b.sm { height: 32px; font-size: 14px; border-radius: 8px; }
@@ -61,6 +63,7 @@ h1 { margin: 0 0 6px; font: 650 24px/1.2 var(--display); letter-spacing: -.02em;
 .copy { margin: 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); }
 .copy b { color: var(--text); font-weight: 600; }
 .copy.note { color: var(--text-2); }
+.copy.who { color: var(--text); font-weight: 500; }
 .copy.waiting { display: flex; align-items: center; gap: 10px; margin: 0; }
 .fine { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--border); color: var(--faint); font-size: 13.5px; line-height: 1.5; }
 .path { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; color: var(--text-2); font-weight: 500; }
