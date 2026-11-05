@@ -1,4 +1,4 @@
-// reset-password.html: choose a new password after the Cloud Sync "Forgot password?"
+// account-reset-password.html: choose a new password after the Cloud Sync "Forgot password?"
 // email (TabSentry#171, #178, #192). Loaded as a file, not inline, so the page's CSP
 // can allow only the site's own scripts.
 document.addEventListener('DOMContentLoaded', () => {

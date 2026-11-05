@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://challenges.cloudflare.com">
 <meta name="referrer" content="no-referrer">
-<script src="/assets/account-handover.js?v=202611050047"></script>
+<script src="/assets/account-handover.js?v=202611050308"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sign in · TabSidecar</title>
 <meta name="description" content="Sign in to TabSidecar, create an account, or reset your password.">
@@ -14,16 +14,16 @@
      hand-over code. The hand-over script is the first script (#578); Turnstile loads
      after it, on this document only. Each step is a view; account-sign-in.js shows one, and account-sign-up.js runs the
      create-account steps. -->
-<link rel="stylesheet" href="/assets/account.css?v=202611050047">
+<link rel="stylesheet" href="/assets/account.css?v=202611050308">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
-<script src="/assets/icons.js?v=202611050047" defer></script>
-<script src="/assets/account-page.js?v=202611050047" defer></script>
-<script src="/assets/common-passwords.js?v=202611050047" defer></script>
-<script src="/assets/account-supabase.js?v=202611050047" defer></script>
-<script src="/assets/account-turnstile.js?v=202611050047" defer></script>
-<script src="/assets/account-sign-in-words.js?v=202611050047" defer></script>
-<script src="/assets/account-sign-up.js?v=202611050047" defer></script>
-<script src="/assets/account-sign-in.js?v=202611050047" defer></script>
+<script src="/assets/icons.js?v=202611050308" defer></script>
+<script src="/assets/account-page.js?v=202611050308" defer></script>
+<script src="/assets/common-passwords.js?v=202611050308" defer></script>
+<script src="/assets/account-supabase.js?v=202611050308" defer></script>
+<script src="/assets/account-turnstile.js?v=202611050308" defer></script>
+<script src="/assets/account-sign-in-words.js?v=202611050308" defer></script>
+<script src="/assets/account-sign-up.js?v=202611050308" defer></script>
+<script src="/assets/account-sign-in.js?v=202611050308" defer></script>
 </head>
 <body>
 
@@ -115,11 +115,11 @@
         <form id="signUpPasswordForm" novalidate>
           <input id="passwordUsername" type="email" autocomplete="username" class="visually-hidden" tabindex="-1" aria-hidden="true" readonly>
           <div class="field"><label for="newPassword">Password</label>
-            <div class="box"><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-show="newPassword">Show</button></div></div>
+            <div class="box"><input id="newPassword" type="password" autocomplete="new-password" minlength="10" required><button type="button" class="show" data-show="newPassword">Show</button></div></div>
           <div class="field"><label for="confirmPassword">Confirm password</label>
-            <div class="box" id="confirmBox"><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-show="confirmPassword">Show</button></div></div>
+            <div class="box" id="confirmBox"><input id="confirmPassword" type="password" autocomplete="new-password" minlength="10" required><button type="button" class="show" data-show="confirmPassword">Show</button></div></div>
           <ul class="reqs">
-            <li id="reqLen"><span class="tick"><i data-icon="check"></i></span>At least 8 characters</li>
+            <li id="reqLen"><span class="tick"><i data-icon="check"></i></span>At least 10 characters</li>
             <li id="reqMatch"><span class="tick"><i data-icon="check"></i></span>Both passwords match</li>
           </ul>
           <div class="actions"><button class="b primary" type="submit">Create account</button></div>

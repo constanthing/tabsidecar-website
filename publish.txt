@@ -2,21 +2,16 @@
 # deploy_check.py (the Pages build command) publishes exactly these.
 404.html
 _headers
+_redirects
 apple-touch-icon.png
-assets/account-page.js
-assets/common-passwords.js
-assets/common-passwords.txt
-assets/email-confirmed.js
 assets/icons.js
 assets/mock.css
 assets/mock.js
-assets/reset-password.js
 assets/site.css
 assets/site.js
 assets/uninstall.js
 assets/windows.css
 assets/windows.js
-email-confirmed.html account
 favicon.ico
 icons/default-favicon.png
 icons/icon128.png
@@ -26,6 +21,5 @@ icons/icon48.png
 icons/og-image.png
 index.html
 privacy.html
-reset-password.html account
 support.html
 uninstall.html
