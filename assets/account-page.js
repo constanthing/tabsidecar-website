@@ -1,5 +1,6 @@
-// What the account pages (email-confirmed.html, reset-password.html) share: reading
-// the link an account email opens them with, and their status line (TabSentry#192).
+// What the account pages share: reading the link an account email opens them with, and
+// their status line (email-confirmed.html, reset-password.html, TabSentry#192), and their
+// icons; on account.tabsidecar.com the sign-in pages use it too (#579).
 // These pages hold a live Supabase session or recovery token, so:
 //   - a token comes only from the link's #fragment, where Supabase puts it, and only
 //     for the link types the page is for; a token in the query string (which ends up
@@ -45,10 +46,10 @@
 
   // readAccountLink for this page's own address.
   function readThisLink(types) {
-    return readAccountLink({ hash: location.hash, search: location.search, framed: window.top !== window.self }, types);
+    return readAccountLink({ hash: location.hash, search: location.search, framed: isFramed() }, types);
   }
 
-  // One icon from the sprite (shared/icons.js) as an <svg> element. The sprite is
+  // One icon from the sprite (icons.js) as an <svg> element. The sprite is
   // the site's own fixed data; nothing from a link or a server goes in here.
   function iconNode(name) {
     const svg = document.createElementNS(SVG_NS, 'svg');
@@ -71,6 +72,14 @@
     el.hidden = false;
   }
 
+  // Each <i data-icon="name"> placeholder in `root` as its icon (the site's own sprite).
+  function renderIcons(root = document) {
+    root.querySelectorAll('i[data-icon]').forEach(placeholder => placeholder.replaceWith(iconNode(placeholder.dataset.icon)));
+  }
+
+  // Whether the page is inside a frame: an account page then reads and sends nothing.
+  const isFramed = () => window.top !== window.self;
+
   // A submit button's label while it works (with a spinner) or at rest.
   function setBusyLabel(button, busy, busyText, idleText) {
     if (!busy) { button.textContent = idleText; return; }
@@ -78,6 +87,11 @@
     spin.className = 'spin';
     button.replaceChildren(spin, busyText);
   }
+
+  // Whether `text` has an email address's shape (and no spaces or markup), so a page may
+  // show it: a token's payload isn't checked on the page, and could hold any words.
+  const EMAIL_SHAPE = /^[^\s@<>"'`]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,63}$/;
+  const isEmailAddress = text => typeof text === 'string' && text.length <= 254 && EMAIL_SHAPE.test(text);
 
   // The email a session's access token (a JWT) carries, read locally; '' when none.
   function emailFromToken(accessToken) {
@@ -89,5 +103,5 @@
     }
   }
 
-  window.AccountPage = { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, MIN_LENGTH, readAccountLink, readThisLink, iconNode, showStatus, setBusyLabel, emailFromToken };
+  window.AccountPage = { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, MIN_LENGTH, readAccountLink, readThisLink, isFramed, iconNode, renderIcons, showStatus, setBusyLabel, emailFromToken, isEmailAddress };
 })();

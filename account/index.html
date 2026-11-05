@@ -2,25 +2,168 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://challenges.cloudflare.com">
+<meta name="referrer" content="no-referrer">
+<script src="/assets/account-handover.js?v=202611042314"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TabSidecar account</title>
-<meta name="description" content="TabSidecar's account pages.">
+<title>Sign in · TabSidecar</title>
+<meta name="description" content="Sign in to TabSidecar, create an account, or reset your password.">
 <meta name="robots" content="noindex">
-<!-- The account site's only page until the account pages arrive (TabSentry#554, #579):
-     account.tabsidecar.com answers every address with it. Self-contained: no scripts,
-     no files from tabsidecar.com. -->
-<style>
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font: 16px/1.5 system-ui, sans-serif; color: #1f2328; background: #f6f7f9; }
-  main { max-width: 26rem; padding: 2rem 1.5rem; text-align: center; }
-  h1 { font-size: 1.25rem; margin: 0 0 .5rem; }
-  p { margin: 0; color: #57606a; }
-  a { color: #0b57d0; }
-</style>
+<!-- account.tabsidecar.com's sign-in document (TabSentry#579), published at /, /sign-in,
+     /sign-up and /forgot-password: TabSidecar opens /sign-in and /sign-up with its
+     hand-over code. The hand-over script is the first script (#578); Turnstile loads
+     after it, on this document only. Each step is a view; account-sign-in.js shows one, and account-sign-up.js runs the
+     create-account steps. -->
+<link rel="stylesheet" href="/assets/account.css?v=202611042314">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
+<script src="/assets/icons.js?v=202611042314" defer></script>
+<script src="/assets/account-page.js?v=202611042314" defer></script>
+<script src="/assets/common-passwords.js?v=202611042314" defer></script>
+<script src="/assets/account-supabase.js?v=202611042314" defer></script>
+<script src="/assets/account-turnstile.js?v=202611042314" defer></script>
+<script src="/assets/account-sign-in-words.js?v=202611042314" defer></script>
+<script src="/assets/account-sign-up.js?v=202611042314" defer></script>
+<script src="/assets/account-sign-in.js?v=202611042314" defer></script>
 </head>
 <body>
+
+<header class="site-nav"><div class="wrap">
+  <a class="wordmark" href="https://tabsidecar.com/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <a class="b sm" href="mailto:support@tabsidecar.com">Help</a>
+</div></header>
+
 <main>
-  <h1>Nothing here yet</h1>
-  <p>TabSidecar's account pages aren't open yet. Go to <a href="https://tabsidecar.com/">tabsidecar.com</a>.</p>
+  <div class="col">
+    <section class="card swin" aria-label="Account">
+      <header class="swin-head"><span class="swin-dot"></span><span class="swin-title">Account</span></header>
+      <div class="swin-body">
+      <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+
+      <!-- Asking TabSidecar who it is signed in as -->
+      <div id="viewLoading">
+        <p class="copy waiting"><span class="spin dark"></span>Checking TabSidecar…</p>
+      </div>
+
+      <!-- Can't sign TabSidecar in from here: not opened from it, an old page, a frame -->
+      <div id="viewProblem" hidden>
+        <div class="big-ico warn"><i data-icon="clock"></i></div>
+        <h1 id="problemTitle">Open this page from TabSidecar</h1>
+        <p class="copy" id="problemCopy">This page signs TabSidecar in, so it has to be opened from TabSidecar.</p>
+        <div class="steps">
+          <div class="row"><span class="n">1</span><span class="label">Open TabSidecar from the toolbar</span></div>
+          <div class="row"><span class="n">2</span><span class="label">Go to <b>Account</b></span></div>
+          <div class="row"><span class="n">3</span><span class="label">Choose <b id="problemAction">Sign in</b></span></div>
+        </div>
+        <div class="actions"><button class="b primary" type="button" id="problemRetry" hidden>Try again</button><a class="b quiet" href="/forgot-password" data-go="Forgot" id="problemForgot">Forgot password?</a></div>
+      </div>
+
+      <!-- TabSidecar is signed in already -->
+      <div id="viewAlready" hidden>
+        <div class="big-ico ok"><i data-icon="check"></i></div>
+        <h1>Already signed in</h1>
+        <p class="copy" id="alreadyText"></p>
+        <p class="copy">To use another account, sign out in <span class="path">TabSidecar<i data-icon="chev-r"></i>Account</span> first. You can close this tab.</p>
+      </div>
+
+      <!-- Sign in -->
+      <div id="viewSignIn" hidden>
+        <h1>Sign in to TabSidecar</h1>
+        <p class="copy">Sign in to sync your windows and restore them on another computer.</p>
+        <form id="signInForm" novalidate>
+          <div class="field"><label for="signInEmail">Email</label>
+            <div class="box"><input id="signInEmail" type="email" autocomplete="username" spellcheck="false" required></div></div>
+          <div class="field"><label for="signInPassword">Password</label>
+            <div class="box"><input id="signInPassword" type="password" autocomplete="current-password" required><button type="button" class="show" data-show="signInPassword">Show</button></div></div>
+          <div class="actions spread">
+            <a class="link" href="/forgot-password" data-go="Forgot">Forgot password?</a>
+            <button class="b primary" type="submit">Sign in</button>
+          </div>
+        </form>
+        <p class="fine">New to TabSidecar? <a href="/sign-up" data-go="SignUpEmail">Create an account</a></p>
+      </div>
+
+      <!-- Create account 1: the email -->
+      <div id="viewSignUpEmail" hidden>
+        <h1>Create your account</h1>
+        <p class="copy">Enter your email and we’ll send you a code to confirm it. You’ll choose a password after that.</p>
+        <form id="signUpEmailForm" novalidate>
+          <div class="field"><label for="signUpEmail">Email</label>
+            <div class="box"><input id="signUpEmail" type="email" autocomplete="username" spellcheck="false" required></div></div>
+          <div class="actions"><button class="b primary" type="submit">Send code</button></div>
+        </form>
+        <p class="fine">Already have an account? <a href="/sign-in" data-go="SignIn">Sign in</a></p>
+      </div>
+
+      <!-- Create account 2: the code from the email -->
+      <div id="viewSignUpCode" hidden>
+        <h1>Check your email</h1>
+        <p class="copy">Enter the code we sent to <b id="codeEmail"></b>.</p>
+        <form id="signUpCodeForm" novalidate>
+          <div class="field"><label for="signUpCode">Code</label>
+            <div class="box"><input id="signUpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="12" spellcheck="false" required></div></div>
+          <div class="actions"><button class="b primary" type="submit">Continue</button></div>
+        </form>
+        <div class="actions secondary"><button class="b quiet" type="button" id="resendCode">Resend code</button><button class="b quiet" type="button" id="otherEmail">Use a different email</button></div>
+      </div>
+
+      <!-- Create account 3: the password -->
+      <div id="viewSignUpPassword" hidden>
+        <span class="done-chip"><i data-icon="check"></i>Email confirmed</span>
+        <h1>Choose a password</h1>
+        <p class="copy">You’ll use it with your email to sign in to TabSidecar.</p>
+        <p class="copy note" id="existingNote" hidden>This email already has an account. The password you choose replaces its old one.</p>
+        <form id="signUpPasswordForm" novalidate>
+          <input id="passwordUsername" type="email" autocomplete="username" class="visually-hidden" tabindex="-1" aria-hidden="true" readonly>
+          <div class="field"><label for="newPassword">Password</label>
+            <div class="box"><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-show="newPassword">Show</button></div></div>
+          <div class="field"><label for="confirmPassword">Confirm password</label>
+            <div class="box" id="confirmBox"><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-show="confirmPassword">Show</button></div></div>
+          <ul class="reqs">
+            <li id="reqLen"><span class="tick"><i data-icon="check"></i></span>At least 8 characters</li>
+            <li id="reqMatch"><span class="tick"><i data-icon="check"></i></span>Both passwords match</li>
+          </ul>
+          <div class="actions"><button class="b primary" type="submit">Create account</button></div>
+        </form>
+      </div>
+
+      <!-- Forgot password -->
+      <div id="viewForgot" hidden>
+        <h1>Reset your password</h1>
+        <p class="copy">Enter your account’s email and we’ll send you a link to choose a new password.</p>
+        <form id="forgotForm" novalidate>
+          <div class="field"><label for="forgotEmail">Email</label>
+            <div class="box"><input id="forgotEmail" type="email" autocomplete="username" spellcheck="false" required></div></div>
+          <div class="actions"><button class="b primary" type="submit">Send reset link</button></div>
+        </form>
+        <p class="fine"><a href="/sign-in" data-go="SignIn">Back to sign in</a></p>
+      </div>
+
+      <!-- Reset link sent (or not: the words are the same) -->
+      <div id="viewForgotSent" hidden>
+        <div class="big-ico ok"><i data-icon="mail"></i></div>
+        <h1>Check your email</h1>
+        <p class="copy" id="forgotSentText"></p>
+        <p class="fine">Once your password is changed, sign in from <span class="path">TabSidecar<i data-icon="chev-r"></i>Account</span>. You can close this tab.</p>
+      </div>
+
+      <!-- Handed over -->
+      <div id="viewSignedIn" hidden>
+        <div class="big-ico ok"><i data-icon="check"></i></div>
+        <h1 id="signedInText">You’re signed in. You can close this tab.</h1>
+      </div>
+
+      <!-- TabSidecar didn't take the sign-in -->
+      <div id="viewFailed" hidden>
+        <div class="big-ico warn"><i data-icon="clock"></i></div>
+        <h1>TabSidecar didn’t finish signing in</h1>
+        <p class="copy">Check TabSidecar: it may have signed in anyway. If it didn’t, go to <span class="path">TabSidecar<i data-icon="chev-r"></i>Account</span> and choose <b>Sign in</b> again.</p>
+      </div>
+
+      <div id="humanCheck" class="human-check"></div>
+      </div>
+    </section>
+  </div>
 </main>
+
 </body>
 </html>

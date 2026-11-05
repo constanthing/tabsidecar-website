@@ -2,6 +2,7 @@
 // signup (or existing-account) code email (TabSentry#171, #192). Loaded as a file,
 // not inline, so the page's CSP can allow only the site's own scripts.
 document.addEventListener('DOMContentLoaded', () => {
+  AccountPage.renderIcons();  // on tabsidecar.com mock.js has drawn them already
   const { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, MIN_LENGTH } = AccountPage;
   // The link types the code email sends here: "signup" for a new (or not yet
   // confirmed) address, "magiclink" for an account that already exists.
@@ -30,9 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
     $('reqMatch').classList.toggle('met', match);
     $('confirmBox').classList.toggle('bad', confirm.value.length >= pw.value.length && confirm.value.length > 0 && !match);
   };
-  const expired = (isExpired, detail) => {
-    $('expiredTitle').textContent = isExpired ? 'This link has expired' : 'We couldn’t confirm your email';
-    $('expiredDetail').textContent = detail || '';
+  // What a failed link says, by Supabase's error_code. Nothing from the address is ever
+  // shown (the security scan's F9, #579): a crafted link's error_description could
+  // otherwise put any sentence on this page.
+  const LINK_ERRORS = {
+    otp_expired: { title: 'This link has expired', detail: '' }
+  };
+  const UNKNOWN_LINK_ERROR = { title: 'We couldn’t confirm your email', detail: 'The link didn’t work.' };
+  const expired = code => {
+    const { title, detail } = Object.hasOwn(LINK_ERRORS, code) ? LINK_ERRORS[code] : UNKNOWN_LINK_ERROR;
+    $('expiredTitle').textContent = title;
+    $('expiredDetail').textContent = detail;
     $('expiredDetail').hidden = !detail;
     view('Expired');
   };
@@ -77,14 +86,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  if (link.kind === 'error') expired(link.code === 'otp_expired', link.description);
+  if (link.kind === 'error') expired(link.code);
   else if (accessToken) {
     view('Form');
     isCommonPassword('');  // start loading the list
-    // The access token is a JWT; its payload carries the email. Read it
-    // locally, no extra request.
+    // The access token is a JWT; its payload carries the email. Read it locally, no
+    // extra request, and shown only when it has an address's shape: the token isn't
+    // checked here, so its payload could hold any sentence (F9, #579).
     const email = AccountPage.emailFromToken(accessToken);
-    if (email) $('emailOut').textContent = email;
+    if (AccountPage.isEmailAddress(email)) $('emailOut').textContent = email;
   } else view('Empty');
 
 });

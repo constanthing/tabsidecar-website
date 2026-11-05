@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<script src="/assets/account-handover.js?v=202611042314"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Email confirmed · TabSidecar</title>
+<meta name="description" content="Choose a password for your TabSidecar account.">
+<meta name="robots" content="noindex">
+<!-- Where the link in the sign-up code email lands on account.tabsidecar.com
+     (TabSentry#579; the same script as tabsidecar.com/email-confirmed, which stays for
+     older versions until #186). No Turnstile here: the page holds a sign-up session. -->
+<link rel="stylesheet" href="/assets/account.css?v=202611042314">
+<script src="/assets/icons.js?v=202611042314" defer></script>
+<script src="/assets/common-passwords.js?v=202611042314" defer></script>
+<script src="/assets/account-page.js?v=202611042314" defer></script>
+<script src="/assets/email-confirmed.js?v=202611042314" defer></script>
+</head>
+<body>
+
+<header class="site-nav"><div class="wrap">
+  <a class="wordmark" href="https://tabsidecar.com/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <a class="b sm" href="mailto:support@tabsidecar.com">Help</a>
+</div></header>
+
+<main>
+  <div class="col">
+    <section class="card swin" aria-labelledby="confirm-title">
+      <header class="swin-head"><span class="swin-dot"></span><span class="swin-title">Account</span></header>
+      <div class="swin-body">
+
+      <!-- Confirmed: choose a password -->
+      <div id="viewForm">
+        <span class="done-chip"><i data-icon="check"></i>Email confirmed</span>
+        <h1 id="confirm-title">Choose a password</h1>
+        <p class="copy">You’ll use it with <b id="emailOut">your email</b> to sign in to TabSidecar.</p>
+        <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+        <form id="password-form" novalidate>
+          <div class="field"><label for="new-password">Password</label>
+            <div class="box"><input id="new-password" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-show="new-password">Show</button></div></div>
+          <div class="field"><label for="confirm-password">Confirm password</label>
+            <div class="box" id="confirmBox"><input id="confirm-password" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-show="confirm-password">Show</button></div></div>
+          <ul class="reqs">
+            <li id="reqLen"><span class="tick"><i data-icon="check"></i></span>At least 8 characters</li>
+            <li id="reqMatch"><span class="tick"><i data-icon="check"></i></span>Both passwords match</li>
+          </ul>
+          <div class="actions"><button class="b primary" type="submit" id="password-submit">Set password</button></div>
+        </form>
+        <p class="fine">Rather use the code? Enter the code from the same email on the page TabSidecar opened.</p>
+      </div>
+
+      <!-- Password saved -->
+      <div id="viewDone" hidden>
+        <div class="big-ico ok"><i data-icon="check"></i></div>
+        <h1>You’re all set</h1>
+        <p class="copy">Your password is saved. Open TabSidecar, go to <span class="path">Account<i data-icon="chev-r"></i>Sign in</span>, and sign in with your email and new password.</p>
+        <p class="copy" id="othersCopy">You can close this tab.</p>
+      </div>
+
+      <!-- Expired or failed link -->
+      <div id="viewExpired" hidden>
+        <div class="big-ico warn"><i data-icon="clock"></i></div>
+        <h1 id="expiredTitle">This link has expired</h1>
+        <p class="copy">Links work once and expire after an hour. Get a new code from TabSidecar:</p>
+        <div class="steps">
+          <div class="row"><span class="n">1</span><span class="label">Open TabSidecar from the toolbar</span></div>
+          <div class="row"><span class="n">2</span><span class="label">Go to <b>Account</b></span></div>
+          <div class="row"><span class="n">3</span><span class="label">Choose <b>Create account</b> and enter your email again</span></div>
+        </div>
+        <p class="fine" id="expiredDetail" hidden></p>
+        <div class="actions"><a class="b" href="mailto:support@tabsidecar.com">Contact support</a></div>
+      </div>
+
+      <!-- Opened without a link -->
+      <div id="viewEmpty" hidden>
+        <div class="big-ico"><i data-icon="mail"></i></div>
+        <h1>Nothing to confirm</h1>
+        <p class="copy">This page opens from the link in your TabSidecar code email. To create an account, open TabSidecar, go to <span class="path">Account</span>, and choose <b>Create account</b>.</p>
+      </div>
+
+      </div>
+    </section>
+  </div>
+</main>
+
+</body>
+</html>
