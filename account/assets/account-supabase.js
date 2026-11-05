@@ -1,5 +1,6 @@
-// The account site's own small Supabase Auth client (TabSentry#579): the calls the
-// sign-in, create-account and forgot-password steps make, with nothing kept anywhere.
+// The account site's own small Supabase client (TabSentry#579, #580): the calls the
+// sign-in, create-account, forgot-password, change-password and delete-account pages
+// make, with nothing kept anywhere.
 //   - A session lives only in the variable the caller holds. Nothing is written to any
 //     storage, nothing is read from the address, and no session is ever refreshed: the
 //     page hands its session to TabSidecar, which refreshes it (twice) itself, and the
@@ -10,6 +11,8 @@
 //   - Every call that Supabase's CAPTCHA protection guards sends the Turnstile token
 //     (gotrue_meta_security.captcha_token).
 //   - Each request waits at most REQUEST_TIMEOUT_MS, and sends no cookies or referrer.
+// read() and requestOptions() are for a page's own request with the same rules (the
+// delete page's account deletion, written there so only it names it).
 // Every answer is { ok: true, body } or { ok: false, status, code }: status 0 means
 // Supabase couldn't be reached. Callers turn these into fixed words; Supabase's own
 // message is never shown, so no answer can tell an existing address from a missing one.
@@ -21,21 +24,20 @@
   const CONFIRM_REDIRECT = `${ACCOUNT_ORIGIN}/email-confirmed`;
   const REQUEST_TIMEOUT_MS = 10000;
 
-  // One request to Supabase Auth. `accessToken` signs it as that session.
-  async function call(path, { method = 'POST', body, accessToken } = {}) {
-    const headers = { apikey: SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json' };
-    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  // What every request sends besides its own method, headers and body: no cookies, no
+  // referrer, nothing cached, and at most REQUEST_TIMEOUT_MS.
+  const requestOptions = () => ({
+    credentials: 'omit',
+    referrerPolicy: 'no-referrer',
+    cache: 'no-store',
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+  });
+
+  // A request's answer as { ok: true, body } or { ok: false, status, code }.
+  async function read(request) {
     let response;
     try {
-      response = await fetch(`${SUPABASE_URL}/auth/v1${path}`, {
-        method,
-        headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
-        credentials: 'omit',
-        referrerPolicy: 'no-referrer',
-        cache: 'no-store',
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
-      });
+      response = await request;
     } catch {
       return { ok: false, status: 0, code: 'unreachable' };
     }
@@ -47,8 +49,28 @@
       parsed = null;
     }
     if (response.ok) return { ok: true, body: parsed };
-    const code = typeof parsed?.error_code === 'string' ? parsed.error_code : (typeof parsed?.code === 'string' ? parsed.code : '');
-    return { ok: false, status: response.status, code };
+    return { ok: false, status: response.status, code: errorCode(parsed) };
+  }
+
+  // One request to Supabase Auth. `accessToken` signs it as that session.
+  function call(path, { method = 'POST', body, accessToken } = {}) {
+    const headers = { apikey: SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json' };
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+    return read(fetch(`${SUPABASE_URL}/auth/v1${path}`, {
+      ...requestOptions(),
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body)
+    }));
+  }
+
+  // Supabase's code for a refusal: Auth's error_code, a database function's own exception
+  // (raise ... using errcode 'P0001' answers its message, such as reauthentication_required),
+  // or the API's code.
+  function errorCode(parsed) {
+    if (typeof parsed?.error_code === 'string') return parsed.error_code;
+    if (parsed?.code === 'P0001' && typeof parsed?.message === 'string') return parsed.message;
+    return typeof parsed?.code === 'string' ? parsed.code : '';
   }
 
   const security = captchaToken => ({ captcha_token: String(captchaToken || '') });
@@ -85,6 +107,13 @@
     return call('/user', { method: 'PUT', accessToken, body: { password } });
   }
 
+  // PUT /user with the current password (#580): Supabase's "Require current password"
+  // checks it, and its password rules apply. Refused with current_password_mismatch,
+  // same_password, weak_password or reauthentication_needed.
+  function changePassword({ accessToken, password, currentPassword }) {
+    return call('/user', { method: 'PUT', accessToken, body: { password, current_password: currentPassword } });
+  }
+
   // POST /logout?scope=others: ends every session of the account but `accessToken`'s.
   function signOutOthers({ accessToken }) {
     return call('/logout?scope=others', { accessToken });
@@ -97,5 +126,5 @@
     return call(`/recover?${query}`, { body: { email, gotrue_meta_security: security(captchaToken) } });
   }
 
-  window.AccountAuth = Object.freeze({ signInWithPassword, sendSignupCode, verifySignupCode, setPassword, signOutOthers, sendPasswordReset });
+  window.AccountAuth = Object.freeze({ signInWithPassword, sendSignupCode, verifySignupCode, setPassword, changePassword, signOutOthers, sendPasswordReset, read, requestOptions });
 })();

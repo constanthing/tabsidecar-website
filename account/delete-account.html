@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://challenges.cloudflare.com">
+<meta name="referrer" content="no-referrer">
+<script src="/assets/account-handover.js?v=202611050047"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete account · TabSidecar</title>
+<meta name="description" content="Delete your TabSidecar account.">
+<meta name="robots" content="noindex">
+<!-- account.tabsidecar.com/delete-account (TabSentry#580): TabSidecar opens it with its
+     hand-over code. The hand-over script is the first script (#578); Turnstile loads
+     after it. account-manage.js asks TabSidecar which account is signed in;
+     account-delete.js deletes that account and asks TabSidecar to sign out. -->
+<link rel="stylesheet" href="/assets/account.css?v=202611050047">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
+<script src="/assets/icons.js?v=202611050047" defer></script>
+<script src="/assets/account-page.js?v=202611050047" defer></script>
+<script src="/assets/account-supabase.js?v=202611050047" defer></script>
+<script src="/assets/account-turnstile.js?v=202611050047" defer></script>
+<script src="/assets/account-sign-in-words.js?v=202611050047" defer></script>
+<script src="/assets/account-manage-words.js?v=202611050047" defer></script>
+<script src="/assets/account-manage.js?v=202611050047" defer></script>
+<script src="/assets/account-delete.js?v=202611050047" defer></script>
+</head>
+<body>
+
+<header class="site-nav"><div class="wrap">
+  <a class="wordmark" href="https://tabsidecar.com/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <a class="b sm" href="mailto:support@tabsidecar.com">Help</a>
+</div></header>
+
+<main>
+  <div class="col">
+    <section class="card swin" aria-label="Account">
+      <header class="swin-head"><span class="swin-dot"></span><span class="swin-title">Account</span></header>
+      <div class="swin-body">
+      <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+
+      <!-- Asking TabSidecar which account is signed in -->
+      <div id="viewLoading">
+        <p class="copy waiting"><span class="spin dark"></span>Checking TabSidecar…</p>
+      </div>
+
+      <!-- Can't delete from here: not opened from TabSidecar, signed out, a frame -->
+      <div id="viewProblem" hidden>
+        <div class="big-ico warn"><i data-icon="clock"></i></div>
+        <h1 id="problemTitle">Open this page from TabSidecar</h1>
+        <p class="copy" id="problemCopy">This page deletes your TabSidecar account, so it has to be opened from TabSidecar.</p>
+        <div class="steps">
+          <div class="row"><span class="n">1</span><span class="label">Open TabSidecar from the toolbar</span></div>
+          <div class="row"><span class="n">2</span><span class="label">Go to <b>Account</b></span></div>
+          <div class="row"><span class="n">3</span><span class="label">Choose <b>Delete account</b></span></div>
+        </div>
+        <div class="actions"><button class="b primary" type="button" id="problemRetry" hidden>Try again</button></div>
+      </div>
+
+      <!-- The password, to confirm -->
+      <div id="viewForm" hidden>
+        <h1>Delete your account</h1>
+        <p class="copy who" data-signed-in-as></p>
+        <p class="copy">This permanently deletes your account, its cloud snapshots and devices, and your address on the update-email list. It can’t be undone. Tabs and windows on this computer are kept.</p>
+        <form id="deleteForm" novalidate>
+          <input id="deleteUsername" type="email" autocomplete="username" class="visually-hidden" tabindex="-1" aria-hidden="true" readonly data-username>
+          <div class="field"><label for="deletePassword">Enter your password to confirm</label>
+            <div class="box"><input id="deletePassword" type="password" autocomplete="current-password" required><button type="button" class="show" data-show="deletePassword">Show</button></div></div>
+          <div class="actions"><button class="b danger" type="submit">Delete account permanently</button></div>
+        </form>
+      </div>
+
+      <!-- Deleted -->
+      <div id="viewDeleted" hidden>
+        <div class="big-ico ok"><i data-icon="check"></i></div>
+        <h1>Your account is deleted</h1>
+        <p class="copy" id="deletedText"></p>
+      </div>
+
+      <div id="humanCheck" class="human-check"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+</body>
+</html>

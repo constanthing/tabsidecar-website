@@ -46,7 +46,9 @@ The checks, on the headers Pages will send (_headers, merged as Pages merges the
     persistSession, autoRefreshToken and detectSessionInUrl false. A page that hands a
     session to TabSidecar (its scripts name handOver) never signs it out: no signOut(),
     and /logout only as /logout?scope=others. The page and TabSidecar share that
-    session (docs: sign-in-hand-over.md, "The shared session").
+    session (docs: sign-in-hand-over.md, "The shared session");
+  - only the delete page (delete-account.html) and its scripts name delete_my_account
+    (TabSentry#580).
 The allow-list: publish.txt names every file the site publishes, and only those are
 staged. A listed file that is missing, a dot file and a path outside the site are refused.
 """
@@ -135,6 +137,10 @@ CLIENT_SETTINGS = ('persistSession', 'autoRefreshToken', 'detectSessionInUrl')
 # On a page that hands a session over: a sign-out of it.
 HANDS_OVER = re.compile(r'\bhandOver\b')
 SIGN_OUT = re.compile(r'(?<![\w$])signOut\s*\(|/logout(?!\?scope=others(?![\w&=]))')
+# Deleting the account (TabSentry#580): only the delete page's scripts may name it, so a
+# bug or a stray script on any other account page can't reach it.
+DELETES_ACCOUNT = re.compile(r'\bdelete_my_account\b')
+DELETE_PAGE = 'delete-account.html'
 HANDOVER_FIRST = re.compile(rf'(?i:\s*(?:{"|".join(PAGE_START_PARTS)}))*\s*{HANDOVER_TAG}', re.S)
 
 
@@ -315,8 +321,18 @@ def handover_problems(path, scripts):
             for name, text in sorted(scripts.items()) if SIGN_OUT.search(text)]
 
 
+def delete_problems(path, scripts):
+    """A page other than the delete page whose own text or scripts name the account
+    deletion (scripts: {path: text})."""
+    if path == DELETE_PAGE:
+        return []
+    return [f'{path}: {name} names delete_my_account; only {DELETE_PAGE} may'
+            for name, text in sorted(scripts.items()) if DELETES_ACCOUNT.search(text)]
+
+
 def account_page_problems(path, text, read, files):
-    """An account page's scripts, and on a hand-over page its sign-outs."""
+    """An account page's scripts, on a hand-over page its sign-outs, and the account
+    deletion anywhere but the delete page."""
     problems = script_problems(path, text, files)
     scripts = {path: text}
     for tag in SCRIPT_TAG.findall(text):
@@ -324,7 +340,7 @@ def account_page_problems(path, text, read, files):
         own = src and OWN_SCRIPT.fullmatch(src.group(1))
         if own and own.group(1) in files and own.group(1) != HANDOVER_FILE:
             scripts[own.group(1)] = read(own.group(1)) or ''
-    return problems + handover_problems(path, scripts)
+    return problems + handover_problems(path, scripts) + delete_problems(path, scripts)
 
 
 def page_paths(name):
