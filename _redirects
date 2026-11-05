@@ -1,0 +1,7 @@
+# Written by TabSentry/website/build_site.py; edit it there.
+/reset-password https://account.tabsidecar.com/reset-password 302
+/reset-password.html https://account.tabsidecar.com/reset-password 302
+/reset-password/ https://account.tabsidecar.com/reset-password 302
+/email-confirmed https://account.tabsidecar.com/email-confirmed 302
+/email-confirmed.html https://account.tabsidecar.com/email-confirmed 302
+/email-confirmed/ https://account.tabsidecar.com/email-confirmed 302

@@ -1,6 +1,6 @@
 // What the account pages share: reading the link an account email opens them with, and
-// their status line (email-confirmed.html, reset-password.html, TabSentry#192), and their
-// icons; on account.tabsidecar.com the sign-in pages use it too (#579).
+// their status line (account-email-confirmed.html, account-reset-password.html,
+// TabSentry#192), and their icons; the sign-in pages use it too (#579).
 // These pages hold a live Supabase session or recovery token, so:
 //   - a token comes only from the link's #fragment, where Supabase puts it, and only
 //     for the link types the page is for; a token in the query string (which ends up
@@ -14,7 +14,10 @@
   // TOKEN_PAGE_CSP must allow it).
   const SUPABASE_URL = 'https://quqhdnkypnuxvmibnzhn.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2O_Jk16JhJLmK7bFtLHsNQ_ifUzkz1Z';
-  const MIN_LENGTH = 8;  // MIN_PASSWORD_LENGTH in background/cloud-auth.js
+  // The shortest password the account site takes; Supabase's own minimum is set to the
+  // same (docs/supabase-auth-email-setup.md), and scripts/build-common-passwords.mjs
+  // keeps only list entries this long (#186).
+  const MIN_LENGTH = 10;
   // Parameters that carry a session or say why a link failed. When the address holds
   // any of them (in the fragment or the query), the page removes them from the address
   // bar, whether it uses them or not.

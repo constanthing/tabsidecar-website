@@ -5,6 +5,8 @@
     python3 deploy_check.py main --check    check only, stage nothing
     python3 deploy_check.py main --headers /a /b ...   the headers Pages would send on
                                             each path, as JSON (website-check.mjs serves them)
+    python3 deploy_check.py main --redirects   the _redirects rules, as JSON
+                                            {source: [destination, status]}
 
 Each Cloudflare Pages project runs this as its build command and publishes <out>, so a
 site that fails a check is never deployed. build_site.py (TabSentry/website) copies this
@@ -48,7 +50,15 @@ The checks, on the headers Pages will send (_headers, merged as Pages merges the
     and /logout only as /logout?scope=others. The page and TabSidecar share that
     session (docs: sign-in-hand-over.md, "The shared session");
   - only the delete page (delete-account.html) and its scripts name delete_my_account
-    (TabSentry#580).
+    (TabSentry#580);
+  - _redirects (TabSentry#186): the main site publishes one with REQUIRED_REDIRECTS,
+    each old account page address to the same page on the account site, and the
+    account site publishes none. Every rule is a plain path (no splat, placeholder,
+    query or fragment) to a page on ACCOUNT_ORIGIN with no query or fragment of its own,
+    so the browser keeps the link's #fragment, where Supabase puts the token; its status
+    is a redirect (301, 302, 303, 307 or 308; none is 302), never a 200 rewrite; no
+    path has two rules; and no published page answers at a redirected path (Pages
+    follows a redirect even where a file matches).
 The allow-list: publish.txt names every file the site publishes, and only those are
 staged. A listed file that is missing, a dot file and a path outside the site are refused.
 """
@@ -62,6 +72,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 SITES = {'main': HERE, 'account': HERE / 'account'}
 MANIFEST = 'publish.txt'
 HEADERS_FILE = '_headers'
+REDIRECTS_FILE = '_redirects'
 ACCOUNT_MARK = 'account'
 
 HSTS_MIN_AGE = 300  # seconds: the first deploy's value (docs: the move checklist)
@@ -141,6 +152,16 @@ SIGN_OUT = re.compile(r'(?<![\w$])signOut\s*\(|/logout(?!\?scope=others(?![\w&=]
 # bug or a stray script on any other account page can't reach it.
 DELETES_ACCOUNT = re.compile(r'\bdelete_my_account\b')
 DELETE_PAGE = 'delete-account.html'
+# The old tabsidecar.com account pages' addresses (TabSentry#186), with and without
+# .html and a trailing slash, and where each now answers. Links in emails sent before
+# TabSentry#578, and older TabSidecar versions' resets, still open them.
+ACCOUNT_ORIGIN = 'https://account.tabsidecar.com'
+REQUIRED_REDIRECTS = {f'/{page}{ending}': f'{ACCOUNT_ORIGIN}/{page}'
+                      for page in ('reset-password', 'email-confirmed') for ending in ('', '.html', '/')}
+REDIRECT_STATUS = 302
+REDIRECT_STATUSES = (301, 302, 303, 307, 308)
+PLAIN_SOURCE = re.compile(r'/[A-Za-z0-9._/-]*')
+ACCOUNT_DESTINATION = re.compile(re.escape(ACCOUNT_ORIGIN) + r'/[A-Za-z0-9._/-]*')
 HANDOVER_FIRST = re.compile(rf'(?i:\s*(?:{"|".join(PAGE_START_PARTS)}))*\s*{HANDOVER_TAG}', re.S)
 
 
@@ -408,6 +429,50 @@ def account_file_problems(path, text, test_ids):
     return problems
 
 
+def read_redirects(text):
+    """_redirects as {source: (destination, status)}, and its problems."""
+    rules, problems = {}, []
+    for number, line in enumerate(text.splitlines(), 1):
+        words = line.split()
+        if not words or words[0].startswith('#'):
+            continue
+        if len(words) not in (2, 3):
+            problems.append(f'_redirects line {number}: "{line.strip()}" is not "source destination [status]"')
+            continue
+        source, destination = words[0], words[1]
+        status = words[2] if len(words) == 3 else str(REDIRECT_STATUS)
+        if not PLAIN_SOURCE.fullmatch(source):
+            problems.append(f'_redirects line {number}: "{source}" is not a plain path (no splat, placeholder, query or fragment)')
+        if not ACCOUNT_DESTINATION.fullmatch(destination):
+            problems.append(f'_redirects line {number}: "{destination}" is not a page on {ACCOUNT_ORIGIN} without a query or fragment')
+        if not status.isdigit() or int(status) not in REDIRECT_STATUSES:
+            problems.append(f'_redirects line {number}: status "{status}" is not a redirect ({", ".join(map(str, REDIRECT_STATUSES))})')
+        if source in rules:
+            problems.append(f'_redirects line {number}: "{source}" has a rule already; the first one wins')
+            continue
+        rules[source] = (destination, int(status) if status.isdigit() else status)
+    return rules, problems
+
+
+def redirect_problems(site, read, files):
+    """The site's _redirects: required on the main site with REQUIRED_REDIRECTS, refused on
+    the account site, and no published page at an address it redirects."""
+    if site == 'account':
+        return [f'the account site publishes {REDIRECTS_FILE}; it has no redirects'] if REDIRECTS_FILE in files else []
+    text = read(REDIRECTS_FILE)
+    if REDIRECTS_FILE not in files or text is None:
+        return [f'{MANIFEST} does not publish {REDIRECTS_FILE}, so the old account page addresses answer 404']
+    rules, problems = read_redirects(text)
+    for source, destination in REQUIRED_REDIRECTS.items():
+        found = rules.get(source, (None,))[0]
+        if found != destination:
+            problems.append(f'{REDIRECTS_FILE}: {source} goes to {found or "nowhere"}, wanted {destination}')
+    pages = {address: path for path in files if path.endswith('.html') for address in page_paths(path)}
+    problems += [f'{REDIRECTS_FILE}: {source} redirects, and {pages[source]} is published there'
+                 for source in rules if source in pages]
+    return problems
+
+
 def check(site, read, test_ids=()):
     """Every problem with a site, where read(path) gives a file's text (None when missing).
     site is 'main' or 'account'. test_ids: extension IDs a local test build may name
@@ -444,6 +509,7 @@ def check(site, read, test_ids=()):
                 problems += [f'{address}: {p}' for p in meta_problems(path, text, headers.get('content-security-policy', ''))]
         if account:
             problems += account_page_problems(path, text, read, files)
+    problems += redirect_problems(site, read, files)
     if site == 'account' and '404.html' not in files:
         problems.append('no 404.html: Pages would answer every unknown address with index.html')
     if site == 'account' and HANDOVER_FILE not in files:
@@ -477,6 +543,10 @@ def main():
     if args[1] == '--headers':
         rules, _ = read_rules(disk_reader(root)(HEADERS_FILE) or '')
         print(json.dumps({path: headers_for(rules, path)[0] for path in args[2:]}))
+        return
+    if args[1] == '--redirects':
+        rules, _ = read_redirects(disk_reader(root)(REDIRECTS_FILE) or '')
+        print(json.dumps(rules))
         return
     problems = check(site, disk_reader(root))
     if problems:

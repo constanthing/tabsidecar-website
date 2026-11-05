@@ -1,4 +1,4 @@
-// email-confirmed.html: choose the account's first password after the link in the
+// account-email-confirmed.html: choose the account's first password after the link in the
 // signup (or existing-account) code email (TabSentry#171, #192). Loaded as a file,
 // not inline, so the page's CSP can allow only the site's own scripts.
 document.addEventListener('DOMContentLoaded', () => {

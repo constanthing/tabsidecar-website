@@ -1,6 +1,6 @@
-// Checks a new password against common-passwords.txt, the same list as the
-// extension's background/common-passwords.txt (built by TabSentry's
-// scripts/build-common-passwords.mjs). build_site.py copies that file next to
+// Checks a new password against common-passwords.txt, TabSentry's
+// background/common-passwords.txt (built by scripts/build-common-passwords.mjs; the
+// extension itself no longer sets passwords, #186). build_site.py copies that file next to
 // this script, so the list loads from beside it with the script's own build
 // version (serve.py serves it there in a prototype preview). The ~450 KB list
 // loads on the first check. If it can't load, the password is allowed.
