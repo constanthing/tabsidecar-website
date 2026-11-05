@@ -2,4 +2,22 @@
 # deploy_check.py (the Pages build command) publishes exactly these.
 404.html
 _headers
+assets/account-handover.js
+assets/account-page.js
+assets/account-sign-in-words.js
+assets/account-sign-in.js
+assets/account-sign-up.js
+assets/account-supabase.js
+assets/account-turnstile.js
+assets/account.css
+assets/common-passwords.js
+assets/common-passwords.txt
+assets/email-confirmed.js
+assets/icons.js
+assets/reset-password.js
+email-confirmed.html
+forgot-password.html
 index.html
+reset-password.html
+sign-in.html
+sign-up.html

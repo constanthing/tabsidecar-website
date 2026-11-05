@@ -2,25 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://quqhdnkypnuxvmibnzhn.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<script src="/assets/account-handover.js?v=202611042314"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TabSidecar account</title>
+<title>Page not found · TabSidecar</title>
 <meta name="description" content="TabSidecar's account pages.">
 <meta name="robots" content="noindex">
-<!-- The account site's only page until the account pages arrive (TabSentry#554, #579):
-     account.tabsidecar.com answers every address with it. Self-contained: no scripts,
-     no files from tabsidecar.com. -->
-<style>
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font: 16px/1.5 system-ui, sans-serif; color: #1f2328; background: #f6f7f9; }
-  main { max-width: 26rem; padding: 2rem 1.5rem; text-align: center; }
-  h1 { font-size: 1.25rem; margin: 0 0 .5rem; }
-  p { margin: 0; color: #57606a; }
-  a { color: #0b57d0; }
-</style>
+<!-- account.tabsidecar.com's answer to an address it doesn't have (TabSentry#579; Pages
+     would answer it with index.html otherwise). Its links are from the site root, since
+     it answers addresses of any depth. -->
+<link rel="stylesheet" href="/assets/account.css?v=202611042314">
 </head>
 <body>
+
+<header class="site-nav"><div class="wrap">
+  <a class="wordmark" href="https://tabsidecar.com/"><span class="logo-tile">TS</span>TabSidecar</a>
+  <a class="b sm" href="mailto:support@tabsidecar.com">Help</a>
+</div></header>
+
 <main>
-  <h1>Nothing here yet</h1>
-  <p>TabSidecar's account pages aren't open yet. Go to <a href="https://tabsidecar.com/">tabsidecar.com</a>.</p>
+  <div class="col">
+    <section class="card swin" aria-labelledby="missing-title">
+      <header class="swin-head"><span class="swin-dot"></span><span class="swin-title">Account</span></header>
+      <div class="swin-body">
+        <h1 id="missing-title">Page not found</h1>
+        <p class="copy">There’s no page at this address. To sign in or create an account, open TabSidecar and go to <b>Account</b>.</p>
+        <div class="actions"><a class="b" href="https://tabsidecar.com/">Go to tabsidecar.com</a></div>
+      </div>
+    </section>
+  </div>
 </main>
+
 </body>
 </html>

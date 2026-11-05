@@ -2,6 +2,7 @@
 // email (TabSentry#171, #178, #192). Loaded as a file, not inline, so the page's CSP
 // can allow only the site's own scripts.
 document.addEventListener('DOMContentLoaded', () => {
+  AccountPage.renderIcons();  // on tabsidecar.com mock.js has drawn them already
   const { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, MIN_LENGTH } = AccountPage;
   const LINK_TYPES = ['recovery'];  // what Supabase's reset email sends
   const $ = id => document.getElementById(id);

@@ -22,7 +22,31 @@ The checks, on the headers Pages will send (_headers, merged as Pages merges the
     unless _headers removes it). A page that looks like an account page and isn't
     marked is refused;
   - no header set twice for a page (Pages would join the values with a comma), and no
-    path with two rules.
+    path with two rules;
+  - the account site names no extension ID but TabSidecar's store IDs (STORE_EXTENSION_IDS,
+    TabSentry#578): its pages hand a signed-in session to the ID they name, and an
+    unpacked extension's ID comes from its folder path, so anyone can make one. An
+    unpacked extension can also claim any ID, the store's included, through its
+    manifest's "key" (this needs Developer mode): the list stops the site talking to an
+    unknown ID, not a Developer-mode copy that claims the store's;
+  - on the account site, the hand-over script's EXTENSION_IDS is exactly those IDs, no
+    other file calls runtime.sendMessage or runtime.connect, and every page's first
+    script is the plain hand-over tag (HANDOVER_TAG), with only <html>, <head>, <meta>,
+    comments, <noscript> and <template> before it: it takes the one-time code out of the
+    address before any other script can read it;
+  - every account page's scripts (TabSentry#579): each a <script src> of a file the site
+    publishes under assets/ (with ?v=N), or exactly TURNSTILE_SCRIPT; no inline script,
+    event handler attribute or javascript: address. A page that loads Turnstile has its
+    origin in script-src and frame-src, exactly; any other account page has neither. A
+    page's CSP meta tag says what its header says, frame-ancestors aside (a meta tag
+    can't carry it);
+  - the account site's pages and scripts keep nothing and never refresh a session: no
+    localStorage, sessionStorage, indexedDB, document.cookie or Cache Storage, no
+    refresh-token grant or refreshSession, and a supabase-js createClient only with
+    persistSession, autoRefreshToken and detectSessionInUrl false. A page that hands a
+    session to TabSidecar (its scripts name handOver) never signs it out: no signOut(),
+    and /logout only as /logout?scope=others. The page and TabSidecar share that
+    session (docs: sign-in-hand-over.md, "The shared session").
 The allow-list: publish.txt names every file the site publishes, and only those are
 staged. A listed file that is missing, a dot file and a path outside the site are refused.
 """
@@ -59,6 +83,59 @@ ACCOUNT_SIGNS = [
 UNKNOWN_PATH = '/no-such-page-554'
 # What Pages sends on every answer before _headers applies (its attachHeaders).
 PAGES_DEFAULTS = {'access-control-allow-origin': '*'}
+# TabSidecar's IDs in the browsers' stores, the only ones the account site may talk to:
+# the Chrome Web Store's, its only store. A listing in another store (Edge Add-ons) adds
+# its ID here and in account-handover.js.
+STORE_EXTENSION_IDS = ('fcgiclcbpjeccamoihlbhcihommdfame',)
+# An extension ID: 32 letters a to p, standing alone.
+EXTENSION_ID = re.compile(r'(?<![A-Za-z0-9_-])[a-p]{32}(?![A-Za-z0-9_-])')
+# The hand-over script (TabSentry#578), the only account site file that talks to the
+# extension, and its list of the IDs it talks to, as the source writes it.
+HANDOVER_FILE = 'assets/account-handover.js'
+EXTENSION_IDS_LIST = re.compile(r'\bconst\s+EXTENSION_IDS\s*=\s*\[([^\]]*)\]')
+QUOTED = re.compile(r"""'([^'\\]*)'|"([^"\\]*)\"""")
+# Talking to the extension, however it is written: any use of the runtime API
+# (chrome.runtime, chrome?.runtime, chrome['runtime'], api.runtime after an alias), and
+# sendMessage by name (destructured, or as a string key). Words in a page's text don't
+# match: "runtime" must follow a dot or be a quoted key.
+EXTENSION_API = re.compile(r'''(?:\?\.|\.)runtime\b|\[\s*['"`]runtime['"`]\s*\]|\bsendMessage\b''')
+# An account page's start: what may come before the hand-over tag, which must follow.
+# Anything else there (another script, defer or async, a <title>, <style> or attribute
+# the tag could hide in, which would keep it from running first) is refused. Comments,
+# <noscript> and <template> (none nested) never run, so they may hold anything. Each part
+# ends where the browser ends it (a comment at its first --> or --!>), and only one way
+# of reading the start fits, so a page that fails is refused at once.
+PAGE_START_PARTS = [
+    r'<!doctype html>',
+    r'<!--(?:-?>|(?:(?!--!?>).)*--!?>)',
+    r'<noscript\b[^>]*>(?:(?!<noscript\b|</noscript\b).)*</noscript\s*>',
+    r'<template\b[^>]*>(?:(?!<template\b|</template\b).)*</template\s*>',
+    r'</?(?:html|head|meta)(?:\s+[a-z-]+(?:="[^"<>]*")?)*\s*/?>',
+]
+# A page's link to one of the site's own files under assets/ (from the root or the page).
+ASSET_LINK = re.compile(r'''(?:src|href)=["']/?(assets/[^"'?#]+)''', re.I)
+HANDOVER_TAG = r'<script src="/assets/account-handover\.js\?v=\d+"></script>'
+# Cloudflare Turnstile (TabSentry#579): the one script an account page may load from
+# elsewhere, exactly this tag's src, and the origin its CSP then allows.
+TURNSTILE_ORIGIN = 'https://challenges.cloudflare.com'
+TURNSTILE_SCRIPT = f'{TURNSTILE_ORIGIN}/turnstile/v0/api.js?render=explicit'
+# An account page's scripts: every <script> tag, and the srcs it may have (a file of the
+# site's own, from the root or the page, with its build version).
+SCRIPT_TAG = re.compile(r'<script\b[^>]*>', re.I)
+SCRIPT_SRC = re.compile(r'''\ssrc\s*=\s*["']([^"']*)["']''', re.I)
+OWN_SCRIPT = re.compile(r'/?(assets/[\w.-]+\.js)\?v=\d+')
+INLINE_HANDLER = re.compile(r'<[^>]+\son[a-z]+\s*=', re.I)
+SCRIPT_URL = re.compile(r'''(?:href|src|action|formaction)\s*=\s*["']?\s*javascript:''', re.I)
+CSP_META = re.compile(r'''<meta\s+http-equiv=["']?Content-Security-Policy["']?\s+content="([^"]*)"''', re.I)
+# What would keep something on the device, or refresh the shared session.
+STORAGE = re.compile(r'\b(?:localStorage|sessionStorage|indexedDB)\b|\bdocument\s*\.\s*cookie\b|\bcaches\s*\.')
+REFRESH = re.compile(r'grant_type=refresh_token|\brefreshSession\b')
+CREATE_CLIENT = re.compile(r'\bcreateClient\s*\(')
+CLIENT_SETTINGS = ('persistSession', 'autoRefreshToken', 'detectSessionInUrl')
+# On a page that hands a session over: a sign-out of it.
+HANDS_OVER = re.compile(r'\bhandOver\b')
+SIGN_OUT = re.compile(r'(?<![\w$])signOut\s*\(|/logout(?!\?scope=others(?![\w&=]))')
+HANDOVER_FIRST = re.compile(rf'(?i:\s*(?:{"|".join(PAGE_START_PARTS)}))*\s*{HANDOVER_TAG}', re.S)
 
 
 def read_rules(text):
@@ -128,8 +205,9 @@ def connect_problems(csp):
     return [f'CSP connect-src allows {" ".join(loose)}; only \'self\' and https origins'] if loose else []
 
 
-def page_problems(headers, twice, account, not_found=False):
-    """What one page's headers lack, as Pages would send them (not_found: a 404 answer)."""
+def page_problems(headers, twice, account, not_found=False, turnstile=False):
+    """What one page's headers lack, as Pages would send them (not_found: a 404 answer;
+    turnstile: an account page that loads Turnstile)."""
     problems = [f'{name} is set by more than one rule' for name in sorted(twice)]
     hsts = headers.get('strict-transport-security', '')
     age = re.search(r'max-age=(\d+)', hsts)
@@ -146,9 +224,13 @@ def page_problems(headers, twice, account, not_found=False):
         return problems + ['no Content-Security-Policy']
     csp = policy(csp_header)
     wanted = ACCOUNT_POLICY if account else SITE_POLICY
+    if account:
+        wanted = account_policy(turnstile)
     for name, value in wanted.items():
         if csp.get(name) != value:
             problems.append(f'CSP {name} is "{csp.get(name, "missing")}", wanted "{value}"')
+    if account and not turnstile and 'frame-src' in csp:
+        problems.append(f'CSP frame-src is "{csp["frame-src"]}" on a page that loads no Turnstile, wanted none')
     if not account and csp.get('frame-ancestors') not in FRAME_ANCESTORS_SITE:
         problems.append(f'CSP frame-ancestors is "{csp.get("frame-ancestors", "missing")}", wanted one of {", ".join(FRAME_ANCESTORS_SITE)}')
     problems += connect_problems(csp)
@@ -163,6 +245,86 @@ def page_problems(headers, twice, account, not_found=False):
     elif referrer not in SITE_REFERRER:
         problems.append(f'Referrer-Policy is "{referrer}", wanted one of {", ".join(SITE_REFERRER)}')
     return problems
+
+
+def account_policy(turnstile):
+    """ACCOUNT_POLICY, with Turnstile's origin in script-src and frame-src for a page
+    that loads it."""
+    if not turnstile:
+        return ACCOUNT_POLICY
+    return dict(ACCOUNT_POLICY, **{'script-src': f"'self' {TURNSTILE_ORIGIN}", 'frame-src': TURNSTILE_ORIGIN})
+
+
+def loads_turnstile(text):
+    return any(SCRIPT_SRC.search(tag) and SCRIPT_SRC.search(tag).group(1) == TURNSTILE_SCRIPT
+               for tag in SCRIPT_TAG.findall(text))
+
+
+def script_problems(path, text, files):
+    """An account page's scripts that aren't the site's own published files or Turnstile's,
+    and anything that runs script inline."""
+    problems = []
+    for tag in SCRIPT_TAG.findall(text):
+        src = SCRIPT_SRC.search(tag)
+        if not src:
+            problems.append(f'{path}: an inline <script>; an account page runs only files')
+            continue
+        own = OWN_SCRIPT.fullmatch(src.group(1))
+        if src.group(1) != TURNSTILE_SCRIPT and not (own and own.group(1) in files):
+            problems.append(f'{path}: loads the script "{src.group(1)}", neither a published assets/ file (?v=N) nor {TURNSTILE_SCRIPT}')
+    if INLINE_HANDLER.search(text):
+        problems.append(f'{path}: an inline event handler attribute (on...=)')
+    if SCRIPT_URL.search(text):
+        problems.append(f'{path}: a javascript: address')
+    return problems
+
+
+def meta_problems(path, text, header_csp):
+    """A page's CSP meta tag, unless it says what its header says (frame-ancestors aside)."""
+    metas = CSP_META.findall(text)
+    if not metas:
+        return []
+    wanted = {name: value for name, value in policy(header_csp).items() if name != 'frame-ancestors'}
+    if len(metas) > 1 or policy(metas[0]) != wanted:
+        return [f'{path}: its CSP meta tag says "{"; ".join(metas)}", not what its header says']
+    return []
+
+
+def keeping_problems(path, text):
+    """An account site file that keeps something or refreshes a session."""
+    problems = []
+    if STORAGE.search(text):
+        problems.append(f'{path}: uses storage ({STORAGE.search(text).group(0)}); an account page keeps nothing')
+    if REFRESH.search(text):
+        problems.append(f'{path}: refreshes a session ({REFRESH.search(text).group(0)}); TabSidecar refreshes the shared session')
+    for call in CREATE_CLIENT.finditer(text):
+        settings = text[call.end():call.end() + 600]
+        unset = [name for name in CLIENT_SETTINGS if not re.search(rf'\b{name}\s*:\s*false\b', settings)]
+        if unset:
+            problems.append(f'{path}: createClient without {", ".join(unset)} false')
+    return problems
+
+
+def handover_problems(path, scripts):
+    """A page that hands a session over (scripts: {path: text} of the page and its own
+    scripts, the hand-over script aside) and signs a session out."""
+    if not any(HANDS_OVER.search(text) for text in scripts.values()):
+        return []
+    return [f'{path}: hands a session to TabSidecar, and {name} signs out ({SIGN_OUT.search(text).group(0)}); '
+            'only /logout?scope=others before the hand-over'
+            for name, text in sorted(scripts.items()) if SIGN_OUT.search(text)]
+
+
+def account_page_problems(path, text, read, files):
+    """An account page's scripts, and on a hand-over page its sign-outs."""
+    problems = script_problems(path, text, files)
+    scripts = {path: text}
+    for tag in SCRIPT_TAG.findall(text):
+        src = SCRIPT_SRC.search(tag)
+        own = src and OWN_SCRIPT.fullmatch(src.group(1))
+        if own and own.group(1) in files and own.group(1) != HANDOVER_FILE:
+            scripts[own.group(1)] = read(own.group(1)) or ''
+    return problems + handover_problems(path, scripts)
 
 
 def page_paths(name):
@@ -193,9 +355,47 @@ def read_manifest(text):
     return files, problems
 
 
-def check(site, read):
+def extension_id_problems(path, text, test_ids):
+    """The extension IDs in one account site file that aren't TabSidecar's store IDs."""
+    allowed = set(STORE_EXTENSION_IDS) | set(test_ids)
+    found = sorted(set(EXTENSION_ID.findall(text)) - allowed)
+    return [f'{path}: names the extension ID {found_id}, not one of TabSidecar\'s store IDs' for found_id in found]
+
+
+def extension_list_problems(text, test_ids):
+    """The hand-over script's EXTENSION_IDS, unless it is one list of exactly the store IDs
+    (and test_ids), each quoted: the ID scan can't see one built some other way."""
+    lists = EXTENSION_IDS_LIST.findall(text)
+    if len(lists) != 1:
+        return [f'{HANDOVER_FILE}: has {len(lists)} "const EXTENSION_IDS = [...]" lists, wanted exactly one']
+    ids = {single or double for single, double in QUOTED.findall(lists[0])}
+    unquoted = QUOTED.sub('', lists[0]).replace(',', '').strip()
+    wanted = set(STORE_EXTENSION_IDS) | set(test_ids)
+    if unquoted or ids != wanted:
+        return [f'{HANDOVER_FILE}: EXTENSION_IDS is [{lists[0].strip()}], wanted the quoted IDs {", ".join(sorted(wanted))}']
+    return []
+
+
+def account_file_problems(path, text, test_ids):
+    """One account site file: the extension IDs it names, whether it talks to the extension
+    though it isn't the hand-over script, and for a page whether that script runs first."""
+    problems = extension_id_problems(path, text, test_ids)
+    if path == HANDOVER_FILE:
+        return problems + extension_list_problems(text, test_ids)
+    problems += keeping_problems(path, text)
+    if EXTENSION_API.search(text):
+        problems.append(f'{path}: talks to the extension (the runtime API or sendMessage); only {HANDOVER_FILE} may')
+    if path.endswith('.html') and not HANDOVER_FIRST.match(text):
+        problems.append(f'{path}: its first script must be account-handover.js, as <script src="/assets/account-handover.js?v=N"></script> '
+                        'with only <html>, <head>, <meta>, comments, <noscript> and <template> before it, '
+                        'so the code leaves the address before any other script runs')
+    return problems
+
+
+def check(site, read, test_ids=()):
     """Every problem with a site, where read(path) gives a file's text (None when missing).
-    site is 'main' or 'account'."""
+    site is 'main' or 'account'. test_ids: extension IDs a local test build may name
+    (build_site.py --test-extension-id); the Pages build command never passes any."""
     manifest, headers_text = read(MANIFEST), read(HEADERS_FILE)
     if manifest is None or headers_text is None:
         return [f'no {MANIFEST} or {HEADERS_FILE}: not a built site']
@@ -209,18 +409,29 @@ def check(site, read):
         if text is None:
             problems.append(f'{path}: listed in {MANIFEST} and missing')
             continue
+        if site == 'account':
+            problems += account_file_problems(path, text, test_ids)
         if not path.endswith('.html'):
             continue
+        problems += [f'{path}: links {asset}, which {MANIFEST} does not publish'
+                     for asset in sorted(set(ASSET_LINK.findall(text))) if asset not in files]
         looks_account = any(sign.search(text) for sign in ACCOUNT_SIGNS)
         if looks_account and not marked and site == 'main':
             problems.append(f'{path}: an account page (password field, CSP meta tag or account-page.js) that {MANIFEST} does not mark "{ACCOUNT_MARK}"')
         account = marked or looks_account or site == 'account'
+        turnstile = account and loads_turnstile(text)
         for address in page_paths(path):
             not_found = address == UNKNOWN_PATH
             headers, twice = headers_for(rules, address, not_found)
-            problems += [f'{address}: {p}' for p in page_problems(headers, twice, account, not_found)]
+            problems += [f'{address}: {p}' for p in page_problems(headers, twice, account, not_found, turnstile)]
+            if account:
+                problems += [f'{address}: {p}' for p in meta_problems(path, text, headers.get('content-security-policy', ''))]
+        if account:
+            problems += account_page_problems(path, text, read, files)
     if site == 'account' and '404.html' not in files:
         problems.append('no 404.html: Pages would answer every unknown address with index.html')
+    if site == 'account' and HANDOVER_FILE not in files:
+        problems.append(f'{MANIFEST} does not list {HANDOVER_FILE}, which every account page loads first')
     return problems
 
 
